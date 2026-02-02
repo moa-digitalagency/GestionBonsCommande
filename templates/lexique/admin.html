@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion Dictionnaire - BTP Commande{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Gestion du Dictionnaire</h1>
+        <p class="text-gray-600">Validez les suggestions et gérez les termes</p>
+    </div>
+    <a href="{{ url_for('lexique.add_entry') }}" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <i class="fas fa-plus mr-2"></i> Ajouter un terme
+    </a>
+</div>
+
+{% if pending %}
+<div class="bg-white rounded-lg shadow mb-6">
+    <div class="px-6 py-4 border-b bg-yellow-50">
+        <h2 class="text-lg font-semibold text-yellow-800">
+            <i class="fas fa-clock mr-2"></i> Suggestions en attente ({{ pending|length }})
+        </h2>
+    </div>
+    <div class="divide-y">
+        {% for suggestion in pending %}
+        <div class="p-6">
+            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+                <div class="flex-1">
+                    <p class="font-medium text-lg text-gray-900">{{ suggestion.original_term }}</p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Suggéré par {{ suggestion.suggested_by_user.full_name }} - {{ suggestion.created_at.strftime('%d/%m/%Y') }}
+                    </p>
+                    {% if suggestion.context %}
+                    <p class="text-sm text-gray-600 mt-2">{{ suggestion.context }}</p>
+                    {% endif %}
+                    
+                    <div class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                        {% for lang, trans in suggestion.suggested_translations.items() %}
+                        <div class="bg-gray-50 px-2 py-1 rounded">
+                            <span class="text-gray-500">{{ lang }}:</span> {{ trans }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="flex gap-2">
+                    <form method="POST" action="{{ url_for('lexique.approve_suggestion', suggestion_id=suggestion.id) }}" class="inline">
+                        {% for lang, trans in suggestion.suggested_translations.items() %}
+                        <input type="hidden" name="translation_{{ lang }}" value="{{ trans }}">
+                        {% endfor %}
+                        <input type="hidden" name="category" value="{{ suggestion.category or 'general' }}">
+                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-check mr-1"></i> Approuver
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('lexique.reject_suggestion', suggestion_id=suggestion.id) }}" class="inline">
+                        <button type="submit" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">
+                            <i class="fas fa-times mr-1"></i> Rejeter
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b">
+        <h2 class="text-lg font-semibold">Historique récent</h2>
+    </div>
+    <div class="divide-y">
+        {% for suggestion in recent %}
+        <div class="px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="font-medium text-gray-900">{{ suggestion.original_term }}</p>
+                    <p class="text-sm text-gray-500">{{ suggestion.suggested_by_user.full_name }}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 text-xs rounded-full {% if suggestion.status == 'approved' %}bg-green-100 text-green-600{% else %}bg-red-100 text-red-600{% endif %}">
+                        {{ 'Approuvé' if suggestion.status == 'approved' else 'Rejeté' }}
+                    </span>
+                    <span class="text-xs text-gray-400">{{ suggestion.reviewed_at.strftime('%d/%m/%Y') if suggestion.reviewed_at else '' }}</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="px-6 py-4 text-gray-500 text-center">Aucun historique</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

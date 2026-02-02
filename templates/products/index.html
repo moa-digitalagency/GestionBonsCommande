@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Articles - BTP Commande{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Catalogue Articles</h1>
+    {% if current_user.role in ['admin', 'super_admin'] %}
+    <a href="{{ url_for('products.add') }}" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <i class="fas fa-plus mr-2"></i> Nouvel article
+    </a>
+    {% endif %}
+</div>
+
+<div class="bg-white rounded-lg shadow mb-6 p-4">
+    <form method="GET" class="flex flex-wrap gap-4">
+        <select name="category" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Toutes catégories</option>
+            <option value="materiau" {% if current_category == 'materiau' %}selected{% endif %}>Matériaux</option>
+            <option value="materiel" {% if current_category == 'materiel' %}selected{% endif %}>Matériel</option>
+        </select>
+        <button type="submit" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+            <i class="fas fa-filter mr-1"></i> Filtrer
+        </button>
+    </form>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    {% if products %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Libellé</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unité</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Prix</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for product in products %}
+                <tr class="hover:bg-gray-50 {% if not product.is_active %}opacity-50{% endif %}">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ product.reference or '-' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <p class="font-medium text-gray-900">{{ product.get_label('fr') }}</p>
+                        {% if product.labels.get('ar') %}
+                        <p class="text-sm text-gray-500" dir="rtl">{{ product.labels.ar }}</p>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded-full {% if product.category == 'materiau' %}bg-blue-100 text-blue-600{% else %}bg-green-100 text-green-600{% endif %}">
+                            {{ 'Matériau' if product.category == 'materiau' else 'Matériel' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {{ product.unit }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-600 hidden md:table-cell">
+                        {{ '%.2f MAD' % product.unit_price if product.unit_price else '-' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        {% if current_user.role in ['admin', 'super_admin'] %}
+                        <a href="{{ url_for('products.edit', product_id=product.id) }}" class="text-blue-600 hover:text-blue-800 mr-3">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="px-6 py-12 text-center text-gray-500">
+        <i class="fas fa-boxes text-5xl mb-4"></i>
+        <p class="text-lg">Aucun article</p>
+        {% if current_user.role in ['admin', 'super_admin'] %}
+        <a href="{{ url_for('products.add') }}" class="mt-4 inline-block text-blue-600 hover:underline">
+            Ajouter votre premier article
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

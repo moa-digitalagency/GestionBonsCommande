@@ -1,0 +1,156 @@
+import os
+from datetime import datetime
+from weasyprint import HTML, CSS
+from flask import render_template, current_app
+
+class PDFService:
+    @staticmethod
+    def generate_order_pdf(order):
+        if not order.can_generate_pdf():
+            if order.status not in ['PDF_GENERE', 'PARTAGE']:
+                raise ValueError("Le BC doit être validé avant de générer le PDF")
+        
+        company = order.company
+        project = order.project
+        lines = order.lines.order_by('line_number').all()
+        
+        html_content = render_template('pdf/order_pdf.html',
+            order=order,
+            company=company,
+            project=project,
+            lines=lines,
+            generated_at=datetime.utcnow()
+        )
+        
+        css = CSS(string='''
+            @page {
+                size: A4;
+                margin: 1.5cm;
+            }
+            body {
+                font-family: Arial, sans-serif;
+                font-size: 11pt;
+                line-height: 1.4;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 2px solid #333;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+            }
+            .logo {
+                max-height: 80px;
+                max-width: 200px;
+            }
+            .company-info {
+                text-align: right;
+                font-size: 10pt;
+            }
+            .company-name {
+                font-size: 14pt;
+                font-weight: bold;
+                color: #2563eb;
+            }
+            .bc-title {
+                text-align: center;
+                font-size: 18pt;
+                font-weight: bold;
+                margin: 20px 0;
+                color: #1e40af;
+            }
+            .bc-number {
+                text-align: center;
+                font-size: 14pt;
+                margin-bottom: 20px;
+            }
+            .info-section {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 20px;
+            }
+            .info-box {
+                width: 48%;
+                border: 1px solid #ddd;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            .info-box h3 {
+                margin: 0 0 10px 0;
+                font-size: 12pt;
+                color: #374151;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+            }
+            th {
+                background-color: #2563eb;
+                color: white;
+                padding: 10px;
+                text-align: left;
+                font-size: 10pt;
+            }
+            td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                font-size: 10pt;
+            }
+            tr:nth-child(even) {
+                background-color: #f9fafb;
+            }
+            .total-row {
+                font-weight: bold;
+                background-color: #e5e7eb !important;
+            }
+            .footer {
+                margin-top: 30px;
+                border-top: 1px solid #ddd;
+                padding-top: 15px;
+                font-size: 9pt;
+                color: #6b7280;
+            }
+            .legal-info {
+                margin-bottom: 10px;
+            }
+            .signature-section {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 40px;
+            }
+            .signature-box {
+                width: 45%;
+                border-top: 1px solid #333;
+                padding-top: 10px;
+                text-align: center;
+            }
+            .notes {
+                background-color: #fffbeb;
+                border: 1px solid #fbbf24;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 15px 0;
+            }
+        ''')
+        
+        uploads_dir = os.path.join(current_app.root_path, 'statics', 'uploads', 'pdfs')
+        os.makedirs(uploads_dir, exist_ok=True)
+        
+        filename = f"BC_{order.bc_number.replace('-', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        filepath = os.path.join(uploads_dir, filename)
+        
+        html = HTML(string=html_content, base_url=current_app.root_path)
+        html.write_pdf(filepath, stylesheets=[css])
+        
+        relative_path = os.path.join('statics', 'uploads', 'pdfs', filename)
+        
+        return relative_path
+    
+    @staticmethod
+    def get_pdf_path(order):
+        if order.pdf_path:
+            return os.path.join(current_app.root_path, order.pdf_path)
+        return None

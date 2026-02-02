@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}BTP Commande - Gestion de Bons de Commande{% endblock %}
+
+{% block guest_content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex flex-col">
+    <nav class="p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <span class="text-white text-2xl font-bold">BTP Commande</span>
+            <div class="space-x-4">
+                <a href="{{ url_for('auth.login') }}" class="text-white hover:text-blue-200">Connexion</a>
+                <a href="{{ url_for('auth.register') }}" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50">Inscription</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="flex-1 flex items-center">
+        <div class="max-w-7xl mx-auto px-4 py-16 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+                Gestion de Bons de Commande BTP
+            </h1>
+            <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                Solution SaaS multilingue pour digitaliser et standardiser vos bons de commande de matériaux et matériels de construction au Maroc.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+                <a href="{{ url_for('auth.register') }}" class="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 shadow-lg">
+                    Commencer gratuitement
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-600">
+                    Se connecter
+                </a>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mt-12">
+                <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-white">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-language text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Multilingue</h3>
+                    <p class="text-blue-100">Support du Français, Arabe, Darija et plus encore avec dictionnaire BTP intégré.</p>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-white">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-file-pdf text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">PDF Professionnel</h3>
+                    <p class="text-blue-100">Génération de documents conformes avec ICE, RC et mentions légales marocaines.</p>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-white">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-whatsapp text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Partage Facile</h3>
+                    <p class="text-blue-100">Envoyez vos BC directement via WhatsApp ou Email depuis le chantier.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="p-4 text-center text-blue-200">
+        <p>&copy; 2024 BTP Commande - Solution de gestion pour le BTP au Maroc</p>
+    </footer>
+</div>
+{% endblock %}

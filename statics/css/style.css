@@ -1,0 +1,62 @@
+/* Custom styles for BTP Commande */
+
+/* Arabic text support */
+[dir="rtl"] {
+    text-align: right;
+}
+
+/* Mobile-first responsive adjustments */
+@media (max-width: 640px) {
+    .mobile-full {
+        width: 100%;
+    }
+}
+
+/* Print styles for PDF */
+@media print {
+    body {
+        font-size: 10pt;
+    }
+    
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* Loading spinner */
+.spinner {
+    border: 2px solid #f3f4f6;
+    border-top: 2px solid #2563eb;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Status badge colors */
+.status-brouillon { background-color: #f3f4f6; color: #4b5563; }
+.status-soumis { background-color: #fef3c7; color: #d97706; }
+.status-valide { background-color: #d1fae5; color: #059669; }
+.status-pdf { background-color: #dbeafe; color: #2563eb; }
+.status-partage { background-color: #e9d5ff; color: #7c3aed; }
+
+/* Focus styles */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Table hover effect */
+tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Card hover effect */
+.card-hover:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}

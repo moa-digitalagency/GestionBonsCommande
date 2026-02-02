@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bon de Commande {{ order.bc_number }}</title>
+</head>
+<body>
+    <div class="header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                {% if company.logo_path %}
+                <img src="{{ url_for('static', filename=company.logo_path) }}" alt="Logo" class="logo">
+                {% endif %}
+            </div>
+            <div class="company-info">
+                <div class="company-name">{{ company.name }}</div>
+                {% if company.address %}<div>{{ company.address }}</div>{% endif %}
+                {% if company.city %}<div>{{ company.city }}</div>{% endif %}
+                {% if company.phone %}<div>Tél: {{ company.phone }}</div>{% endif %}
+                {% if company.email %}<div>{{ company.email }}</div>{% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="bc-title">BON DE COMMANDE</div>
+    <div class="bc-number">N° {{ order.bc_number }}</div>
+    
+    <div class="info-section">
+        <div class="info-box">
+            <h3>Chantier</h3>
+            <p><strong>{{ project.name }}</strong></p>
+            {% if project.address %}<p>{{ project.address }}</p>{% endif %}
+            {% if project.city %}<p>{{ project.city }}</p>{% endif %}
+            {% if project.contact_name %}<p>Contact: {{ project.contact_name }}</p>{% endif %}
+            {% if project.contact_phone %}<p>Tél: {{ project.contact_phone }}</p>{% endif %}
+        </div>
+        
+        <div class="info-box">
+            <h3>Informations</h3>
+            <p>Date: {{ generated_at.strftime('%d/%m/%Y') }}</p>
+            {% if order.requested_date %}
+            <p>Livraison souhaitée: {{ order.requested_date.strftime('%d/%m/%Y') }}</p>
+            {% endif %}
+            {% if order.supplier_name %}
+            <p><strong>Fournisseur:</strong> {{ order.supplier_name }}</p>
+            {% if order.supplier_phone %}<p>Tél: {{ order.supplier_phone }}</p>{% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 45%;">Désignation</th>
+                <th style="width: 15%; text-align: right;">Quantité</th>
+                <th style="width: 10%;">Unité</th>
+                <th style="width: 12%; text-align: right;">Prix U.</th>
+                <th style="width: 13%; text-align: right;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set total = namespace(value=0) %}
+            {% for line in lines %}
+            <tr>
+                <td>{{ line.line_number }}</td>
+                <td>
+                    {{ line.description }}
+                    {% if line.note %}
+                    <br><em style="font-size: 9pt; color: #666;">{{ line.note }}</em>
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">{{ line.quantity }}</td>
+                <td>{{ line.unit }}</td>
+                <td style="text-align: right;">
+                    {% if line.unit_price %}{{ '%.2f' % line.unit_price }}{% else %}-{% endif %}
+                </td>
+                <td style="text-align: right;">
+                    {% if line.unit_price %}
+                        {% set subtotal = line.quantity|float * line.unit_price|float %}
+                        {% set total.value = total.value + subtotal %}
+                        {{ '%.2f' % subtotal }}
+                    {% else %}-{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        {% if total.value > 0 %}
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="5" style="text-align: right;"><strong>TOTAL HT:</strong></td>
+                <td style="text-align: right;"><strong>{{ '%.2f' % total.value }} MAD</strong></td>
+            </tr>
+        </tfoot>
+        {% endif %}
+    </table>
+    
+    {% if order.notes %}
+    <div class="notes">
+        <strong>Notes:</strong> {{ order.notes }}
+    </div>
+    {% endif %}
+    
+    <div class="signature-section">
+        <div class="signature-box">
+            <p>Demandé par</p>
+            <p style="font-size: 10pt; color: #666;">{{ order.creator.full_name }}</p>
+        </div>
+        <div class="signature-box">
+            <p>Validé par</p>
+            {% if order.validator %}
+            <p style="font-size: 10pt; color: #666;">{{ order.validator.full_name }}</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="legal-info">
+            {% if company.ice %}<strong>ICE:</strong> {{ company.ice }} | {% endif %}
+            {% if company.rc %}<strong>RC:</strong> {{ company.rc }} | {% endif %}
+            {% if company.patente %}<strong>Patente:</strong> {{ company.patente }} | {% endif %}
+            {% if company.if_number %}<strong>IF:</strong> {{ company.if_number }}{% endif %}
+        </div>
+        {% if company.bc_footer %}
+        <div>{{ company.bc_footer }}</div>
+        {% endif %}
+        <div style="margin-top: 10px; text-align: center; font-size: 8pt;">
+            Document généré le {{ generated_at.strftime('%d/%m/%Y à %H:%M') }} - BTP Commande
+        </div>
+    </div>
+</body>
+</html>

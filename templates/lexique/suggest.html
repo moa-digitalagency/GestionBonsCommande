@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Suggérer un terme - BTP Commande{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="flex items-center mb-6">
+        <a href="{{ url_for('lexique.index') }}" class="text-gray-500 hover:text-gray-700 mr-4">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="text-2xl font-bold text-gray-900">Suggérer un terme</h1>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6">
+        <p class="text-gray-600 mb-6">
+            Vous ne trouvez pas un terme dans le dictionnaire ? Suggérez-le ! Un administrateur validera votre suggestion et elle sera disponible pour tous.
+        </p>
+        
+        <form method="POST" class="space-y-6">
+            <div>
+                <label for="original_term" class="block text-sm font-medium text-gray-700">Terme original *</label>
+                <input type="text" name="original_term" id="original_term" required
+                       class="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="Le terme que vous souhaitez ajouter">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="source_language" class="block text-sm font-medium text-gray-700">Langue du terme</label>
+                    <select name="source_language" id="source_language"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Non spécifiée</option>
+                        <option value="fr">Français</option>
+                        <option value="ar">Arabe</option>
+                        <option value="darija_lat">Darija (Latin)</option>
+                        <option value="en">Anglais</option>
+                        <option value="es">Espagnol</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700">Catégorie</label>
+                    <select name="category" id="category"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="general">Général</option>
+                        <option value="materiau">Matériau</option>
+                        <option value="materiel">Matériel</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="border-t pt-4">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">Traductions proposées</h3>
+                <p class="text-xs text-gray-500 mb-4">Remplissez au moins une traduction</p>
+                <div class="space-y-4">
+                    {% for lang in languages %}
+                    <div>
+                        <label for="translation_{{ lang }}" class="block text-sm text-gray-600">
+                            {% if lang == 'fr' %}Français{% elif lang == 'ar' %}العربية{% elif lang == 'darija_lat' %}Darija (Latin){% elif lang == 'en' %}English{% elif lang == 'es' %}Español{% endif %}
+                        </label>
+                        <input type="text" name="translation_{{ lang }}" id="translation_{{ lang }}"
+                               {% if lang == 'ar' %}dir="rtl"{% endif %}
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div>
+                <label for="context" class="block text-sm font-medium text-gray-700">Contexte d'utilisation</label>
+                <textarea name="context" id="context" rows="2"
+                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Expliquez dans quel contexte ce terme est utilisé..."></textarea>
+            </div>
+            
+            <div class="flex justify-end space-x-4 pt-4">
+                <a href="{{ url_for('lexique.index') }}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                    Annuler
+                </a>
+                <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="fas fa-paper-plane mr-2"></i> Envoyer la suggestion
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Chantiers - BTP Commande{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Chantiers</h1>
+    {% if current_user.role in ['admin', 'super_admin'] %}
+    <a href="{{ url_for('projects.add') }}" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <i class="fas fa-plus mr-2"></i> Nouveau chantier
+    </a>
+    {% endif %}
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for project in projects %}
+    <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+        <div class="p-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ project.name }}</h3>
+                    {% if project.code %}
+                    <p class="text-sm text-gray-500">{{ project.code }}</p>
+                    {% endif %}
+                </div>
+                {% if not project.is_active %}
+                <span class="px-2 py-1 text-xs bg-red-100 text-red-600 rounded">Inactif</span>
+                {% endif %}
+            </div>
+            
+            <div class="mt-4 space-y-2 text-sm text-gray-600">
+                {% if project.city or project.address %}
+                <p><i class="fas fa-map-marker-alt mr-2 text-gray-400"></i> {{ project.city or project.address }}</p>
+                {% endif %}
+                {% if project.contact_name %}
+                <p><i class="fas fa-user mr-2 text-gray-400"></i> {{ project.contact_name }}</p>
+                {% endif %}
+                {% if project.contact_phone %}
+                <p><i class="fas fa-phone mr-2 text-gray-400"></i> {{ project.contact_phone }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="mt-4 pt-4 border-t flex justify-between items-center">
+                <span class="text-sm text-gray-500">{{ project.orders.count() }} commandes</span>
+                <div class="space-x-2">
+                    <a href="{{ url_for('projects.view', project_id=project.id) }}" class="text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    {% if current_user.role in ['admin', 'super_admin'] %}
+                    <a href="{{ url_for('projects.edit', project_id=project.id) }}" class="text-green-600 hover:text-green-800">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-span-full bg-white rounded-lg shadow p-12 text-center">
+        <i class="fas fa-hard-hat text-5xl text-gray-300 mb-4"></i>
+        <p class="text-lg text-gray-500">Aucun chantier</p>
+        {% if current_user.role in ['admin', 'super_admin'] %}
+        <a href="{{ url_for('projects.add') }}" class="mt-4 inline-block text-blue-600 hover:underline">
+            Créer votre premier chantier
+        </a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

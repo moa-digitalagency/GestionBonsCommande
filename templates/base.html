@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BTP Commande{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="h-full bg-gray-100" x-data="{ sidebarOpen: false }">
+    {% block body %}
+    {% if current_user.is_authenticated %}
+    <div class="min-h-full">
+        <nav class="bg-blue-700 shadow-lg">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center justify-between">
+                    <div class="flex items-center">
+                        <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-white mr-4">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <a href="{{ url_for('main.dashboard') }}" class="flex-shrink-0">
+                            <span class="text-white text-xl font-bold">BTP Commande</span>
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="{{ url_for('main.dashboard') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-home mr-1"></i> Tableau de bord
+                            </a>
+                            {% if current_user.role != 'super_admin' %}
+                            <a href="{{ url_for('orders.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-file-alt mr-1"></i> Bons de Commande
+                            </a>
+                            <a href="{{ url_for('projects.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-hard-hat mr-1"></i> Chantiers
+                            </a>
+                            <a href="{{ url_for('products.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-boxes mr-1"></i> Articles
+                            </a>
+                            {% endif %}
+                            <a href="{{ url_for('lexique.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-book mr-1"></i> Dictionnaire
+                            </a>
+                            {% if current_user.role == 'super_admin' %}
+                            <a href="{{ url_for('admin.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-cog mr-1"></i> Administration
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-white hover:bg-blue-600 px-3 py-2 rounded-md">
+                                <span class="mr-2 hidden sm:block">{{ current_user.first_name }}</span>
+                                <i class="fas fa-user-circle text-xl"></i>
+                            </button>
+                            <div x-show="open" @click.away="open = false" 
+                                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                                <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i> Mon profil
+                                </a>
+                                {% if current_user.role in ['admin', 'super_admin'] and current_user.company_id %}
+                                <a href="{{ url_for('company.settings') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-building mr-2"></i> Paramètres société
+                                </a>
+                                {% endif %}
+                                <hr class="my-1">
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <div x-show="sidebarOpen" class="fixed inset-0 z-40 md:hidden" @click="sidebarOpen = false">
+            <div class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
+            <div class="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
+                <div class="flex h-16 items-center justify-between px-4 bg-blue-700">
+                    <span class="text-white font-bold">Menu</span>
+                    <button @click="sidebarOpen = false" class="text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <nav class="flex-1 overflow-y-auto p-4">
+                    <a href="{{ url_for('main.dashboard') }}" class="block py-2 text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-home mr-2"></i> Tableau de bord
+                    </a>
+                    {% if current_user.role != 'super_admin' %}
+                    <a href="{{ url_for('orders.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-file-alt mr-2"></i> Bons de Commande
+                    </a>
+                    <a href="{{ url_for('projects.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-hard-hat mr-2"></i> Chantiers
+                    </a>
+                    <a href="{{ url_for('products.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-boxes mr-2"></i> Articles
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('lexique.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-book mr-2"></i> Dictionnaire BTP
+                    </a>
+                    {% if current_user.role == 'super_admin' %}
+                    <a href="{{ url_for('admin.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-cog mr-2"></i> Administration
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+
+        <main class="py-6">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="mb-4">
+                    {% for category, message in messages %}
+                    <div class="p-4 mb-2 rounded-lg {% if category == 'success' %}bg-green-100 text-green-700{% elif category == 'danger' %}bg-red-100 text-red-700{% elif category == 'warning' %}bg-yellow-100 text-yellow-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    {% else %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="fixed top-4 right-4 z-50 w-80">
+        {% for category, message in messages %}
+        <div class="p-4 mb-2 rounded-lg shadow-lg {% if category == 'success' %}bg-green-100 text-green-700{% elif category == 'danger' %}bg-red-100 text-red-700{% elif category == 'warning' %}bg-yellow-100 text-yellow-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    
+    {% block guest_content %}{% endblock %}
+    {% endif %}
+    {% endblock %}
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
