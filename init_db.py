@@ -9,13 +9,46 @@ from models import db
 from models.company import Company
 from models.user import User
 from models.lexique import LexiqueEntry
+from sqlalchemy import inspect, text
 
 def init_database():
     app = create_app()
     
     with app.app_context():
-        db.create_all()
-        print("Tables created successfully!")
+        inspector = inspect(db.engine)
+        existing_tables = inspector.get_table_names()
+
+        # Iterate over all models defined in SQLAlchemy metadata
+        for table_name, table in db.metadata.tables.items():
+            if table_name not in existing_tables:
+                print(f"Creating table: {table_name}")
+                table.create(db.engine)
+            else:
+                print(f"Checking table: {table_name}")
+                existing_columns = [c['name'] for c in inspector.get_columns(table_name)]
+
+                for column in table.columns:
+                    if column.name not in existing_columns:
+                        print(f"Adding missing column: {column.name} to {table_name}")
+                        # Compile the column type to SQL string
+                        col_type = column.type.compile(db.engine.dialect)
+
+                        # Handle Nullability (SQLite ADD COLUMN implies nullable usually unless DEFAULT is provided)
+                        # We will default to simply adding the column. Ideally we should handle defaults.
+                        # If the column is NOT NULL but has no default, SQLite will error.
+                        # We assume for now that schema updates are compatible (nullable or with default).
+
+                        try:
+                            with db.engine.connect() as conn:
+                                # SQLite requires separate ALTER TABLE statements for each column
+                                sql = f'ALTER TABLE "{table_name}" ADD COLUMN "{column.name}" {col_type}'
+                                conn.execute(text(sql))
+                                conn.commit()
+                                print(f"Successfully added column {column.name}")
+                        except Exception as e:
+                            print(f"Error adding column {column.name} to {table_name}: {e}")
+
+        print("Schema verification complete!")
         
         if not User.query.filter_by(email='admin@btpcommande.ma').first():
             admin = User(
