@@ -1,3 +1,11 @@
+{#
+ /* * Nom de l'application : BTP Commande
+  * Description : Modification de commande
+  * Produit de : MOA Digital Agency, www.myoneart.com
+  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+  */
+#}
 {% extends "base.html" %}
 
 {% block title %}Modifier {{ order.bc_number }} - BTP Commande{% endblock %}
@@ -45,6 +53,7 @@
                             <td class="px-4 py-3 text-center">
                                 <form method="POST" action="{{ url_for('orders.delete_line', order_id=order.id, line_id=line.id) }}" 
                                       onsubmit="return confirm('Supprimer cette ligne?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <button type="submit" class="text-red-600 hover:text-red-800">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -66,6 +75,7 @@
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-lg font-semibold mb-4">Ajouter un article</h3>
             <form method="POST" class="space-y-4">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="hidden" name="action" value="add_line">
                 
                 <div>
@@ -140,6 +150,7 @@
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="font-semibold text-gray-900 mb-4">Informations BC</h3>
             <form method="POST" class="space-y-4">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="hidden" name="action" value="update_info">
                 
                 <div>
@@ -185,6 +196,7 @@
                 
                 {% if order.can_submit(current_user) and lines|length > 0 %}
                 <form method="POST" action="{{ url_for('orders.submit', order_id=order.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
                         <i class="fas fa-paper-plane mr-2"></i> Soumettre pour validation
                     </button>
@@ -212,7 +224,10 @@ document.getElementById('description').addEventListener('blur', function() {
     if (term.length > 2) {
         fetch('/orders/translate', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
             body: JSON.stringify({term: term, to_lang: 'fr'})
         })
         .then(r => r.json())

@@ -1,3 +1,10 @@
+# /* * Nom de l'application : BTP Commande
+#  * Description : Gestion des bons de commande
+#  * Produit de : MOA Digital Agency, www.myoneart.com
+#  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+#  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+#  */
+
 import os
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_file, current_app
@@ -77,8 +84,11 @@ def create():
             
             flash(f'Bon de commande {order.bc_number} créé.', 'success')
             return redirect(url_for('orders.edit', order_id=order.id))
+        except ValueError as e:
+            flash(str(e), 'warning')
         except Exception as e:
-            flash(f'Erreur lors de la création: {str(e)}', 'danger')
+            current_app.logger.error(f"Error creating order: {e}")
+            flash('Une erreur est survenue lors de la création.', 'danger')
     
     return render_template('orders/create.html', projects=projects, products=products)
 
@@ -159,8 +169,11 @@ def edit(order_id):
                         translation_snapshot=translation_result
                     )
                     flash('Ligne ajoutée.', 'success')
+                except ValueError as e:
+                    flash(str(e), 'warning')
                 except Exception as e:
-                    flash(f'Erreur: {str(e)}', 'danger')
+                    current_app.logger.error(f"Error adding line: {e}")
+                    flash('Une erreur est survenue lors de l\'ajout de la ligne.', 'danger')
         
         return redirect(url_for('orders.edit', order_id=order.id))
     
@@ -181,8 +194,15 @@ def delete_line(order_id, line_id):
         flash('Vous ne pouvez pas modifier ce bon de commande.', 'warning')
         return redirect(url_for('orders.view', order_id=order.id))
     
-    OrderService.delete_line(line)
-    flash('Ligne supprimée.', 'success')
+    try:
+        OrderService.delete_line(line)
+        flash('Ligne supprimée.', 'success')
+    except ValueError as e:
+        flash(str(e), 'warning')
+    except Exception as e:
+        current_app.logger.error(f"Error deleting line: {e}")
+        flash('Une erreur est survenue lors de la suppression.', 'danger')
+
     return redirect(url_for('orders.edit', order_id=order.id))
 
 @orders_bp.route('/<int:order_id>/submit', methods=['POST'])
@@ -198,8 +218,11 @@ def submit(order_id):
     try:
         OrderService.submit_order(order)
         flash('Bon de commande soumis pour validation.', 'success')
+    except ValueError as e:
+        flash(str(e), 'warning')
     except Exception as e:
-        flash(f'Erreur: {str(e)}', 'danger')
+        current_app.logger.error(f"Error submitting order: {e}")
+        flash('Une erreur est survenue lors de la soumission.', 'danger')
     
     return redirect(url_for('orders.view', order_id=order.id))
 
@@ -216,8 +239,11 @@ def validate(order_id):
     try:
         OrderService.validate_order(order)
         flash('Bon de commande validé.', 'success')
+    except ValueError as e:
+        flash(str(e), 'warning')
     except Exception as e:
-        flash(f'Erreur: {str(e)}', 'danger')
+        current_app.logger.error(f"Error validating order: {e}")
+        flash('Une erreur est survenue lors de la validation.', 'danger')
     
     return redirect(url_for('orders.view', order_id=order.id))
 
@@ -236,8 +262,11 @@ def reject(order_id):
     try:
         OrderService.reject_order(order, reason)
         flash('Bon de commande rejeté.', 'info')
+    except ValueError as e:
+        flash(str(e), 'warning')
     except Exception as e:
-        flash(f'Erreur: {str(e)}', 'danger')
+        current_app.logger.error(f"Error rejecting order: {e}")
+        flash('Une erreur est survenue lors du rejet.', 'danger')
     
     return redirect(url_for('orders.view', order_id=order.id))
 
@@ -259,8 +288,12 @@ def generate_pdf(order_id):
         
         full_path = os.path.join(current_app.root_path, pdf_path)
         return send_file(full_path, as_attachment=True, download_name=f"{order.bc_number}.pdf")
+    except ValueError as e:
+        flash(str(e), 'warning')
+        return redirect(url_for('orders.view', order_id=order.id))
     except Exception as e:
-        flash(f'Erreur lors de la génération du PDF: {str(e)}', 'danger')
+        current_app.logger.error(f"Error generating PDF: {e}")
+        flash('Une erreur est survenue lors de la génération du PDF.', 'danger')
         return redirect(url_for('orders.view', order_id=order.id))
 
 @orders_bp.route('/<int:order_id>/share/<method>')
@@ -277,29 +310,33 @@ def share(order_id, method):
         flash('Le bon de commande doit être validé avant le partage.', 'warning')
         return redirect(url_for('orders.view', order_id=order.id))
     
-    OrderService.mark_shared(order, method)
-    
-    company = order.company
-    project = order.project
-    
-    message = f"Bon de Commande {order.bc_number}\n"
-    message += f"Société: {company.name}\n"
-    message += f"Chantier: {project.name}\n"
-    if order.requested_date:
-        message += f"Date souhaitée: {order.requested_date.strftime('%d/%m/%Y')}\n"
-    message += f"\nArticles:\n"
-    for line in order.lines:
-        message += f"- {line.description}: {line.quantity} {line.unit}\n"
-    
-    if method == 'whatsapp':
-        import urllib.parse
-        encoded_message = urllib.parse.quote(message)
-        return redirect(f"https://wa.me/?text={encoded_message}")
-    elif method == 'email':
-        import urllib.parse
-        subject = urllib.parse.quote(f"Bon de Commande {order.bc_number}")
-        body = urllib.parse.quote(message)
-        return redirect(f"mailto:?subject={subject}&body={body}")
+    try:
+        OrderService.mark_shared(order, method)
+
+        company = order.company
+        project = order.project
+
+        message = f"Bon de Commande {order.bc_number}\n"
+        message += f"Société: {company.name}\n"
+        message += f"Chantier: {project.name}\n"
+        if order.requested_date:
+            message += f"Date souhaitée: {order.requested_date.strftime('%d/%m/%Y')}\n"
+        message += f"\nArticles:\n"
+        for line in order.lines:
+            message += f"- {line.description}: {line.quantity} {line.unit}\n"
+
+        if method == 'whatsapp':
+            import urllib.parse
+            encoded_message = urllib.parse.quote(message)
+            return redirect(f"https://wa.me/?text={encoded_message}")
+        elif method == 'email':
+            import urllib.parse
+            subject = urllib.parse.quote(f"Bon de Commande {order.bc_number}")
+            body = urllib.parse.quote(message)
+            return redirect(f"mailto:?subject={subject}&body={body}")
+    except Exception as e:
+        current_app.logger.error(f"Error sharing order: {e}")
+        flash('Une erreur est survenue lors du partage.', 'danger')
     
     return redirect(url_for('orders.view', order_id=order.id))
 
@@ -311,5 +348,9 @@ def translate_term():
     term = data.get('term', '')
     to_lang = data.get('to_lang', 'fr')
     
-    result = LexiqueService.translate(term, to_lang=to_lang)
-    return jsonify(result)
+    try:
+        result = LexiqueService.translate(term, to_lang=to_lang)
+        return jsonify(result)
+    except Exception as e:
+        current_app.logger.error(f"Error translating: {e}")
+        return jsonify({'error': 'Translation failed'}), 500

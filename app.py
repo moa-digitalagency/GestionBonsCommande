@@ -1,10 +1,19 @@
+# /* * Nom de l'application : BTP Commande
+#  * Description : Point d'entrée de l'application
+#  * Produit de : MOA Digital Agency, www.myoneart.com
+#  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+#  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+#  */
+
 import os
 from flask import Flask, g
 from flask_login import LoginManager, current_user
+from flask_wtf.csrf import CSRFProtect
 from config.settings import Config
 from models import db
 
 login_manager = LoginManager()
+csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__, 
@@ -14,6 +23,7 @@ def create_app():
     app.config.from_object(Config)
     
     db.init_app(app)
+    csrf.init_app(app)
     
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
@@ -43,10 +53,18 @@ def create_app():
         }
     
     @app.after_request
-    def add_cache_control(response):
+    def add_security_headers(response):
+        # Cache control
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
+
+        # Security Headers
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:;"
+
         return response
     
     from routes.main import main_bp

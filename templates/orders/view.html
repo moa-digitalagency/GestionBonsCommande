@@ -1,3 +1,11 @@
+{#
+ /* * Nom de l'application : BTP Commande
+  * Description : Visualisation de commande
+  * Produit de : MOA Digital Agency, www.myoneart.com
+  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+  */
+#}
 {% extends "base.html" %}
 
 {% block title %}{{ order.bc_number }} - BTP Commande{% endblock %}
@@ -129,6 +137,7 @@
                 
                 {% if order.can_submit(current_user) %}
                 <form method="POST" action="{{ url_for('orders.submit', order_id=order.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
                         <i class="fas fa-paper-plane mr-2"></i> Soumettre
                     </button>
@@ -137,6 +146,7 @@
                 
                 {% if order.can_validate(current_user) %}
                 <form method="POST" action="{{ url_for('orders.validate', order_id=order.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                         <i class="fas fa-check mr-2"></i> Valider
                     </button>
@@ -215,6 +225,7 @@
         <div class="relative bg-white rounded-lg max-w-md w-full p-6">
             <h3 class="text-lg font-semibold mb-4">Rejeter le bon de commande</h3>
             <form method="POST" action="{{ url_for('orders.reject', order_id=order.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="mb-4">
                     <label for="reason" class="block text-sm font-medium text-gray-700">Raison du rejet</label>
                     <textarea name="reason" id="reason" rows="3" 
