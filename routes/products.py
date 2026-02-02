@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import current_user, login_required
+from sqlalchemy import or_
 from models import db
 from models.product import Product
 from security.decorators import tenant_required, admin_required
@@ -129,26 +130,27 @@ def search():
     if not query or len(query) < 2:
         return jsonify([])
     
-    products = TenantService.get_tenant_products().all()
+    # Optimization: Filter in database instead of memory
+    base_query = TenantService.get_tenant_products()
     
-    results = []
-    for product in products:
-        match = False
-        if product.reference and query in product.reference.lower():
-            match = True
-        for lang, label in (product.labels or {}).items():
-            if label and query in label.lower():
-                match = True
-                break
-        
-        if match:
-            results.append({
-                'id': product.id,
-                'reference': product.reference,
-                'label': product.get_label('fr'),
-                'unit': product.unit,
-                'unit_price': float(product.unit_price) if product.unit_price else None,
-                'category': product.category
-            })
+    # We iterate over SUPPORTED_LANGUAGES to check values.
+    # This avoids casting the whole JSON to text which would match keys (e.g. 'fr').
+    conditions = [Product.reference.ilike(f'%{query}%')]
+    for lang in Config.SUPPORTED_LANGUAGES:
+        conditions.append(Product.labels[lang].astext.ilike(f'%{query}%'))
+
+    products = base_query.filter(or_(*conditions)).limit(20).all()
+
+    results = [
+        {
+            'id': product.id,
+            'reference': product.reference,
+            'label': product.get_label('fr'),
+            'unit': product.unit,
+            'unit_price': float(product.unit_price) if product.unit_price else None,
+            'category': product.category
+        }
+        for product in products
+    ]
     
-    return jsonify(results[:20])
+    return jsonify(results)
