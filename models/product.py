@@ -1,6 +1,5 @@
 from datetime import datetime
 from models import db
-from sqlalchemy.dialects.postgresql import JSONB
 
 class Product(db.Model):
     __tablename__ = 'products'
@@ -11,7 +10,7 @@ class Product(db.Model):
     reference = db.Column(db.String(100), nullable=True)
     category = db.Column(db.String(50), nullable=False, default='materiau')
     
-    labels = db.Column(JSONB, nullable=False, default=dict)
+    labels = db.Column(db.JSON, nullable=False, default=dict)
     
     unit = db.Column(db.String(20), nullable=False, default='unite')
     unit_price = db.Column(db.Numeric(12, 2), nullable=True)

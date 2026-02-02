@@ -1,6 +1,5 @@
 from datetime import datetime
 from models import db
-from sqlalchemy.dialects.postgresql import JSONB
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -76,7 +75,7 @@ class OrderLine(db.Model):
     
     description = db.Column(db.String(500), nullable=False)
     description_translated = db.Column(db.String(500), nullable=True)
-    translation_snapshot = db.Column(JSONB, nullable=True)
+    translation_snapshot = db.Column(db.JSON, nullable=True)
     
     quantity = db.Column(db.Numeric(12, 3), nullable=False)
     unit = db.Column(db.String(20), nullable=False, default='unite')
@@ -107,7 +106,7 @@ class OrderHistory(db.Model):
     old_status = db.Column(db.String(20), nullable=True)
     new_status = db.Column(db.String(20), nullable=True)
     
-    details = db.Column(JSONB, nullable=True)
+    details = db.Column(db.JSON, nullable=True)
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
