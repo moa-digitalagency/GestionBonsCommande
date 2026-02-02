@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_file, current_app
 from flask_login import current_user, login_required
 from models import db
-from models.order import Order, OrderLine
+from models.order import Order, OrderLine, OrderHistory
 from models.project import Project
 from models.product import Product
 from security.decorators import tenant_required
@@ -93,7 +93,7 @@ def view(order_id):
         return redirect(url_for('orders.index'))
     
     lines = order.lines.order_by(OrderLine.line_number).all()
-    history = order.history.order_by('created_at desc').all()
+    history = order.history.order_by(OrderHistory.created_at.desc()).all()
     
     return render_template('orders/view.html', order=order, lines=lines, history=history)
 

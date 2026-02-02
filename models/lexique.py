@@ -1,6 +1,5 @@
 from datetime import datetime
 from models import db
-from sqlalchemy.dialects.postgresql import JSONB
 
 class LexiqueEntry(db.Model):
     __tablename__ = 'lexique_entries'
@@ -9,9 +8,9 @@ class LexiqueEntry(db.Model):
     
     category = db.Column(db.String(50), nullable=False, default='general')
     
-    translations = db.Column(JSONB, nullable=False, default=dict)
+    translations = db.Column(db.JSON, nullable=False, default=dict)
     
-    aliases = db.Column(JSONB, nullable=True)
+    aliases = db.Column(db.JSON, nullable=True)
     
     is_validated = db.Column(db.Boolean, default=True)
     usage_count = db.Column(db.Integer, default=0)
@@ -66,7 +65,7 @@ class LexiqueSuggestion(db.Model):
     original_term = db.Column(db.String(200), nullable=False)
     source_language = db.Column(db.String(10), nullable=True)
     
-    suggested_translations = db.Column(JSONB, nullable=False, default=dict)
+    suggested_translations = db.Column(db.JSON, nullable=False, default=dict)
     
     category = db.Column(db.String(50), nullable=True)
     context = db.Column(db.Text, nullable=True)
