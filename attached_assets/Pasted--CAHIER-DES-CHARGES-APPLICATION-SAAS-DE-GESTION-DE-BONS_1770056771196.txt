@@ -1,0 +1,133 @@
+# CAHIER DES CHARGES : APPLICATION SAAS DE GESTION DE BONS DE COMMANDE BTP (MAROC)
+
+## 1. PRÉSENTATION DU PROJET
+Le projet consiste à développer une application SaaS (Software as a Service) multi-tenant, responsive et multilingue, dédiée aux professionnels du BTP au Maroc. L'objectif principal est de digitaliser et standardiser le flux de création, validation et partage des Bons de Commande (BC) de matériaux et matériels.
+
+### 1.1 Objectifs Clés
+* **Centralisation :** Gestion unifiée des demandes d'achats par chantier.
+* **Accessibilité Linguistique :** Support natif du Darija (arabe et latin), Français, Anglais, Espagnol.
+* **Intelligence Collective :** Un dictionnaire BTP global et enrichissable qui s'améliore avec l'usage.
+* **Conformité :** Génération de documents PDF professionnels incluant les identifiants légaux marocains (ICE, RC, Patente).
+* **Mobilité :** Partage fluide via WhatsApp/Email pour les équipes terrain.
+
+---
+
+## 2. ACTEURS ET RÔLES (PERMISSIONS)
+
+L'application gère quatre niveaux d'utilisateurs répartis sur deux niveaux d'administration (Global et Tenant).
+
+### A. Niveau Global (Super-Admin)
+* **Super-Admin :**
+    * Création et gestion des sociétés (Tenants).
+    * **Gestion du Dictionnaire Global :** Validation, modification ou rejet des suggestions de termes (LexiqueSuggestion) pour les intégrer au LexiqueEntry.
+    * Vue d'ensemble des statistiques d'usage.
+
+### B. Niveau Société (Tenant)
+* **Admin Société :**
+    * Configuration de l'identité visuelle et légale (Logo, ICE, adresse).
+    * Gestion des utilisateurs de sa société.
+    * Gestion du catalogue articles et des chantiers.
+* **Valideur (Conducteur de travaux / Ingénieur) :**
+    * Reçoit les notifications de nouveaux BC.
+    * Modifie les quantités ou articles si nécessaire.
+    * **Action critique :** Valide le Bon de Commande (débloque la génération du PDF).
+* **Demandeur (Chef de chantier / Magasinier) :**
+    * Crée les demandes (Brouillon -> Soumis).
+    * Peut proposer de nouveaux termes au dictionnaire si un article/matériau est introuvable.
+
+---
+
+## 3. SPÉCIFICATIONS FONCTIONNELLES (MODULES)
+
+### 3.1 Module Authentification & Multi-tenant
+* **Isolation :** Chaque utilisateur appartient strictement à une société (Tenant ID).
+* **Connexion :** Email/Mot de passe avec gestion de session sécurisée.
+* **Rôles :** Attribution des droits (Demandeur, Valideur, Admin) lors de la création du compte.
+
+### 3.2 Module Gestion Société (Tenant Settings)
+* **Identité :** Upload du Logo, Raison Sociale.
+* **Légal (Maroc) :** Champs obligatoires pour ICE (Identifiant Commun de l'Entreprise), RC, Patente, IF.
+* **Configuration BC :** Préfixe de numérotation (ex: `BC-2023-001`), Pied de page par défaut.
+
+### 3.3 Module Données de Base (Chantiers & Articles)
+* **Chantiers :** Nom du projet, Adresse de livraison, Géolocalisation (optionnel MVP), Contact sur place.
+* **Catalogue Articles :**
+    * Champs : Référence interne, Catégorie (Matériau/Matériel), Unité (kg, m3, unite, sac...), Prix unitaire estimatif (optionnel).
+    * **Multilinguisme :** Chaque article possède des libellés dans les langues supportées.
+
+### 3.4 Module Workflow Bon de Commande (Cœur du système)
+Le cycle de vie d'un BC est strict :
+1.  **Création (Brouillon) :** Sélection du chantier, date souhaitée, ajout de lignes (Article + Qte + Note).
+2.  **Soumission (Soumis) :** Le demandeur envoie le BC pour validation. Le BC n'est plus modifiable par le demandeur.
+3.  **Validation (Validé) :** Le Valideur vérifie. Il peut corriger ou valider.
+    * *Règle impérative :* Impossible de générer le PDF tant que le statut n'est pas `VALIDÉ`.
+4.  **Génération (PDF Généré) :** Le système crée le document officiel.
+5.  **Partage (Partagé) :** Le lien ou le fichier a été envoyé via l'interface.
+6.  **Historique (Audit) :** Tracabilité de qui a changé le statut et quand.
+
+### 3.5 Module Traduction & Dictionnaire Intelligent
+* **Moteur Hybride :**
+    1.  **Niveau 1 (Prioritaire) - Dictionnaire BTP :** Recherche exacte ou floue dans la base de données validée (ex: "Bghli" -> "Gravette").
+    2.  **Niveau 2 (Fallback) - Traduction Automatique :** Appel simulé ou API externe pour les termes courants.
+* **Enrichissement (Crowdsourcing interne) :**
+    * Si un terme est inconnu ou mal traduit, l'utilisateur peut "Suggérer une traduction".
+    * Cette suggestion entre dans une file d'attente `LexiqueSuggestion`.
+    * Le Super-Admin valide la suggestion -> elle devient disponible pour **tous** les tenants.
+* **Gestion du Darija :** Support des caractères arabes et de la transcription latine (Arabizi) pour les termes techniques.
+
+### 3.6 Module PDF & Partage
+* **Génération PDF :**
+    * Utilisation d'un template HTML to PDF.
+    * Header : Logo Société + Infos Société.
+    * Body : Tableau des articles, Infos Chantier, Infos Fournisseur (si renseigné).
+    * Footer : Mentions légales (ICE, RC...), Signature.
+* **Partage Natif :**
+    * Bouton "Partager sur WhatsApp" : Ouvre l'API WhatsApp (`wa.me`) avec un message pré-rempli contenant le lien de téléchargement ou le résumé.
+    * Bouton "Email" : Ouvre le client mail (`mailto`).
+
+---
+
+## 4. SPÉCIFICATIONS TECHNIQUES
+
+### 4.1 Stack Technologique
+* **Backend :** Python 3.11+
+* **Framework Web :** Flask (Micro-framework, léger et flexible).
+* **Base de Données :** PostgreSQL (Robuste, supporte JSONB pour les traductions dynamiques).
+* **ORM :** SQLAlchemy.
+* **Frontend :** HTML5, JavaScript (Vanilla ou léger framework type Alpine.js), Tailwind CSS pour le styling rapide et responsive.
+* **Génération PDF :** `WeasyPrint` ou `ReportLab`.
+
+### 4.2 Architecture des Données (Principes)
+* **Multi-tenancy Logique :**
+    * Toutes les tables métiers (`users`, `orders`, `projects`, `products`) contiennent une colonne `company_id` (Foreign Key).
+    * Les requêtes sont toujours filtrées par `company_id` via des décorateurs ou services intermédiaires pour garantir l'isolation.
+* **Table Dictionnaire Global (`lexique_entries`) :**
+    * Commune à tous les tenants (pas de `company_id` ou `company_id` null).
+    * Structure JSONB pour stocker les variantes linguistiques : `{"fr": "Ciment", "ar": "إسمنت", "darija_lat": "Sima", "en": "Cement"}`.
+
+### 4.3 Stratégie de Détection et Traduction
+* **Input :** L'utilisateur saisit du texte libre pour une note ou un article hors catalogue.
+* **Algorithme de traitement :**
+    1.  **Tokenization :** Découpage de la phrase.
+    2.  **Lookup Dictionary :** Vérification présence dans `LexiqueEntry`.
+    3.  **Confidence Score :**
+        * Match 100% Dictionnaire = Score 1.0 (Validé).
+        * Match partiel / Traduction Auto = Score < 0.8 (Marqué comme "Incertain" sur l'UI).
+    4.  **Stockage :** On sauvegarde le texte original ET la traduction validée au moment de la commande (snapshot).
+
+### 4.4 Sécurité
+* **Mots de passe :** Hashage (Argon2 ou PBKDF2).
+* **Session :** Cookies sécurisés (HttpOnly, Secure).
+* **Access Control :** Décorateurs Flask `@login_required`, `@role_required('admin')`, et `@tenant_required`.
+* **Validation des Entrées :** Protection contre Injection SQL et XSS (via WTForms ou Marshmallow).
+
+---
+
+## 5. PRIORITÉS MVP (Minimum Viable Product)
+
+Pour la première version livrable, les efforts seront concentrés sur :
+1.  **Architecture Core :** Mise en place du Flask + Postgres avec isolation Tenant fonctionnelle.
+2.  **CRUD de base :** Création Société, Chantiers, Articles.
+3.  **Le Tunnel BC :** Créer -> Valider -> PDF. C'est la valeur ajoutée immédiate pour le client.
+4.  **Dictionnaire V1 :** Structure de la table et interface Super-Admin pour peupler les 50 termes BTP les plus courants (Ciment, Sable, Briques, Fer à béton, etc.).
+5.  **Interface Mobile First :** Le design doit être pensé pour un usage sur smartphone (Chefs de chantier).
