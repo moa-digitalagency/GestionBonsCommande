@@ -13,6 +13,7 @@
     
     <div class="bg-white rounded-lg shadow p-6">
         <form method="POST" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div>
                 <label for="project_id" class="block text-sm font-medium text-gray-700">Chantier *</label>
                 <select name="project_id" id="project_id" required

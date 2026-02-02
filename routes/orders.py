@@ -1,4 +1,11 @@
+# Nom de l'application : BTP Commande
+# Description : Routes de gestion des commandes
+# Produit de : MOA Digital Agency, www.myoneart.com
+# Fait par : Aisance KALONJI, www.aisancekalonji.com
+# Auditer par : La CyberConfiance, www.cyberconfiance.com
+
 import os
+import re
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_file, current_app
 from flask_login import current_user, login_required
@@ -13,6 +20,12 @@ from services.pdf_service import PDFService
 from services.lexique_service import LexiqueService
 
 orders_bp = Blueprint('orders', __name__)
+
+def strip_tags(text):
+    """CyberConfiance: Remove HTML tags from input to prevent XSS/Injection."""
+    if not text:
+        return text
+    return re.sub('<[^<]+?>', '', text)
 
 @orders_bp.route('/')
 @login_required
@@ -44,10 +57,12 @@ def create():
     if request.method == 'POST':
         project_id = request.form.get('project_id')
         requested_date_str = request.form.get('requested_date', '')
-        notes = request.form.get('notes', '').strip()
-        supplier_name = request.form.get('supplier_name', '').strip()
-        supplier_contact = request.form.get('supplier_contact', '').strip()
-        supplier_phone = request.form.get('supplier_phone', '').strip()
+
+        # Input Sanitization
+        notes = strip_tags(request.form.get('notes', '').strip())
+        supplier_name = strip_tags(request.form.get('supplier_name', '').strip())
+        supplier_contact = strip_tags(request.form.get('supplier_contact', '').strip())
+        supplier_phone = strip_tags(request.form.get('supplier_phone', '').strip())
         
         if not project_id:
             flash('Veuillez sélectionner un chantier.', 'danger')
@@ -119,10 +134,12 @@ def edit(order_id):
         
         if action == 'update_info':
             requested_date_str = request.form.get('requested_date', '')
-            order.notes = request.form.get('notes', '').strip()
-            order.supplier_name = request.form.get('supplier_name', '').strip()
-            order.supplier_contact = request.form.get('supplier_contact', '').strip()
-            order.supplier_phone = request.form.get('supplier_phone', '').strip()
+
+            # Input Sanitization
+            order.notes = strip_tags(request.form.get('notes', '').strip())
+            order.supplier_name = strip_tags(request.form.get('supplier_name', '').strip())
+            order.supplier_contact = strip_tags(request.form.get('supplier_contact', '').strip())
+            order.supplier_phone = strip_tags(request.form.get('supplier_phone', '').strip())
             
             if requested_date_str:
                 try:
@@ -135,11 +152,15 @@ def edit(order_id):
         
         elif action == 'add_line':
             product_id = request.form.get('product_id')
-            description = request.form.get('description', '').strip()
+
+            # Input Sanitization
+            description = strip_tags(request.form.get('description', '').strip())
+            note = strip_tags(request.form.get('note', '').strip())
+
             quantity = request.form.get('quantity', '1')
             unit = request.form.get('unit', 'unite')
             unit_price = request.form.get('unit_price', '')
-            note = request.form.get('note', '').strip()
+
             
             if not description:
                 flash('La description est obligatoire.', 'danger')
@@ -231,7 +252,8 @@ def reject(order_id):
         flash('Accès non autorisé.', 'danger')
         return redirect(url_for('orders.index'))
     
-    reason = request.form.get('reason', '')
+    # Input Sanitization
+    reason = strip_tags(request.form.get('reason', ''))
     
     try:
         OrderService.reject_order(order, reason)

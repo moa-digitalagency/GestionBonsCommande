@@ -30,6 +30,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <form method="POST" action="{{ url_for('admin.assign_user', user_id=user.id) }}" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <select name="company_id" onchange="this.form.submit()"
                                 class="text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Non assigné --</option>
@@ -43,6 +44,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <form method="POST" action="{{ url_for('admin.change_role', user_id=user.id) }}" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <select name="role" onchange="this.form.submit()"
                                 class="text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                             <option value="demandeur" {% if user.role == 'demandeur' %}selected{% endif %}>Demandeur</option>

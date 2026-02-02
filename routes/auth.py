@@ -1,10 +1,23 @@
+# Nom de l'application : BTP Commande
+# Description : Routes d'authentification
+# Produit de : MOA Digital Agency, www.myoneart.com
+# Fait par : Aisance KALONJI, www.aisancekalonji.com
+# Auditer par : La CyberConfiance, www.cyberconfiance.com
+
 from datetime import datetime
+from urllib.parse import urlparse, urljoin
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from models import db
 from models.user import User
 
 auth_bp = Blueprint('auth', __name__)
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and \
+           ref_url.netloc == test_url.netloc
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -32,9 +45,9 @@ def login():
             db.session.commit()
             
             next_page = request.args.get('next')
-            if next_page:
-                return redirect(next_page)
-            return redirect(url_for('main.dashboard'))
+            if not next_page or not is_safe_url(next_page):
+                next_page = url_for('main.dashboard')
+            return redirect(next_page)
         
         flash('Email ou mot de passe incorrect.', 'danger')
     
@@ -68,13 +81,14 @@ def register():
             flash('Les mots de passe ne correspondent pas.', 'danger')
             return render_template('auth/register.html')
         
-        if len(password) < 6:
-            flash('Le mot de passe doit contenir au moins 6 caractères.', 'danger')
+        if len(password) < 8:
+            flash('Le mot de passe doit contenir au moins 8 caractères.', 'danger')
             return render_template('auth/register.html')
         
+        # CyberConfiance: Prevent User Enumeration logic flaw
         if User.query.filter_by(email=email).first():
-            flash('Cet email est déjà utilisé.', 'danger')
-            return render_template('auth/register.html')
+            flash('Si un compte existe déjà avec cet email, veuillez vous connecter.', 'warning')
+            return redirect(url_for('auth.login'))
         
         user = User(
             email=email,
@@ -120,8 +134,8 @@ def profile():
                 flash('Mot de passe actuel incorrect.', 'danger')
                 return render_template('auth/profile.html')
             
-            if len(new_password) < 6:
-                flash('Le nouveau mot de passe doit contenir au moins 6 caractères.', 'danger')
+            if len(new_password) < 8:
+                flash('Le nouveau mot de passe doit contenir au moins 8 caractères.', 'danger')
                 return render_template('auth/profile.html')
             
             current_user.set_password(new_password)

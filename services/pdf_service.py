@@ -1,7 +1,14 @@
+# Nom de l'application : BTP Commande
+# Description : Service de génération PDF
+# Produit de : MOA Digital Agency, www.myoneart.com
+# Fait par : Aisance KALONJI, www.aisancekalonji.com
+# Auditer par : La CyberConfiance, www.cyberconfiance.com
+
 import os
 from datetime import datetime
 from weasyprint import HTML, CSS
 from flask import render_template, current_app
+from werkzeug.utils import secure_filename
 
 class PDFService:
     @staticmethod
@@ -139,7 +146,9 @@ class PDFService:
         uploads_dir = os.path.join(current_app.root_path, 'statics', 'uploads', 'pdfs')
         os.makedirs(uploads_dir, exist_ok=True)
         
-        filename = f"BC_{order.bc_number.replace('-', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        # CyberConfiance: Secure filename
+        safe_bc = secure_filename(order.bc_number)
+        filename = f"BC_{safe_bc}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
         filepath = os.path.join(uploads_dir, filename)
         
         html = HTML(string=html_content, base_url=current_app.root_path)
