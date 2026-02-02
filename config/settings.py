@@ -16,7 +16,7 @@ class Config:
             raise ValueError("No SESSION_SECRET set for production configuration.")
         SECRET_KEY = 'dev-secret-key-change-in-production'
 
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///btp_commande.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
