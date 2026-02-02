@@ -1,4 +1,12 @@
+# /* * Nom de l'application : BTP Commande
+#  * Description : Routes d'authentification et gestion des utilisateurs
+#  * Produit de : MOA Digital Agency, www.myoneart.com
+#  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+#  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+#  */
+
 from datetime import datetime
+from urllib.parse import urlparse
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from models import db
@@ -32,7 +40,8 @@ def login():
             db.session.commit()
             
             next_page = request.args.get('next')
-            if next_page:
+            # Security: Prevent Open Redirect
+            if next_page and urlparse(next_page).netloc == '':
                 return redirect(next_page)
             return redirect(url_for('main.dashboard'))
         
@@ -68,8 +77,8 @@ def register():
             flash('Les mots de passe ne correspondent pas.', 'danger')
             return render_template('auth/register.html')
         
-        if len(password) < 6:
-            flash('Le mot de passe doit contenir au moins 6 caractères.', 'danger')
+        if len(password) < 8:
+            flash('Le mot de passe doit contenir au moins 8 caractères.', 'danger')
             return render_template('auth/register.html')
         
         if User.query.filter_by(email=email).first():
@@ -120,8 +129,8 @@ def profile():
                 flash('Mot de passe actuel incorrect.', 'danger')
                 return render_template('auth/profile.html')
             
-            if len(new_password) < 6:
-                flash('Le nouveau mot de passe doit contenir au moins 6 caractères.', 'danger')
+            if len(new_password) < 8:
+                flash('Le nouveau mot de passe doit contenir au moins 8 caractères.', 'danger')
                 return render_template('auth/profile.html')
             
             current_user.set_password(new_password)

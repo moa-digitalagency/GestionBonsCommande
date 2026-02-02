@@ -1,8 +1,21 @@
+# /* * Nom de l'application : BTP Commande
+#  * Description : Configuration globale de l'application
+#  * Produit de : MOA Digital Agency, www.myoneart.com
+#  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+#  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+#  */
+
 import os
 from datetime import timedelta
 
 class Config:
-    SECRET_KEY = os.environ.get('SESSION_SECRET') or 'dev-secret-key-change-in-production'
+    # Security: Enforce strong secret key in production
+    SECRET_KEY = os.environ.get('SESSION_SECRET')
+    if not SECRET_KEY:
+        if os.environ.get('FLASK_ENV') == 'production':
+            raise ValueError("No SESSION_SECRET set for production configuration.")
+        SECRET_KEY = 'dev-secret-key-change-in-production'
+
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
@@ -15,7 +28,9 @@ class Config:
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
-    SESSION_COOKIE_SECURE = False
+
+    # Security: Cookie settings
+    SESSION_COOKIE_SECURE = os.environ.get('FLASK_ENV') == 'production'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     
