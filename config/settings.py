@@ -39,3 +39,9 @@ class Config:
     
     BC_STATUSES = ['BROUILLON', 'SOUMIS', 'VALIDE', 'PDF_GENERE', 'PARTAGE']
     USER_ROLES = ['super_admin', 'admin', 'valideur', 'demandeur']
+
+    # Super Admin Configuration
+    SUPER_ADMIN_EMAIL = os.environ.get('SUPER_ADMIN_EMAIL', 'admin@btpcommande.ma')
+    SUPER_ADMIN_PASSWORD = os.environ.get('SUPER_ADMIN_PASSWORD', 'admin123')
+    SUPER_ADMIN_FIRST_NAME = os.environ.get('SUPER_ADMIN_FIRST_NAME', 'Super')
+    SUPER_ADMIN_LAST_NAME = os.environ.get('SUPER_ADMIN_LAST_NAME', 'Admin')
