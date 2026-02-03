@@ -17,7 +17,7 @@ except (OSError, ImportError) as e:
     # Capture missing system dependency errors (like pango)
     print("WARNING: WeasyPrint system dependencies are missing.")
     print("PDF generation will be disabled.")
-    print("Please run './setup_vps.sh' (on Linux VPS) or install the required libraries.")
+    print("Please run './setup_vps.sh' (on Linux VPS) and ensure the virtual environment is activated.")
     print(f"Error details: {e}")
     # Define dummy classes to avoid NameErrors if referenced (though logical guards should prevent use)
     HTML = None
@@ -56,7 +56,7 @@ class PDFService:
         if not WEASYPRINT_AVAILABLE:
              raise RuntimeError(
                 "La génération de PDF est indisponible car les dépendances système (WeasyPrint/Pango) sont manquantes. "
-                "Contactez l'administrateur pour exécuter le script d'installation './setup_vps.sh'."
+                "Assurez-vous que './setup_vps.sh' a été exécuté et que l'environnement virtuel est activé."
             )
 
         if not order.can_generate_pdf():
