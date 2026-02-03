@@ -2,6 +2,19 @@
 import os
 import sys
 
+# /* * Nom de l'application : BTP Commande
+#  * Description : Script d'initialisation de la base de données
+#  * Produit de : MOA Digital Agency, www.myoneart.com
+#  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+#  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+#  */
+
+# Ensure we are running in the correct environment
+if os.path.exists('venv') and sys.prefix == sys.base_prefix:
+    print("WARNING: You seem to be running outside the virtual environment.")
+    print("Please activate it first: source venv/bin/activate")
+    # We don't exit to allow manual overrides, but it's a strong hint.
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app import create_app
