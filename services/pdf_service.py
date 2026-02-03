@@ -7,8 +7,17 @@
 
 import os
 from datetime import datetime
-from weasyprint import HTML, CSS, default_url_fetcher
 from flask import render_template, current_app
+
+try:
+    from weasyprint import HTML, CSS, default_url_fetcher
+except OSError as e:
+    # Capture missing system dependency errors (like pango)
+    print("CRITICAL ERROR: WeasyPrint system dependencies are missing.")
+    print("Please run './setup_vps.sh' (on Linux VPS) or install the required libraries.")
+    print(f"Error details: {e}")
+    # Re-raise to stop execution if essential, or mock if we want soft failure (but here we need it)
+    raise ImportError(f"WeasyPrint system dependencies missing: {e}. Run ./setup_vps.sh") from e
 
 class PDFService:
     @staticmethod

@@ -10,15 +10,47 @@ Application SaaS multi-tenant pour la gestion de Bons de Commande de matériaux/
 
 ## Installation
 
-1.  **Prérequis**
-    - Python 3.8 ou supérieur.
-    - pip (gestionnaire de paquets Python).
+### 1. Prérequis
+- Python 3.8 ou supérieur.
+- pip (gestionnaire de paquets Python).
 
-2.  **Installation des dépendances**
-    ```bash
-    pip install -r requirements.txt
-    ```
-    *Note : Pour la génération PDF, WeasyPrint peut nécessiter des bibliothèques systèmes supplémentaires (cairo, pango).*
+### 2. Installation sur un serveur VPS (Debian/Ubuntu)
+
+La génération de PDF utilise la bibliothèque WeasyPrint, qui nécessite des dépendances système spécifiques (Pango, Cairo, etc.) qui ne sont pas installées par défaut.
+
+Si vous rencontrez l'erreur `OSError: cannot load library 'pango-1.0-0'`, suivez ces étapes :
+
+**Option A : Utiliser le script d'installation automatique**
+```bash
+# Rendre le script exécutable
+chmod +x setup_vps.sh
+
+# Exécuter avec les droits root (sudo)
+sudo ./setup_vps.sh
+```
+
+**Option B : Installation manuelle des dépendances**
+```bash
+sudo apt-get update
+sudo apt-get install -y python3-pip python3-cffi python3-brotli libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 libjpeg-dev libopenjp2-7-dev libffi-dev shared-mime-info
+pip install -r requirements.txt
+```
+
+### 3. Installation standard (Local/Dev)
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Déploiement via Docker
+Un `Dockerfile` est fourni pour faciliter le déploiement conteneurisé.
+
+```bash
+# Construire l'image
+docker build -t btp-commande .
+
+# Lancer le conteneur
+docker run -p 5000:5000 btp-commande
+```
 
 ## Configuration Base de Données
 
