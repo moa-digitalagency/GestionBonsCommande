@@ -7,8 +7,22 @@
 
 import os
 from datetime import datetime
-from weasyprint import HTML, CSS, default_url_fetcher
 from flask import render_template, current_app
+
+WEASYPRINT_AVAILABLE = False
+try:
+    from weasyprint import HTML, CSS, default_url_fetcher
+    WEASYPRINT_AVAILABLE = True
+except (OSError, ImportError) as e:
+    # Capture missing system dependency errors (like pango)
+    print("WARNING: WeasyPrint system dependencies are missing.")
+    print("PDF generation will be disabled.")
+    print("Please run './setup_vps.sh' (on Linux VPS) or install the required libraries.")
+    print(f"Error details: {e}")
+    # Define dummy classes to avoid NameErrors if referenced (though logical guards should prevent use)
+    HTML = None
+    CSS = None
+    default_url_fetcher = None
 
 class PDFService:
     @staticmethod
@@ -17,6 +31,9 @@ class PDFService:
         Security: Custom URL fetcher to prevent LFI (Local File Inclusion).
         Only allows access to files within the static folder.
         """
+        if not WEASYPRINT_AVAILABLE:
+             raise RuntimeError("WeasyPrint is not available. Install system dependencies.")
+
         if url.startswith('file://'):
             path = url[7:]
             # Determine the allowed directory (static folder)
@@ -36,6 +53,12 @@ class PDFService:
 
     @staticmethod
     def generate_order_pdf(order):
+        if not WEASYPRINT_AVAILABLE:
+             raise RuntimeError(
+                "La génération de PDF est indisponible car les dépendances système (WeasyPrint/Pango) sont manquantes. "
+                "Contactez l'administrateur pour exécuter le script d'installation './setup_vps.sh'."
+            )
+
         if not order.can_generate_pdf():
             if order.status not in ['PDF_GENERE', 'PARTAGE']:
                 raise ValueError("Le BC doit être validé avant de générer le PDF")
