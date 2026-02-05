@@ -1,108 +1,200 @@
 {% extends "base.html" %}
 
-{% block title %}Bons de Commande - BTP Commande{% endblock %}
+{% block title %}Achats & Commandes - BTP Commande{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Bons de Commande</h1>
-    <a href="{{ url_for('orders.create') }}" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-        <i class="fas fa-plus mr-2"></i> Nouveau BC
-    </a>
-</div>
-
-<div class="bg-white rounded-lg shadow mb-6 p-4">
-    <form method="GET" class="flex flex-col md:flex-row gap-4">
-        <select name="status" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            <option value="">Tous les statuts</option>
-            <option value="BROUILLON" {% if current_status == 'BROUILLON' %}selected{% endif %}>Brouillon</option>
-            <option value="SOUMIS" {% if current_status == 'SOUMIS' %}selected{% endif %}>Soumis</option>
-            <option value="VALIDE" {% if current_status == 'VALIDE' %}selected{% endif %}>Validé</option>
-            <option value="PDF_GENERE" {% if current_status == 'PDF_GENERE' %}selected{% endif %}>PDF Généré</option>
-            <option value="PARTAGE" {% if current_status == 'PARTAGE' %}selected{% endif %}>Partagé</option>
-        </select>
-        
-        <select name="project_id" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            <option value="">Tous les chantiers</option>
-            {% for project in projects %}
-            <option value="{{ project.id }}" {% if current_project == project.id|string %}selected{% endif %}>{{ project.name }}</option>
-            {% endfor %}
-        </select>
-        
-        <button type="submit" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
-            <i class="fas fa-filter mr-1"></i> Filtrer
-        </button>
-    </form>
-</div>
-
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    {% if orders %}
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° BC</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chantier</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Date souhaitée</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Créé par</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {% for order in orders %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="{{ url_for('orders.view', order_id=order.id) }}" class="text-blue-600 hover:underline font-medium">
-                            {{ order.bc_number }}
-                        </a>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ order.project.name }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 text-xs rounded-full 
-                            {% if order.status == 'BROUILLON' %}bg-gray-100 text-gray-600
-                            {% elif order.status == 'SOUMIS' %}bg-yellow-100 text-yellow-600
-                            {% elif order.status == 'VALIDE' %}bg-green-100 text-green-600
-                            {% elif order.status == 'PDF_GENERE' %}bg-blue-100 text-blue-600
-                            {% else %}bg-purple-100 text-purple-600{% endif %}">
-                            {{ order.status }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                        {{ order.requested_date.strftime('%d/%m/%Y') if order.requested_date else '-' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                        {{ order.creator.full_name }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <a href="{{ url_for('orders.view', order_id=order.id) }}" class="text-blue-600 hover:text-blue-800 mr-3" aria-label="Voir le bon de commande {{ order.bc_number }}" title="Voir le bon de commande">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        {% if order.can_edit(current_user) %}
-                        <a href="{{ url_for('orders.edit', order_id=order.id) }}" class="text-green-600 hover:text-green-800 mr-3" aria-label="Modifier le bon de commande {{ order.bc_number }}" title="Modifier">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        {% endif %}
-                        {% if order.can_share() %}
-                        <a href="{{ url_for('orders.generate_pdf', order_id=order.id) }}" class="text-red-600 hover:text-red-800" aria-label="Télécharger le PDF du bon de commande {{ order.bc_number }}" title="Télécharger le PDF">
-                            <i class="fas fa-file-pdf"></i>
-                        </a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Achats & Commandes</h1>
+            <p class="text-gray-500 text-sm">Gérez vos approvisionnements et validations.</p>
+        </div>
+        <div class="flex space-x-3">
+             <a href="{{ url_for('orders.create') }}" class="inline-flex items-center px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-brand-dark shadow-sm">
+                <i class="fas fa-plus mr-2"></i> Nouvelle Commande
+            </a>
+        </div>
     </div>
-    {% else %}
-    <div class="px-6 py-12 text-center text-gray-500">
-        <i class="fas fa-file-alt text-5xl mb-4"></i>
-        <p class="text-lg">Aucun bon de commande</p>
-        <a href="{{ url_for('orders.create') }}" class="mt-4 inline-block text-blue-600 hover:underline">
-            Créer votre premier BC
-        </a>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {% set total_orders = orders|length %}
+        {% set pending = orders|selectattr('status', 'equalto', 'SOUMIS')|list|length %}
+        {% set validated = orders|selectattr('status', 'equalto', 'VALIDE')|list|length %}
+        {% set pdf_gen = orders|selectattr('status', 'in', ['PDF_GENERE', 'PARTAGE'])|list|length %}
+        
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <div class="text-gray-500 text-sm font-medium">Total Commandes</div>
+            <div class="mt-2 text-3xl font-bold text-gray-900">{{ total_orders }}</div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 ring-1 ring-yellow-400 bg-yellow-50">
+            <div class="text-yellow-800 text-sm font-medium">En attente validation</div>
+            <div class="mt-2 text-3xl font-bold text-yellow-900">{{ pending }}</div>
+            <p class="text-xs text-yellow-700 mt-1">Action requise</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <div class="text-gray-500 text-sm font-medium">Validées</div>
+            <div class="mt-2 text-3xl font-bold text-green-600">
+                {% if total_orders > 0 %}
+                {{ ((validated / total_orders) * 100)|round|int }}%
+                {% else %}
+                0%
+                {% endif %}
+            </div>
+            <p class="text-xs text-gray-400 mt-1">{{ validated }} commandes</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <div class="text-gray-500 text-sm font-medium">PDF Générés</div>
+            <div class="mt-2 text-3xl font-bold text-blue-600">{{ pdf_gen }}</div>
+        </div>
     </div>
-    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main List (2/3) -->
+        <div class="lg:col-span-2 space-y-4">
+            <!-- Filters -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
+                 <div class="flex-1 relative">
+                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" placeholder="Recherche par référence..." class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                </div>
+                 <div class="w-full md:w-48">
+                     <form id="filter-form" method="GET">
+                        <select name="status" onchange="document.getElementById('filter-form').submit()" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                            <option value="">Tous les statuts</option>
+                            <option value="BROUILLON" {% if current_status == 'BROUILLON' %}selected{% endif %}>Brouillon</option>
+                            <option value="SOUMIS" {% if current_status == 'SOUMIS' %}selected{% endif %}>Soumis</option>
+                            <option value="VALIDE" {% if current_status == 'VALIDE' %}selected{% endif %}>Validé</option>
+                            <option value="REJET" {% if current_status == 'REJET' %}selected{% endif %}>Rejeté</option>
+                        </select>
+                     </form>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chantier</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fournisseur</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
+                            <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for order in orders %}
+                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{{ url_for('orders.view', order_id=order.id) }}'">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm font-bold text-brand-primary">{{ order.bc_number }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ order.project.name }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ order.supplier_name or '-' }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full status-{{ order.status|lower }}">
+                                    {% if order.status == 'BROUILLON' %}Brouillon
+                                    {% elif order.status == 'SOUMIS' %}Soumis
+                                    {% elif order.status == 'VALIDE' %}Validé
+                                    {% elif order.status == 'PDF_GENERE' %}PDF Généré
+                                    {% elif order.status == 'PARTAGE' %}Partagé
+                                    {% elif order.status == 'REJET' %}Rejeté
+                                    {% else %}{{ order.status }}{% endif %}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ order.created_at.strftime('%d/%m/%Y') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
+                                {{ "%.2f"|format(order.get_total()) }} {{ order.company.currency or 'MAD' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button class="text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                <i class="fas fa-file-invoice text-4xl mb-3 text-gray-300"></i>
+                                <p>Aucune commande trouvée.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Activity (1/3) -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Activité Récente</h3>
+                <div class="flow-root">
+                    <ul class="-mb-8">
+                        {% for history in recent_history %}
+                        <li>
+                            <div class="relative pb-8">
+                                {% if not loop.last %}
+                                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                {% endif %}
+                                <div class="relative flex space-x-3">
+                                    <div>
+                                        <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white
+                                            {% if history.action == 'CREATION' %}bg-gray-400
+                                            {% elif history.action == 'SOUMISSION' %}bg-yellow-500
+                                            {% elif history.action == 'VALIDATION' %}bg-green-500
+                                            {% elif history.action == 'REJET' %}bg-red-500
+                                            {% elif history.action == 'PDF_GENERATION' %}bg-blue-500
+                                            {% else %}bg-gray-500{% endif %}">
+
+                                            {% if history.action == 'CREATION' %}<i class="fas fa-plus text-white text-xs"></i>
+                                            {% elif history.action == 'SOUMISSION' %}<i class="fas fa-paper-plane text-white text-xs"></i>
+                                            {% elif history.action == 'VALIDATION' %}<i class="fas fa-check text-white text-xs"></i>
+                                            {% elif history.action == 'REJET' %}<i class="fas fa-times text-white text-xs"></i>
+                                            {% elif history.action == 'PDF_GENERATION' %}<i class="fas fa-file-pdf text-white text-xs"></i>
+                                            {% else %}<i class="fas fa-history text-white text-xs"></i>{% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                        <div>
+                                            <p class="text-sm text-gray-500">
+                                                <span class="font-medium text-gray-900">{{ history.order.bc_number }}</span>
+                                                {% if history.action == 'CREATION' %}créé
+                                                {% elif history.action == 'SOUMISSION' %}soumis
+                                                {% elif history.action == 'VALIDATION' %}validé
+                                                {% elif history.action == 'REJET' %}rejeté
+                                                {% elif history.action == 'PDF_GENERATION' %}PDF généré
+                                                {% else %}mis à jour{% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                                            <time datetime="{{ history.created_at }}">{{ history.created_at.strftime('%H:%M') }}</time>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {% else %}
+                        <li><p class="text-sm text-gray-500">Aucune activité récente.</p></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

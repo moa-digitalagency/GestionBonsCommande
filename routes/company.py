@@ -35,8 +35,30 @@ def settings():
         company.city = request.form.get('city', '').strip()
         company.phone = request.form.get('phone', '').strip()
         company.email = request.form.get('email', '').strip()
-        company.bc_prefix = request.form.get('bc_prefix', 'BC').strip()
+        # company.bc_prefix kept for backward compat or we migrate it to settings
         company.bc_footer = request.form.get('bc_footer', '').strip()
+
+        # Regional Settings
+        company.default_language = request.form.get('default_language', 'fr')
+        company.currency = request.form.get('currency', 'MAD')
+
+        # Numbering Settings
+        numbering_settings = {
+            "prefix": request.form.get('num_prefix', 'BC'),
+            "year_format": request.form.get('num_year', 'YYYY'),
+            "sequence_length": int(request.form.get('num_length', 3) or 3),
+            "separator": request.form.get('num_separator', '-'),
+            "start_number": int(request.form.get('num_start', 1) or 1)
+        }
+
+        # Update JSON settings
+        # Note: We must assign a new dictionary for SQLAlchemy to detect the change on JSON type
+        current_settings = dict(company.settings) if company.settings else {}
+        current_settings['numbering'] = numbering_settings
+        company.settings = current_settings
+
+        # Update legacy field to match prefix for backward compatibility if needed
+        company.bc_prefix = numbering_settings['prefix']
         
         if 'logo' in request.files:
             file = request.files['logo']

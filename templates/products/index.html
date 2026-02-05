@@ -1,89 +1,140 @@
 {% extends "base.html" %}
 
-{% block title %}Articles - BTP Commande{% endblock %}
+{% block title %}Catalogue Articles - BTP Commande{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Catalogue Articles</h1>
-    {% if current_user.role in ['admin', 'super_admin'] %}
-    <a href="{{ url_for('products.add') }}" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-        <i class="fas fa-plus mr-2"></i> Nouvel article
-    </a>
-    {% endif %}
-</div>
-
-<div class="bg-white rounded-lg shadow mb-6 p-4">
-    <form method="GET" class="flex flex-wrap gap-4">
-        <select name="category" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            <option value="">Toutes catégories</option>
-            <option value="materiau" {% if current_category == 'materiau' %}selected{% endif %}>Matériaux</option>
-            <option value="materiel" {% if current_category == 'materiel' %}selected{% endif %}>Matériel</option>
-        </select>
-        <button type="submit" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
-            <i class="fas fa-filter mr-1"></i> Filtrer
-        </button>
-    </form>
-</div>
-
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    {% if products %}
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Libellé</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unité</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Prix</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {% for product in products %}
-                <tr class="hover:bg-gray-50 {% if not product.is_active %}opacity-50{% endif %}">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ product.reference or '-' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <p class="font-medium text-gray-900">{{ product.get_label('fr') }}</p>
-                        {% if product.labels.get('ar') %}
-                        <p class="text-sm text-gray-500" dir="rtl">{{ product.labels.ar }}</p>
-                        {% endif %}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs rounded-full {% if product.category == 'materiau' %}bg-blue-100 text-blue-600{% else %}bg-green-100 text-green-600{% endif %}">
-                            {{ 'Matériau' if product.category == 'materiau' else 'Matériel' }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {{ product.unit }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-600 hidden md:table-cell">
-                        {{ '%.2f MAD' % product.unit_price if product.unit_price else '-' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        {% if current_user.role in ['admin', 'super_admin'] %}
-                        <a href="{{ url_for('products.edit', product_id=product.id) }}" class="text-blue-600 hover:text-blue-800 mr-3" aria-label="Modifier l'article {{ product.get_label('fr') }}" title="Modifier l'article">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <div class="px-6 py-12 text-center text-gray-500">
-        <i class="fas fa-boxes text-5xl mb-4"></i>
-        <p class="text-lg">Aucun article</p>
+<div class="space-y-6">
+    <!-- Header & Actions -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Catalogue Articles</h1>
+            <p class="text-gray-500 text-sm">Gérez votre base de produits et matériaux.</p>
+        </div>
         {% if current_user.role in ['admin', 'super_admin'] %}
-        <a href="{{ url_for('products.add') }}" class="mt-4 inline-block text-blue-600 hover:underline">
-            Ajouter votre premier article
+        <a href="{{ url_for('products.add') }}" class="inline-flex items-center px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-brand-dark shadow-sm">
+            <i class="fas fa-plus mr-2"></i> Nouvel article
         </a>
         {% endif %}
     </div>
-    {% endif %}
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {% set total_products = products|length %}
+        {% set materiaux = products|selectattr('category', 'equalto', 'materiau')|list|length %}
+        {% set materiels = products|selectattr('category', 'equalto', 'materiel')|list|length %}
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
+             <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                <i class="fas fa-cubes text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Total Articles</p>
+                <p class="text-2xl font-bold text-gray-900">{{ total_products }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
+             <div class="p-3 rounded-full bg-orange-100 text-orange-600 mr-4">
+                <i class="fas fa-layer-group text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Matériaux</p>
+                <p class="text-2xl font-bold text-gray-900">{{ materiaux }}</p>
+                <p class="text-xs text-gray-400">Ciment, Sable, etc.</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
+             <div class="p-3 rounded-full bg-gray-100 text-gray-600 mr-4">
+                <i class="fas fa-tools text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Matériel / Engins</p>
+                <p class="text-2xl font-bold text-gray-900">{{ materiels }}</p>
+                <p class="text-xs text-gray-400">Pelles, Grues, etc.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
+        <div class="flex-1 relative">
+             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+            </div>
+            <input type="text" placeholder="Rechercher un article..." class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+        </div>
+        <div class="w-full md:w-64">
+            <form method="GET">
+                <select name="category" onchange="this.form.submit()" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                    <option value="">Toutes catégories</option>
+                    <option value="materiau" {% if current_category == 'materiau' %}selected{% endif %}>Matériaux</option>
+                    <option value="materiel" {% if current_category == 'materiel' %}selected{% endif %}>Matériel</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Libellé (FR)</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Libellé (EN)</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unité</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for product in products %}
+                    <tr class="hover:bg-gray-50 transition-colors {% if not product.is_active %}opacity-50{% endif %}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                            {{ product.reference or '-' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="font-medium text-gray-900">{{ product.get_label('fr') }}</span>
+                            {% if product.labels.get('ar') %}
+                            <p class="text-xs text-gray-400" dir="rtl">{{ product.labels.ar }}</p>
+                            {% endif %}
+                        </td>
+                         <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-500">{{ product.labels.get('en') or '-' }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs rounded-full {% if product.category == 'materiau' %}bg-orange-100 text-orange-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ 'Matériau' if product.category == 'materiau' else 'Matériel' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ product.unit }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-600">
+                            {{ "%.2f"|format(product.unit_price) }} {{ product.company.currency or 'MAD' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            {% if current_user.role in ['admin', 'super_admin'] %}
+                            <a href="{{ url_for('products.edit', product_id=product.id) }}" class="text-brand-primary hover:text-brand-dark mr-3" title="Modifier">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            <i class="fas fa-boxes text-4xl mb-3 text-gray-300"></i>
+                            <p>Aucun article trouvé.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

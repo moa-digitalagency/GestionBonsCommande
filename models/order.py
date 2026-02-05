@@ -12,7 +12,12 @@ class Order(db.Model):
     status = db.Column(db.String(20), nullable=False, default='BROUILLON')
     
     requested_date = db.Column(db.Date, nullable=True)
-    notes = db.Column(db.Text, nullable=True)
+
+    # Updated Notes structure
+    notes_internal = db.Column(db.Text, nullable=True)
+    notes_supplier_fr = db.Column(db.Text, nullable=True)
+    notes_supplier_en = db.Column(db.Text, nullable=True)
+    notes = db.Column(db.Text, nullable=True) # Kept for backward compatibility
     
     supplier_name = db.Column(db.String(200), nullable=True)
     supplier_contact = db.Column(db.String(200), nullable=True)

@@ -15,68 +15,103 @@
     <title>{% block title %}BTP Commande{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <script defer src="{{ url_for('static', filename='js/alpine.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#005691',
+                            secondary: '#E2E8F0',
+                            bg: '#F3F4F6',
+                            card: '#FFFFFF',
+                            text: {
+                                title: '#111827',
+                                body: '#4B5563',
+                                label: '#6B7280'
+                            }
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
         [x-cloak] { display: none !important; }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="h-full bg-gray-100" x-data="{ sidebarOpen: false }">
+<body class="h-full bg-brand-bg text-brand-text-body" x-data="{ sidebarOpen: false }">
     {% block body %}
     {% if current_user.is_authenticated %}
     <div class="flex h-screen overflow-hidden">
 
-        <!-- Desktop Sidebar -->
-        <aside class="hidden md:flex md:flex-col w-64 bg-blue-800 text-white shadow-xl z-20 flex-shrink-0">
-            <div class="flex h-16 items-center justify-center border-b border-blue-700 bg-blue-900">
+        <!-- Desktop Sidebar (White Background) -->
+        <aside class="hidden md:flex md:flex-col w-64 bg-white border-r border-gray-200 shadow-sm z-20 flex-shrink-0">
+            <div class="flex h-16 items-center justify-center border-b border-gray-200">
                  <a href="{{ url_for('main.dashboard') }}" class="flex items-center space-x-2">
-                    <span class="text-xl font-bold tracking-wider">BTP Commande</span>
+                    <span class="text-xl font-bold tracking-wider text-brand-primary">BTP COMMAND</span>
                  </a>
             </div>
 
-            <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-1">
-                <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if request.endpoint == 'main.dashboard' }}">
-                    <i class="fas fa-home w-6 text-center text-lg {{ 'text-white' if request.endpoint == 'main.dashboard' else 'text-blue-300 group-hover:text-white' }}"></i>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if request.endpoint == 'main.dashboard' else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <i class="fas fa-home w-6 text-center text-lg {{ 'text-brand-primary' if request.endpoint == 'main.dashboard' else 'text-gray-400 group-hover:text-gray-500' }}"></i>
                     <span class="mx-3">{{ _('Tableau de bord') }}</span>
                 </a>
 
                 {% if current_user.role != 'super_admin' %}
-                <a href="{{ url_for('orders.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'orders' in request.endpoint }}">
-                    <i class="fas fa-file-alt w-6 text-center text-lg {{ 'text-white' if 'orders' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                <a href="{{ url_for('orders.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'orders' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <i class="fas fa-file-alt w-6 text-center text-lg {{ 'text-brand-primary' if 'orders' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
                     <span class="mx-3">{{ _('Bons de Commande') }}</span>
                 </a>
-                <a href="{{ url_for('projects.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'projects' in request.endpoint }}">
-                    <i class="fas fa-hard-hat w-6 text-center text-lg {{ 'text-white' if 'projects' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                <a href="{{ url_for('projects.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'projects' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <i class="fas fa-hard-hat w-6 text-center text-lg {{ 'text-brand-primary' if 'projects' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
                     <span class="mx-3">{{ _('Chantiers') }}</span>
                 </a>
-                <a href="{{ url_for('products.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'products' in request.endpoint }}">
-                    <i class="fas fa-boxes w-6 text-center text-lg {{ 'text-white' if 'products' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                <a href="{{ url_for('products.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'products' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <i class="fas fa-boxes w-6 text-center text-lg {{ 'text-brand-primary' if 'products' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
                     <span class="mx-3">{{ _('Articles') }}</span>
                 </a>
                 {% endif %}
 
-                <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'lexique' in request.endpoint }}">
-                    <i class="fas fa-book w-6 text-center text-lg {{ 'text-white' if 'lexique' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'lexique' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <i class="fas fa-book w-6 text-center text-lg {{ 'text-brand-primary' if 'lexique' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
                     <span class="mx-3">{{ _('Dictionnaire') }}</span>
                 </a>
 
                 {% if current_user.role == 'super_admin' %}
-                <a href="{{ url_for('admin.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'admin' in request.endpoint }}">
-                    <i class="fas fa-cog w-6 text-center text-lg {{ 'text-white' if 'admin' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                <a href="{{ url_for('admin.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'admin' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <i class="fas fa-cog w-6 text-center text-lg {{ 'text-brand-primary' if 'admin' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
                     <span class="mx-3">{{ _('Administration') }}</span>
                 </a>
                 {% endif %}
             </nav>
 
-             <div class="p-4 border-t border-blue-700 bg-blue-900">
+             <div class="p-4 border-t border-gray-200">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                         <i class="fas fa-user-circle text-3xl text-blue-300"></i>
+                         <div class="h-8 w-8 rounded-full bg-brand-primary flex items-center justify-center text-white font-bold">
+                             {{ current_user.first_name[0] }}
+                         </div>
                     </div>
                     <div class="mx-3">
-                        <p class="text-sm font-medium text-white">{{ current_user.first_name }}</p>
-                        <p class="text-xs text-blue-300 truncate w-32" title="{{ current_user.email }}">{{ current_user.email }}</p>
+                        <p class="text-sm font-medium text-gray-700">{{ current_user.first_name }}</p>
+                        <p class="text-xs text-gray-500 truncate w-32" title="{{ current_user.email }}">{{ current_user.email }}</p>
                     </div>
                 </div>
             </div>
@@ -87,7 +122,7 @@
             <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/80" @click="sidebarOpen = false"></div>
 
             <div class="fixed inset-0 flex">
-                <div x-show="sidebarOpen" x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="-translate-x-full rtl:translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full rtl:translate-x-full" class="relative flex w-full max-w-xs flex-1 flex-col bg-blue-800 pt-5 pb-4 text-white">
+                <div x-show="sidebarOpen" x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="-translate-x-full rtl:translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full rtl:translate-x-full" class="relative flex w-full max-w-xs flex-1 flex-col bg-white pt-5 pb-4">
                     <div class="absolute top-0 right-0 -mr-12 pt-2 rtl:left-0 rtl:-ml-12 rtl:mr-auto">
                         <button type="button" class="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="sidebarOpen = false">
                             <span class="sr-only">Close sidebar</span>
@@ -96,36 +131,36 @@
                     </div>
 
                     <div class="flex flex-shrink-0 items-center px-4">
-                        <span class="text-xl font-bold">BTP Commande</span>
+                        <span class="text-xl font-bold text-brand-primary">BTP COMMAND</span>
                     </div>
                     <div class="mt-5 h-0 flex-1 overflow-y-auto">
                         <nav class="space-y-1 px-2">
-                             <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
-                                <i class="fas fa-home mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                             <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
+                                <i class="fas fa-home mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
                                 {{ _('Tableau de bord') }}
                             </a>
 
                              {% if current_user.role != 'super_admin' %}
-                            <a href="{{ url_for('orders.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
-                                <i class="fas fa-file-alt mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                            <a href="{{ url_for('orders.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
+                                <i class="fas fa-file-alt mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
                                 {{ _('Bons de Commande') }}
                             </a>
-                            <a href="{{ url_for('projects.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
-                                <i class="fas fa-hard-hat mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                            <a href="{{ url_for('projects.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
+                                <i class="fas fa-hard-hat mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
                                 {{ _('Chantiers') }}
                             </a>
-                            <a href="{{ url_for('products.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
-                                <i class="fas fa-boxes mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                            <a href="{{ url_for('products.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
+                                <i class="fas fa-boxes mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
                                 {{ _('Articles') }}
                             </a>
                             {% endif %}
-                            <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
-                                <i class="fas fa-book mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                            <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
+                                <i class="fas fa-book mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
                                 {{ _('Dictionnaire') }}
                             </a>
                             {% if current_user.role == 'super_admin' %}
-                            <a href="{{ url_for('admin.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
-                                <i class="fas fa-cog mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                            <a href="{{ url_for('admin.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
+                                <i class="fas fa-cog mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
                                 {{ _('Administration') }}
                             </a>
                             {% endif %}
@@ -146,13 +181,13 @@
                 <div class="flex-1 px-4 flex justify-between items-center">
                     <!-- Title/Header Content from Blocks -->
                     <div class="flex-1">
-                        <!-- We can put a block here for page title if needed, currently reusing title() or custom -->
+                         <!-- Placeholder for page titles -->
                     </div>
 
                     <div class="flex items-center space-x-4 rtl:space-x-reverse">
                         <!-- Language Switcher -->
                         <div class="relative" x-data="{ langOpen: false }">
-                            <button @click="langOpen = !langOpen" class="flex items-center text-gray-600 hover:text-blue-600 focus:outline-none transition-colors">
+                            <button @click="langOpen = !langOpen" class="flex items-center text-gray-600 hover:text-brand-primary focus:outline-none transition-colors">
                                 <i class="fas fa-globe mr-1 rtl:mr-0 rtl:ml-1"></i> <span class="uppercase font-medium text-sm">{{ get_locale() }}</span>
                             </button>
                             <div x-show="langOpen" x-cloak @click.away="langOpen = false" class="absolute right-0 rtl:right-auto rtl:left-0 z-20 mt-2 w-32 origin-top-right rtl:origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
@@ -166,9 +201,11 @@
 
                         <!-- User Dropdown -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="flex items-center space-x-2 rtl:space-x-reverse text-gray-600 hover:text-blue-600 focus:outline-none transition-colors">
+                            <button @click="open = !open" class="flex items-center space-x-2 rtl:space-x-reverse text-gray-600 hover:text-brand-primary focus:outline-none transition-colors">
                                 <span class="hidden sm:inline font-medium text-sm">{{ current_user.first_name }}</span>
-                                <i class="fas fa-user-circle text-2xl"></i>
+                                <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                                    <i class="fas fa-user"></i>
+                                </div>
                             </button>
                              <div x-show="open" x-cloak @click.away="open = false"
                                  class="absolute right-0 rtl:right-auto rtl:left-0 z-20 mt-2 w-48 origin-top-right rtl:origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
@@ -191,13 +228,13 @@
             </header>
 
             <!-- Main Scrollable Content -->
-            <main class="flex-1 overflow-y-auto bg-gray-50 p-4 sm:p-6 lg:p-8">
+            <main class="flex-1 overflow-y-auto bg-brand-bg p-4 sm:p-6 lg:p-8">
                 <div class="mx-auto max-w-7xl">
                      {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                     <div class="mb-6 space-y-2">
                         {% for category, message in messages %}
-                        <div class="flex p-4 rounded-lg shadow-sm {% if category == 'success' %}bg-green-50 text-green-700 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-green-500{% elif category == 'danger' %}bg-red-50 text-red-700 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-red-500{% elif category == 'warning' %}bg-yellow-50 text-yellow-700 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-yellow-500{% else %}bg-blue-50 text-blue-700 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-blue-500{% endif %}" role="alert">
+                        <div class="flex p-4 rounded-md shadow-sm {% if category == 'success' %}bg-green-50 text-green-800 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-green-500{% elif category == 'danger' %}bg-red-50 text-red-800 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-red-500{% elif category == 'warning' %}bg-yellow-50 text-yellow-800 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-yellow-500{% else %}bg-blue-50 text-blue-800 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-blue-500{% endif %}" role="alert">
                              <div class="ml-3 rtl:ml-0 rtl:mr-3 text-sm font-medium">
                                 {{ message }}
                              </div>

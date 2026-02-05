@@ -1,73 +1,72 @@
-{#
- /* * Nom de l'application : BTP Commande
-  * Description : Création de commande
-  * Produit de : MOA Digital Agency, www.myoneart.com
-  * Fait par : Aisance KALONJI, www.aisancekalonji.com
-  * Auditer par : La CyberConfiance, www.cyberconfiance.com
-  */
-#}
 {% extends "base.html" %}
 
-{% block title %}Nouveau Bon de Commande - BTP Commande{% endblock %}
+{% block title %}Nouvelle Commande - BTP Commande{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="flex items-center mb-6">
-        <a href="{{ url_for('orders.index') }}" class="text-gray-500 hover:text-gray-700 mr-4">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-        <h1 class="text-2xl font-bold text-gray-900">Nouveau Bon de Commande</h1>
+<div class="max-w-3xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Nouvelle Commande</h1>
+        <p class="text-gray-500">Initialisation du bon de commande</p>
     </div>
-    
-    <div class="bg-white rounded-lg shadow p-6">
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
         <form method="POST" class="space-y-6">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <div>
-                <label for="project_id" class="block text-sm font-medium text-gray-700">Chantier *</label>
-                <select name="project_id" id="project_id" required
-                        class="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-lg">
-                    <option value="">-- Sélectionner un chantier --</option>
-                    {% for project in projects %}
-                    <option value="{{ project.id }}">{{ project.name }} {% if project.city %}({{ project.city }}){% endif %}</option>
-                    {% endfor %}
-                </select>
-            </div>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
-            <div>
-                <label for="requested_date" class="block text-sm font-medium text-gray-700">Date de livraison souhaitée</label>
-                <input type="date" name="requested_date" id="requested_date"
-                       class="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <!-- Company & Project -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Société</label>
+                    <div class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-md text-gray-500 sm:text-sm">
+                        {{ current_user.company.name }}
+                    </div>
+                </div>
+                <div>
+                    <label for="project_id" class="block text-sm font-medium text-gray-700">Chantier / Site *</label>
+                    <select id="project_id" name="project_id" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm rounded-md border">
+                        <option value="">Sélectionner un chantier</option>
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-            
-            <div class="border-t pt-4">
-                <h3 class="text-sm font-medium text-gray-700 mb-2">Fournisseur (optionnel)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="supplier_name" class="block text-sm text-gray-600">Nom du fournisseur</label>
-                        <input type="text" name="supplier_name" id="supplier_name"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+
+            <!-- Supplier Info -->
+            <div class="border-t border-gray-100 pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Informations Fournisseur</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="col-span-2">
+                         <label for="supplier_name" class="block text-sm font-medium text-gray-700">Nom du Fournisseur</label>
+                         <input type="text" name="supplier_name" id="supplier_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
                     </div>
                     <div>
-                        <label for="supplier_phone" class="block text-sm text-gray-600">Téléphone</label>
-                        <input type="tel" name="supplier_phone" id="supplier_phone"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                         <label for="supplier_contact" class="block text-sm font-medium text-gray-700">Contact</label>
+                         <input type="text" name="supplier_contact" id="supplier_contact" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                    </div>
+                    <div>
+                         <label for="supplier_phone" class="block text-sm font-medium text-gray-700">Téléphone</label>
+                         <input type="text" name="supplier_phone" id="supplier_phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
                     </div>
                 </div>
             </div>
             
-            <div>
-                <label for="notes" class="block text-sm font-medium text-gray-700">Notes / Observations</label>
-                <textarea name="notes" id="notes" rows="3"
-                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="Instructions particulières, horaires de livraison..."></textarea>
+            <!-- Dates -->
+             <div class="border-t border-gray-100 pt-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="requested_date" class="block text-sm font-medium text-gray-700">Date de livraison souhaitée</label>
+                        <input type="date" name="requested_date" id="requested_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                    </div>
+                </div>
             </div>
-            
-            <div class="flex justify-end space-x-4 pt-4">
-                <a href="{{ url_for('orders.index') }}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+
+            <div class="pt-6 border-t border-gray-100 flex justify-end space-x-4">
+                <a href="{{ url_for('orders.index') }}" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary">
                     Annuler
                 </a>
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-plus mr-2"></i> Créer le BC
+                <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-primary hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary">
+                    Créer et Ajouter des articles
                 </button>
             </div>
         </form>

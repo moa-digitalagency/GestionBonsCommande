@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+import io
+import csv
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import current_user, login_required
 from models import db
 from models.lexique import LexiqueEntry, LexiqueSuggestion
@@ -133,6 +135,58 @@ def approve_suggestion(suggestion_id):
     except Exception as e:
         flash(i18n.translate('Erreur: {}').format(str(e)), 'danger')
     
+    return redirect(url_for('lexique.admin'))
+
+@lexique_bp.route('/admin/import', methods=['POST'])
+@login_required
+@super_admin_required
+def bulk_import():
+    if 'file' not in request.files:
+        flash(i18n.translate('Aucun fichier sélectionné.'), 'danger')
+        return redirect(url_for('lexique.admin'))
+
+    file = request.files['file']
+    if file.filename == '':
+        flash(i18n.translate('Aucun fichier sélectionné.'), 'danger')
+        return redirect(url_for('lexique.admin'))
+
+    if not file.filename.endswith('.csv'):
+        flash(i18n.translate('Seuls les fichiers CSV sont acceptés.'), 'danger')
+        return redirect(url_for('lexique.admin'))
+
+    try:
+        stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+        csv_input = csv.DictReader(stream)
+
+        count = 0
+        for row in csv_input:
+            # Expected columns: fr, en, es, ar, category
+            translations = {}
+            for lang in Config.SUPPORTED_LANGUAGES:
+                if lang in row and row[lang].strip():
+                    translations[lang] = row[lang].strip()
+
+            if not translations.get('fr'):
+                continue
+
+            category = row.get('category', 'general')
+
+            # Create suggestion to be validated
+            suggestion = LexiqueService.suggest_term(
+                original_term=translations['fr'],
+                suggested_translations=translations,
+                category=category,
+                context="Import en masse",
+                source_language='fr'
+            )
+            count += 1
+
+        flash(i18n.translate('{} termes importés dans la file de validation.').format(count), 'success')
+
+    except Exception as e:
+        current_app.logger.error(f"Import Error: {e}")
+        flash(i18n.translate('Erreur lors de l\'import: {}').format(str(e)), 'danger')
+
     return redirect(url_for('lexique.admin'))
 
 @lexique_bp.route('/admin/suggestion/<int:suggestion_id>/reject', methods=['POST'])

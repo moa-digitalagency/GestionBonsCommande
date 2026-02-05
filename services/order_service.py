@@ -6,13 +6,15 @@ from models.order import Order, OrderLine, OrderHistory
 
 class OrderService:
     @staticmethod
-    def create_order(project_id, requested_date=None, notes=None, supplier_name=None, 
-                     supplier_contact=None, supplier_phone=None):
+    def create_order(project_id, requested_date=None, notes=None,
+                     notes_internal=None, notes_supplier_fr=None, notes_supplier_en=None,
+                     supplier_name=None, supplier_contact=None, supplier_phone=None):
         company = Company.query.get(current_user.company_id)
         if not company:
             raise ValueError("Société non trouvée")
         
-        bc_number = company.generate_bc_number()
+        # New Numbering Engine Logic
+        bc_number = OrderService.generate_reference(company)
         
         order = Order(
             company_id=current_user.company_id,
@@ -21,6 +23,9 @@ class OrderService:
             status='BROUILLON',
             requested_date=requested_date,
             notes=notes,
+            notes_internal=notes_internal,
+            notes_supplier_fr=notes_supplier_fr,
+            notes_supplier_en=notes_supplier_en,
             supplier_name=supplier_name,
             supplier_contact=supplier_contact,
             supplier_phone=supplier_phone,
@@ -35,6 +40,38 @@ class OrderService:
         
         return order
     
+    @staticmethod
+    def generate_reference(company):
+        # Default fallback
+        prefix = 'BC'
+        separator = '-'
+        year_format = 'YYYY'
+        length = 3
+        start_number = 1
+
+        if company.settings and 'numbering' in company.settings:
+            n = company.settings['numbering']
+            prefix = n.get('prefix', 'BC')
+            separator = n.get('separator', '-')
+            year_format = n.get('year_format', 'YYYY')
+            length = int(n.get('sequence_length', 3))
+            start_number = int(n.get('start_number', 1))
+
+        # Manage counter
+        # We use bc_counter from company model as the persistent counter
+        # Check if we need to jump to start_number
+        if company.bc_counter < start_number - 1:
+            company.bc_counter = start_number - 1
+
+        company.bc_counter += 1
+        seq_num = company.bc_counter
+
+        now = datetime.utcnow()
+        year_str = str(now.year) if year_format == 'YYYY' else str(now.year)[2:]
+        seq_str = str(seq_num).zfill(length)
+
+        return f"{prefix}{separator}{year_str}{separator}{seq_str}"
+
     @staticmethod
     def add_line(order, description, quantity, unit='unite', unit_price=None, 
                  product_id=None, note=None, description_translated=None, translation_snapshot=None):
