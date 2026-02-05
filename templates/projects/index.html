@@ -3,68 +3,147 @@
 {% block title %}Chantiers - BTP Commande{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Chantiers</h1>
-    {% if current_user.role in ['admin', 'super_admin'] %}
-    <a href="{{ url_for('projects.add') }}" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-        <i class="fas fa-plus mr-2"></i> Nouveau chantier
-    </a>
-    {% endif %}
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    {% for project in projects %}
-    <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-        <div class="p-6">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">{{ project.name }}</h3>
-                    {% if project.code %}
-                    <p class="text-sm text-gray-500">{{ project.code }}</p>
-                    {% endif %}
-                </div>
-                {% if not project.is_active %}
-                <span class="px-2 py-1 text-xs bg-red-100 text-red-600 rounded">Inactif</span>
-                {% endif %}
-            </div>
-            
-            <div class="mt-4 space-y-2 text-sm text-gray-600">
-                {% if project.city or project.address %}
-                <p><i class="fas fa-map-marker-alt mr-2 text-gray-400"></i> {{ project.city or project.address }}</p>
-                {% endif %}
-                {% if project.contact_name %}
-                <p><i class="fas fa-user mr-2 text-gray-400"></i> {{ project.contact_name }}</p>
-                {% endif %}
-                {% if project.contact_phone %}
-                <p><i class="fas fa-phone mr-2 text-gray-400"></i> {{ project.contact_phone }}</p>
-                {% endif %}
-            </div>
-            
-            <div class="mt-4 pt-4 border-t flex justify-between items-center">
-                <span class="text-sm text-gray-500">{{ project.orders.count() }} commandes</span>
-                <div class="space-x-2">
-                    <a href="{{ url_for('projects.view', project_id=project.id) }}" class="text-blue-600 hover:text-blue-800" aria-label="Voir le chantier {{ project.name }}" title="Voir le chantier">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    {% if current_user.role in ['admin', 'super_admin'] %}
-                    <a href="{{ url_for('projects.edit', project_id=project.id) }}" class="text-green-600 hover:text-green-800" aria-label="Modifier le chantier {{ project.name }}" title="Modifier le chantier">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
+<div class="space-y-6">
+    <!-- Header & Actions -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Sites de Construction</h1>
+            <p class="text-gray-500 text-sm">Gérez vos chantiers et lieux de livraison.</p>
         </div>
-    </div>
-    {% else %}
-    <div class="col-span-full bg-white rounded-lg shadow p-12 text-center">
-        <i class="fas fa-hard-hat text-5xl text-gray-300 mb-4"></i>
-        <p class="text-lg text-gray-500">Aucun chantier</p>
         {% if current_user.role in ['admin', 'super_admin'] %}
-        <a href="{{ url_for('projects.add') }}" class="mt-4 inline-block text-blue-600 hover:underline">
-            Créer votre premier chantier
+        <a href="{{ url_for('projects.add') }}" class="inline-flex items-center px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-brand-dark shadow-sm">
+            <i class="fas fa-plus mr-2"></i> Nouveau chantier
         </a>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Filters -->
+    <div class="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+        <div class="flex-1 relative">
+             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+            </div>
+            <input type="text" placeholder="Rechercher un site..." class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+        </div>
+        <div class="w-full md:w-64">
+            <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                <option value="">Tous les statuts</option>
+                <option value="active">Actif</option>
+                <option value="inactive">Inactif</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Nom du site (Ref)
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Adresse
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Contact Principal
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Téléphone
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Statut
+                    </th>
+                    <th scope="col" class="relative px-6 py-3">
+                        <span class="sr-only">Actions</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for project in projects %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 rounded bg-blue-50 flex items-center justify-center text-brand-primary">
+                                <i class="fas fa-hard-hat"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ project.name }}</div>
+                                {% if project.code %}
+                                <div class="text-xs text-gray-500">Ref: {{ project.code }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">{{ project.city or '-' }}</div>
+                        <div class="text-xs text-gray-500 truncate max-w-xs" title="{{ project.address }}">{{ project.address or '' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ project.contact_name or '-' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">{{ project.contact_phone or '-' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if project.is_active %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ 'Actif' if project.is_active else 'Inactif' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ url_for('projects.view', project_id=project.id) }}" class="text-brand-primary hover:text-brand-dark mr-4" title="Voir">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        {% if current_user.role in ['admin', 'super_admin'] %}
+                        <a href="{{ url_for('projects.edit', project_id=project.id) }}" class="text-gray-600 hover:text-gray-900" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                        <i class="fas fa-hard-hat text-4xl mb-3 text-gray-300"></i>
+                        <p>Aucun chantier trouvé.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- KPIs Bottom -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
+            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                <i class="fas fa-check-circle text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Sites Actifs</p>
+                <p class="text-2xl font-bold text-gray-900">{{ projects|selectattr('is_active')|list|length }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
+             <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                <i class="fas fa-map-marker-alt text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Adresses Livraison</p>
+                <p class="text-2xl font-bold text-gray-900">{{ projects|selectattr('address')|list|length }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
+             <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                <i class="fas fa-address-book text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Contacts Enregistrés</p>
+                <p class="text-2xl font-bold text-gray-900">{{ projects|selectattr('contact_name')|list|length }}</p>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,136 +1,209 @@
-{#
- /* * Nom de l'application : BTP Commande
-  * Description : Paramètres de la société
-  * Produit de : MOA Digital Agency, www.myoneart.com
-  * Fait par : Aisance KALONJI, www.aisancekalonji.com
-  * Auditer par : La CyberConfiance, www.cyberconfiance.com
-  */
-#}
 {% extends "base.html" %}
 
-{% block title %}Paramètres Société - BTP Commande{% endblock %}
+{% block title %}Paramètres Société{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Paramètres de la société</h1>
+<div class="space-y-6" x-data="{
+    activeTab: 'branding',
+    prefix: '{{ company.settings.numbering.prefix if company.settings and company.settings.numbering else 'BC' }}',
+    year: '{{ company.settings.numbering.year_format if company.settings and company.settings.numbering else 'YYYY' }}',
+    length: {{ company.settings.numbering.sequence_length if company.settings and company.settings.numbering else 3 }},
+    separator: '{{ company.settings.numbering.separator if company.settings and company.settings.numbering else '-' }}',
+    get preview() {
+        let d = new Date();
+        let y = this.year === 'YYYY' ? d.getFullYear() : (d.getFullYear() % 100);
+        let seq = '1'.padStart(this.length, '0');
+        return `${this.prefix}${this.separator}${y}${this.separator}${seq}`;
+    }
+}">
     
-    <div class="bg-white rounded-lg shadow p-6">
-        <form method="POST" enctype="multipart/form-data" class="space-y-6">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <div class="flex items-center space-x-6">
-                <div class="shrink-0">
-                    {% if company.logo_path %}
-                    <img class="h-20 w-20 object-cover rounded-lg" src="{{ url_for('static', filename=company.logo_path) }}" alt="Logo">
-                    {% else %}
-                    <div class="h-20 w-20 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-building text-3xl text-gray-400"></i>
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-gray-900">Paramètres de l'Entreprise</h1>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <button @click="activeTab = 'branding'"
+                :class="activeTab === 'branding' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Branding & Infos
+            </button>
+            <button @click="activeTab = 'numbering'"
+                :class="activeTab === 'numbering' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Numérotation
+            </button>
+             <button @click="activeTab = 'regional'"
+                :class="activeTab === 'regional' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Régional
+            </button>
+        </nav>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="bg-white shadow rounded-lg divide-y divide-gray-200">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- Branding & Infos Tab -->
+        <div x-show="activeTab === 'branding'" class="p-6 space-y-6">
+            <!-- Logo Section -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Logo de l'entreprise</label>
+                <div class="mt-2 flex items-center space-x-6">
+                    <div class="flex-shrink-0 h-24 w-24 border border-gray-300 rounded-md overflow-hidden bg-gray-50 flex items-center justify-center">
+                        {% if company.logo_path %}
+                        <img class="h-full w-full object-cover" src="{{ url_for('static', filename=company.logo_path) }}" alt="Logo">
+                        {% else %}
+                        <span class="text-gray-400"><i class="fas fa-image text-3xl"></i></span>
+                        {% endif %}
                     </div>
-                    {% endif %}
+                    <div class="flex-1">
+                        <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-3"></i>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="logo-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-brand-primary hover:text-brand-dark focus-within:outline-none">
+                                        <span>Télécharger un fichier</span>
+                                        <input id="logo-upload" name="logo" type="file" class="sr-only" accept="image/*">
+                                    </label>
+                                    <p class="pl-1">ou glisser-déposer</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, GIF jusqu'à 5MB</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal Info Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nom de l'entreprise</label>
+                    <input type="text" name="name" id="name" value="{{ company.name }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Logo de la société</label>
-                    <input type="file" name="logo" accept="image/*"
-                           class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <label for="ice" class="block text-sm font-medium text-gray-700">Identifiant Commun de l'Entreprise (ICE)</label>
+                    <input type="text" name="ice" id="ice" value="{{ company.ice or '' }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                </div>
+                <div>
+                    <label for="rc" class="block text-sm font-medium text-gray-700">Registre de Commerce (RC)</label>
+                    <input type="text" name="rc" id="rc" value="{{ company.rc or '' }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                </div>
+                <div>
+                    <label for="patente" class="block text-sm font-medium text-gray-700">Patente</label>
+                    <input type="text" name="patente" id="patente" value="{{ company.patente or '' }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                </div>
+                 <div>
+                    <label for="if_number" class="block text-sm font-medium text-gray-700">Identifiant Fiscal (IF)</label>
+                    <input type="text" name="if_number" id="if_number" value="{{ company.if_number or '' }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                </div>
+                 <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone</label>
+                    <input type="text" name="phone" id="phone" value="{{ company.phone or '' }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                </div>
+                 <div class="md:col-span-2">
+                    <label for="address" class="block text-sm font-medium text-gray-700">Adresse Complète</label>
+                    <textarea name="address" id="address" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">{{ company.address or '' }}</textarea>
+                </div>
+                 <div>
+                    <label for="city" class="block text-sm font-medium text-gray-700">Ville</label>
+                    <input type="text" name="city" id="city" value="{{ company.city or '' }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                </div>
+                 <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email Professionnel</label>
+                    <input type="email" name="email" id="email" value="{{ company.email or '' }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
                 </div>
             </div>
-            
-            <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Raison sociale *</label>
-                <input type="text" name="name" id="name" required
-                       value="{{ company.name }}"
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            
-            <div class="border-t pt-4">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Informations légales (Maroc)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="ice" class="block text-sm font-medium text-gray-700">ICE</label>
-                        <input type="text" name="ice" id="ice"
-                               value="{{ company.ice or '' }}"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                               placeholder="Identifiant Commun de l'Entreprise">
+        </div>
+
+        <!-- Numbering Tab -->
+        <div x-show="activeTab === 'numbering'" class="p-6 space-y-6">
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-400"></i>
                     </div>
-                    <div>
-                        <label for="rc" class="block text-sm font-medium text-gray-700">RC</label>
-                        <input type="text" name="rc" id="rc"
-                               value="{{ company.rc or '' }}"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                               placeholder="Registre de Commerce">
-                    </div>
-                    <div>
-                        <label for="patente" class="block text-sm font-medium text-gray-700">Patente</label>
-                        <input type="text" name="patente" id="patente"
-                               value="{{ company.patente or '' }}"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="if_number" class="block text-sm font-medium text-gray-700">IF</label>
-                        <input type="text" name="if_number" id="if_number"
-                               value="{{ company.if_number or '' }}"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                               placeholder="Identifiant Fiscal">
-                    </div>
-                </div>
-            </div>
-            
-            <div class="border-t pt-4">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Coordonnées</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label for="address" class="block text-sm font-medium text-gray-700">Adresse</label>
-                        <textarea name="address" id="address" rows="2"
-                                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ company.address or '' }}</textarea>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="city" class="block text-sm font-medium text-gray-700">Ville</label>
-                            <input type="text" name="city" id="city"
-                                   value="{{ company.city or '' }}"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone</label>
-                            <input type="tel" name="phone" id="phone"
-                                   value="{{ company.phone or '' }}"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" name="email" id="email"
-                                   value="{{ company.email or '' }}"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            Configurez comment vos numéros de documents seront générés automatiquement.
+                        </p>
                     </div>
                 </div>
             </div>
-            
-            <div class="border-t pt-4">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Configuration Bons de Commande</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="bc_prefix" class="block text-sm font-medium text-gray-700">Préfixe BC</label>
-                        <input type="text" name="bc_prefix" id="bc_prefix"
-                               value="{{ company.bc_prefix or 'BC' }}"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                               placeholder="Ex: BC, CMD...">
-                        <p class="mt-1 text-xs text-gray-500">Format: {{ company.bc_prefix }}-2024-0001</p>
-                    </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Préfixe</label>
+                    <input type="text" name="num_prefix" x-model="prefix" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                    <p class="mt-1 text-xs text-gray-500">Ex: BC, PO, CMD</p>
                 </div>
-                <div class="mt-4">
-                    <label for="bc_footer" class="block text-sm font-medium text-gray-700">Pied de page PDF</label>
-                    <textarea name="bc_footer" id="bc_footer" rows="2"
-                              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                              placeholder="Mentions à afficher en bas du PDF...">{{ company.bc_footer or '' }}</textarea>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Format Année</label>
+                    <select name="num_year" x-model="year" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                        <option value="YYYY">YYYY (2024)</option>
+                        <option value="YY">YY (24)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Longueur de la séquence</label>
+                    <input type="number" name="num_length" x-model="length" min="1" max="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                    <p class="mt-1 text-xs text-gray-500">Ex: 3 pour 001, 4 pour 0001</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Séparateur</label>
+                    <select name="num_separator" x-model="separator" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                        <option value="-">Tiret (-)</option>
+                        <option value="/">Slash (/)</option>
+                        <option value="_">Underscore (_)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Numéro de départ</label>
+                    <input type="number" name="num_start" value="{{ company.settings.numbering.start_number if company.settings and company.settings.numbering else 1 }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                    <p class="mt-1 text-xs text-gray-500">Le compteur commencera à ce numéro pour la prochaine commande.</p>
                 </div>
             </div>
-            
-            <div class="flex justify-end pt-4">
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-save mr-2"></i> Enregistrer
-                </button>
+
+            <!-- Live Preview -->
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                <p class="text-sm text-gray-500 uppercase tracking-wide">Aperçu du prochain numéro</p>
+                <div class="mt-2 text-3xl font-mono font-bold text-gray-900" x-text="preview"></div>
             </div>
-        </form>
-    </div>
+        </div>
+
+        <!-- Regional Tab -->
+        <div x-show="activeTab === 'regional'" class="p-6 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Langue par défaut</label>
+                    <select name="default_language" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                        {% for lang_code in supported_languages %}
+                        <option value="{{ lang_code }}" {% if company.default_language == lang_code %}selected{% endif %}>{{ lang_code|upper }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Devise</label>
+                    <select name="currency" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                        <option value="MAD" {% if company.currency == 'MAD' %}selected{% endif %}>MAD (Dirham Marocain)</option>
+                        <option value="EUR" {% if company.currency == 'EUR' %}selected{% endif %}>EUR (Euro)</option>
+                        <option value="USD" {% if company.currency == 'USD' %}selected{% endif %}>USD (Dollar Américain)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 bg-gray-50 text-right">
+            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary">
+                Enregistrer les modifications
+            </button>
+        </div>
+    </form>
 </div>
 {% endblock %}

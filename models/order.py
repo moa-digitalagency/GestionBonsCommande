@@ -12,7 +12,12 @@ class Order(db.Model):
     status = db.Column(db.String(20), nullable=False, default='BROUILLON')
     
     requested_date = db.Column(db.Date, nullable=True)
-    notes = db.Column(db.Text, nullable=True)
+
+    # Updated Notes structure
+    notes_internal = db.Column(db.Text, nullable=True)
+    notes_supplier_fr = db.Column(db.Text, nullable=True)
+    notes_supplier_en = db.Column(db.Text, nullable=True)
+    notes = db.Column(db.Text, nullable=True) # Kept for backward compatibility
     
     supplier_name = db.Column(db.String(200), nullable=True)
     supplier_contact = db.Column(db.String(200), nullable=True)
@@ -56,8 +61,7 @@ class Order(db.Model):
     def get_total(self):
         total = 0
         for line in self.lines:
-            if line.unit_price:
-                total += line.quantity * float(line.unit_price)
+            total += line.get_subtotal()
         return total
     
     def __repr__(self):

@@ -34,7 +34,7 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     
-    SUPPORTED_LANGUAGES = ['fr', 'ar', 'darija_lat', 'en', 'es']
+    SUPPORTED_LANGUAGES = ['fr', 'en', 'ar']
     DEFAULT_LANGUAGE = 'fr'
     
     BC_STATUSES = ['BROUILLON', 'SOUMIS', 'VALIDE', 'PDF_GENERE', 'PARTAGE']

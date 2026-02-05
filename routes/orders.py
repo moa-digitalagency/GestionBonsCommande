@@ -39,8 +39,13 @@ def index():
     orders = orders.order_by(Order.created_at.desc()).all()
     projects = TenantService.get_tenant_projects().all()
     
+    # Recent Activity (Global for tenant)
+    recent_history = OrderHistory.query.join(Order).filter(
+        Order.company_id == current_user.company_id
+    ).order_by(OrderHistory.created_at.desc()).limit(10).all()
+
     return render_template('orders/index.html', orders=orders, projects=projects, 
-                         current_status=status, current_project=project_id)
+                         current_status=status, current_project=project_id, recent_history=recent_history)
 
 @orders_bp.route('/create', methods=['GET', 'POST'])
 @login_required
@@ -53,6 +58,10 @@ def create():
         project_id = request.form.get('project_id')
         requested_date_str = request.form.get('requested_date', '')
         notes = request.form.get('notes', '').strip()
+        notes_internal = request.form.get('notes_internal', '').strip()
+        notes_supplier_fr = request.form.get('notes_supplier_fr', '').strip()
+        notes_supplier_en = request.form.get('notes_supplier_en', '').strip()
+
         supplier_name = request.form.get('supplier_name', '').strip()
         supplier_contact = request.form.get('supplier_contact', '').strip()
         supplier_phone = request.form.get('supplier_phone', '').strip()
@@ -78,6 +87,9 @@ def create():
                 project_id=int(project_id),
                 requested_date=requested_date,
                 notes=notes,
+                notes_internal=notes_internal,
+                notes_supplier_fr=notes_supplier_fr,
+                notes_supplier_en=notes_supplier_en,
                 supplier_name=supplier_name,
                 supplier_contact=supplier_contact,
                 supplier_phone=supplier_phone
@@ -131,6 +143,10 @@ def edit(order_id):
         if action == 'update_info':
             requested_date_str = request.form.get('requested_date', '')
             order.notes = request.form.get('notes', '').strip()
+            order.notes_internal = request.form.get('notes_internal', '').strip()
+            order.notes_supplier_fr = request.form.get('notes_supplier_fr', '').strip()
+            order.notes_supplier_en = request.form.get('notes_supplier_en', '').strip()
+
             order.supplier_name = request.form.get('supplier_name', '').strip()
             order.supplier_contact = request.form.get('supplier_contact', '').strip()
             order.supplier_phone = request.form.get('supplier_phone', '').strip()

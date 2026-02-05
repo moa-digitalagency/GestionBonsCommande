@@ -26,7 +26,7 @@
 /* Loading spinner */
 .spinner {
     border: 2px solid #f3f4f6;
-    border-top: 2px solid #2563eb;
+    border-top: 2px solid #005691;
     border-radius: 50%;
     width: 20px;
     height: 20px;
@@ -38,27 +38,52 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Status badge colors */
-.status-brouillon { background-color: #f3f4f6; color: #4b5563; }
-.status-soumis { background-color: #fef3c7; color: #d97706; }
-.status-valide { background-color: #d1fae5; color: #059669; }
-.status-pdf { background-color: #dbeafe; color: #2563eb; }
-.status-partage { background-color: #e9d5ff; color: #7c3aed; }
+/* Status badge colors - Matching Tailwind 100/800 scale */
+/* Brouillon/Inactif: Gray */
+.status-brouillon, .status-inactive, .status-draft {
+    background-color: #F3F4F6; /* gray-100 */
+    color: #1F2937; /* gray-800 */
+}
+
+/* En attente/Soumis: Yellow */
+.status-soumis, .status-pending, .status-submitted {
+    background-color: #FEF9C3; /* yellow-100 */
+    color: #854D0E; /* yellow-800 */
+}
+
+/* Validé/Actif: Green */
+.status-valide, .status-active, .status-validated {
+    background-color: #DCFCE7; /* green-100 */
+    color: #166534; /* green-800 */
+}
+
+/* Partagé/Bleu: Blue */
+.status-partage, .status-pdf, .status-shared {
+    background-color: #DBEAFE; /* blue-100 */
+    color: #1E40AF; /* blue-800 */
+}
+
+/* Rejected: Red (Adding just in case) */
+.status-rejet, .status-rejected {
+    background-color: #FEE2E2; /* red-100 */
+    color: #991B1B; /* red-800 */
+}
 
 /* Focus styles */
 input:focus, select:focus, textarea:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 2px rgba(0, 86, 145, 0.2);
+    border-color: #005691;
 }
 
 /* Table hover effect */
 tbody tr:hover {
-    background-color: #f9fafb;
+    background-color: #F8FAFC;
 }
 
 /* Card hover effect */
 .card-hover:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* Custom Scrollbar */
@@ -82,9 +107,9 @@ tbody tr:hover {
 
 /* Sidebar specific scrollbar */
 aside ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.1);
 }
 
 aside ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.2);
 }

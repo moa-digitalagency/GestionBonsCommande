@@ -11,52 +11,98 @@
 {% block title %}{{ _('Connexion - BTP Commande') }}{% endblock %}
 
 {% block guest_content %}
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <div class="text-center">
-            <h1 class="text-3xl font-bold text-white">{{ _('BTP Commande') }}</h1>
-            <h2 class="mt-4 text-xl text-blue-100">{{ _('Connexion') }}</h2>
-        </div>
-        
-        <div class="bg-white rounded-xl shadow-xl p-8">
-            <form method="POST" class="space-y-6">
+<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-brand-bg">
+
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-brand-text-title">
+            BTP COMMAND
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+            {{ _('Connectez-vous à votre espace') }}
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 shadow-sm sm:rounded-lg sm:px-10 border border-gray-100">
+            <!-- Language Selector (Inside Form) -->
+            <div class="flex justify-center space-x-4 mb-6 border-b border-gray-100 pb-4">
+                {% set current_lang = get_locale() %}
+                <a href="{{ url_for('main.set_language', lang_code='fr') }}"
+                   class="text-sm font-medium {{ 'text-brand-primary border-b-2 border-brand-primary' if current_lang == 'fr' else 'text-gray-500 hover:text-gray-700' }} pb-1 transition-colors">
+                    Français
+                </a>
+                <a href="{{ url_for('main.set_language', lang_code='en') }}"
+                   class="text-sm font-medium {{ 'text-brand-primary border-b-2 border-brand-primary' if current_lang == 'en' else 'text-gray-500 hover:text-gray-700' }} pb-1 transition-colors">
+                    English
+                </a>
+                <a href="{{ url_for('main.set_language', lang_code='ar') }}"
+                   class="text-sm font-medium {{ 'text-brand-primary border-b-2 border-brand-primary' if current_lang == 'ar' else 'text-gray-500 hover:text-gray-700' }} pb-1 transition-colors">
+                    Arabe(Darija)
+                </a>
+            </div>
+
+            <form class="space-y-6" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">{{ _('Email') }}</label>
-                    <input type="email" name="email" id="email" required
-                           class="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="votre@email.com">
-                </div>
-                
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">{{ _('Mot de passe') }}</label>
-                    <input type="password" name="password" id="password" required
-                           class="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="••••••••">
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input type="checkbox" name="remember" id="remember"
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label for="remember" class="ml-2 block text-sm text-gray-700">{{ _('Se souvenir de moi') }}</label>
+                    <label for="email" class="block text-sm font-medium text-gray-700">
+                        {{ _('Email') }}
+                    </label>
+                    <div class="mt-1">
+                        <input id="email" name="email" type="email" autocomplete="email" required class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm">
                     </div>
                 </div>
-                
-                <button type="submit" 
-                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    {{ _('Se connecter') }}
-                </button>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">
+                        {{ _('Mot de passe') }}
+                    </label>
+                    <div class="mt-1">
+                        <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember" name="remember" type="checkbox" class="h-4 w-4 text-brand-primary focus:ring-brand-primary border-gray-300 rounded">
+                        <label for="remember" class="ml-2 block text-sm text-gray-900">
+                            {{ _('Se souvenir de moi') }}
+                        </label>
+                    </div>
+
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-brand-primary hover:text-blue-500">
+                            {{ _('Mot de passe oublié ?') }}
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-primary hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-colors">
+                        {{ _('Se connecter') }}
+                    </button>
+                </div>
             </form>
-            
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-600">
-                    {{ _('Pas encore de compte?') }}
-                    <a href="{{ url_for('auth.register') }}" class="text-blue-600 hover:underline font-medium">{{ _("S'inscrire") }}</a>
-                </p>
+
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">
+                            {{ _('Support') }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <a href="mailto:support@example.com" class="text-sm text-gray-500 hover:text-gray-900">
+                        {{ _('Contact Administrator') }}
+                    </a>
+                </div>
             </div>
         </div>
-        
     </div>
 </div>
 {% endblock %}

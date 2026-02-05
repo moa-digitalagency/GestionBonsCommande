@@ -22,6 +22,11 @@ class Company(db.Model):
     bc_counter = db.Column(db.Integer, default=0)
     bc_footer = db.Column(db.Text, nullable=True)
     
+    # New Fields for Settings Module
+    settings = db.Column(db.JSON, default=dict) # For Numbering Engine etc
+    default_language = db.Column(db.String(10), default='fr')
+    currency = db.Column(db.String(10), default='MAD')
+
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
