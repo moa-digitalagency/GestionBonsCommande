@@ -8,29 +8,34 @@
         <h1 class="text-2xl font-bold text-gray-900">Dictionnaire BTP</h1>
         <p class="text-gray-600">Termes techniques multilingues</p>
     </div>
-    <a href="{{ url_for('lexique.suggest') }}" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+    <a href="{{ url_for('lexique.suggest') }}" class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-opacity-90 transition-colors shadow-sm">
         <i class="fas fa-lightbulb mr-2"></i> Suggérer un terme
     </a>
 </div>
 
-<div class="bg-white rounded-lg shadow mb-6 p-4">
+<div class="bg-white rounded-xl shadow-sm mb-6 p-4 border border-gray-100">
     <form method="GET" class="flex flex-col md:flex-row gap-4">
-        <input type="text" name="search" placeholder="Rechercher un terme..."
+        <div class="flex-1 relative">
+             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+            </div>
+            <input type="text" name="search" placeholder="Rechercher un terme..."
                value="{{ search }}"
-               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-        <select name="category" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+               class="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-colors">
+        </div>
+        <select name="category" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-colors bg-white">
             <option value="">Toutes catégories</option>
             <option value="materiau" {% if current_category == 'materiau' %}selected{% endif %}>Matériaux</option>
             <option value="materiel" {% if current_category == 'materiel' %}selected{% endif %}>Matériel</option>
             <option value="general" {% if current_category == 'general' %}selected{% endif %}>Général</option>
         </select>
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <button type="submit" class="px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-opacity-90 transition-colors shadow-sm">
             <i class="fas fa-search mr-1"></i> Rechercher
         </button>
     </form>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
     {% if entries %}
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">

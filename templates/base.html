@@ -68,35 +68,35 @@
                  </a>
             </div>
 
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if request.endpoint == 'main.dashboard' else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <i class="fas fa-home w-6 text-center text-lg {{ 'text-brand-primary' if request.endpoint == 'main.dashboard' else 'text-gray-400 group-hover:text-gray-500' }}"></i>
+            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
+                <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if request.endpoint == 'main.dashboard' else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
+                    <i class="fas fa-home w-6 text-center text-lg {{ 'text-brand-primary' if request.endpoint == 'main.dashboard' else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
                     <span class="mx-3">{{ _('Tableau de bord') }}</span>
                 </a>
 
                 {% if current_user.role != 'super_admin' %}
-                <a href="{{ url_for('orders.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'orders' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <i class="fas fa-file-alt w-6 text-center text-lg {{ 'text-brand-primary' if 'orders' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
+                <a href="{{ url_for('orders.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'orders' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
+                    <i class="fas fa-file-alt w-6 text-center text-lg {{ 'text-brand-primary' if 'orders' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
                     <span class="mx-3">{{ _('Bons de Commande') }}</span>
                 </a>
-                <a href="{{ url_for('projects.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'projects' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <i class="fas fa-hard-hat w-6 text-center text-lg {{ 'text-brand-primary' if 'projects' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
+                <a href="{{ url_for('projects.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'projects' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
+                    <i class="fas fa-hard-hat w-6 text-center text-lg {{ 'text-brand-primary' if 'projects' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
                     <span class="mx-3">{{ _('Chantiers') }}</span>
                 </a>
-                <a href="{{ url_for('products.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'products' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <i class="fas fa-boxes w-6 text-center text-lg {{ 'text-brand-primary' if 'products' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
+                <a href="{{ url_for('products.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'products' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
+                    <i class="fas fa-boxes w-6 text-center text-lg {{ 'text-brand-primary' if 'products' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
                     <span class="mx-3">{{ _('Articles') }}</span>
                 </a>
                 {% endif %}
 
-                <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'lexique' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <i class="fas fa-book w-6 text-center text-lg {{ 'text-brand-primary' if 'lexique' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
+                <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'lexique' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
+                    <i class="fas fa-book w-6 text-center text-lg {{ 'text-brand-primary' if 'lexique' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
                     <span class="mx-3">{{ _('Dictionnaire') }}</span>
                 </a>
 
                 {% if current_user.role == 'super_admin' %}
-                <a href="{{ url_for('admin.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ 'bg-blue-50 text-brand-primary' if 'admin' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                    <i class="fas fa-cog w-6 text-center text-lg {{ 'text-brand-primary' if 'admin' in request.endpoint else 'text-gray-400 group-hover:text-gray-500' }}"></i>
+                <a href="{{ url_for('admin.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'admin' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
+                    <i class="fas fa-cog w-6 text-center text-lg {{ 'text-brand-primary' if 'admin' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
                     <span class="mx-3">{{ _('Administration') }}</span>
                 </a>
                 {% endif %}
@@ -134,33 +134,33 @@
                         <span class="text-xl font-bold text-brand-primary">BTP COMMAND</span>
                     </div>
                     <div class="mt-5 h-0 flex-1 overflow-y-auto">
-                        <nav class="space-y-1 px-2">
-                             <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
-                                <i class="fas fa-home mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
+                        <nav class="space-y-1 px-3">
+                             <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
+                                <i class="fas fa-home mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
                                 {{ _('Tableau de bord') }}
                             </a>
 
                              {% if current_user.role != 'super_admin' %}
-                            <a href="{{ url_for('orders.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
-                                <i class="fas fa-file-alt mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
+                            <a href="{{ url_for('orders.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
+                                <i class="fas fa-file-alt mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
                                 {{ _('Bons de Commande') }}
                             </a>
-                            <a href="{{ url_for('projects.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
-                                <i class="fas fa-hard-hat mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
+                            <a href="{{ url_for('projects.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
+                                <i class="fas fa-hard-hat mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
                                 {{ _('Chantiers') }}
                             </a>
-                            <a href="{{ url_for('products.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
-                                <i class="fas fa-boxes mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
+                            <a href="{{ url_for('products.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
+                                <i class="fas fa-boxes mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
                                 {{ _('Articles') }}
                             </a>
                             {% endif %}
-                            <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
-                                <i class="fas fa-book mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
+                            <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
+                                <i class="fas fa-book mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
                                 {{ _('Dictionnaire') }}
                             </a>
                             {% if current_user.role == 'super_admin' %}
-                            <a href="{{ url_for('admin.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-900 hover:bg-gray-50">
-                                <i class="fas fa-cog mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"></i>
+                            <a href="{{ url_for('admin.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
+                                <i class="fas fa-cog mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
                                 {{ _('Administration') }}
                             </a>
                             {% endif %}
