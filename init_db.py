@@ -81,6 +81,8 @@ def init_database():
             db.session.add(admin)
             print(f"Super Admin created: {admin_email}")
         else:
+            admin.first_name = app.config['SUPER_ADMIN_FIRST_NAME']
+            admin.last_name = app.config['SUPER_ADMIN_LAST_NAME']
             admin.set_password(admin_password)
             print(f"Super Admin updated: {admin_email}")
 
