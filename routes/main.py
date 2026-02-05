@@ -1,7 +1,25 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, session, request
 from flask_login import current_user, login_required
+from urllib.parse import urlparse, urljoin
+from config.settings import Config
 
 main_bp = Blueprint('main', __name__)
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and \
+           ref_url.netloc == test_url.netloc
+
+@main_bp.route('/set_language/<lang_code>')
+def set_language(lang_code):
+    if lang_code in Config.SUPPORTED_LANGUAGES:
+        session['lang'] = lang_code
+
+    referrer = request.referrer
+    if referrer and is_safe_url(referrer):
+        return redirect(referrer)
+    return redirect(url_for('main.index'))
 
 @main_bp.route('/')
 def index():

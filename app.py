@@ -6,14 +6,17 @@
 #  */
 
 import os
-from flask import Flask, g
+from flask import Flask, g, request, session
 from flask_login import LoginManager, current_user
 from flask_wtf.csrf import CSRFProtect
+# from flask_babel import Babel # Removed in favor of custom JSON i18n
+from services.i18n_service import i18n
 from config.settings import Config
 from models import db
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
+# babel = Babel()
 
 def create_app():
     app = Flask(__name__, 
@@ -24,6 +27,8 @@ def create_app():
     
     db.init_app(app)
     csrf.init_app(app)
+    # babel.init_app(app, locale_selector=get_locale)
+    i18n.init_app(app)
     
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
@@ -49,7 +54,7 @@ def create_app():
             'current_company': lambda: g.get('current_company'),
             'supported_languages': Config.SUPPORTED_LANGUAGES,
             'bc_statuses': Config.BC_STATUSES,
-            'user_roles': Config.USER_ROLES
+            'user_roles': Config.USER_ROLES,
         }
     
     @app.after_request
