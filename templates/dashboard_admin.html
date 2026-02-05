@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Administration - BTP Commande{% endblock %}
+{% block title %}{{ _('Administration - BTP Commande') }}{% endblock %}
 
 {% block content %}
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Administration Globale</h1>
-    <p class="text-gray-600">Super Admin - Vue d'ensemble</p>
+    <h1 class="text-2xl font-bold text-gray-900">{{ _('Administration Globale') }}</h1>
+    <p class="text-gray-600">{{ _('Super Admin - Vue d\'ensemble') }}</p>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -15,7 +15,7 @@
                 <i class="fas fa-building text-2xl"></i>
             </div>
             <div class="ml-4">
-                <p class="text-sm text-gray-500">Sociétés</p>
+                <p class="text-sm text-gray-500">{{ _('Sociétés') }}</p>
                 <p class="text-2xl font-bold">{{ companies|length }}</p>
             </div>
         </div>
@@ -27,7 +27,7 @@
                 <i class="fas fa-lightbulb text-2xl"></i>
             </div>
             <div class="ml-4">
-                <p class="text-sm text-gray-500">Suggestions</p>
+                <p class="text-sm text-gray-500">{{ _('Suggestions') }}</p>
                 <p class="text-2xl font-bold">{{ pending_suggestions }}</p>
             </div>
         </div>
@@ -39,8 +39,8 @@
                 <i class="fas fa-book text-2xl"></i>
             </div>
             <div class="ml-4">
-                <p class="text-sm text-gray-500">Dictionnaire</p>
-                <p class="text-blue-600 font-medium">Gérer <i class="fas fa-arrow-right ml-1"></i></p>
+                <p class="text-sm text-gray-500">{{ _('Dictionnaire') }}</p>
+                <p class="text-blue-600 font-medium">{{ _('Gérer') }} <i class="fas fa-arrow-right ml-1"></i></p>
             </div>
         </div>
     </a>
@@ -51,8 +51,8 @@
                 <i class="fas fa-chart-bar text-2xl"></i>
             </div>
             <div class="ml-4">
-                <p class="text-sm text-gray-500">Statistiques</p>
-                <p class="text-blue-600 font-medium">Voir <i class="fas fa-arrow-right ml-1"></i></p>
+                <p class="text-sm text-gray-500">{{ _('Statistiques') }}</p>
+                <p class="text-blue-600 font-medium">{{ _('Voir') }} <i class="fas fa-arrow-right ml-1"></i></p>
             </div>
         </div>
     </a>
@@ -61,9 +61,9 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b flex justify-between items-center">
-            <h2 class="text-lg font-semibold">Sociétés</h2>
+            <h2 class="text-lg font-semibold">{{ _('Sociétés') }}</h2>
             <a href="{{ url_for('admin.add_company') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
-                <i class="fas fa-plus mr-1"></i> Nouvelle société
+                <i class="fas fa-plus mr-1"></i> {{ _('Nouvelle société') }}
             </a>
         </div>
         <div class="divide-y max-h-96 overflow-y-auto">
@@ -73,10 +73,10 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <p class="font-medium text-gray-900">{{ company.name }}</p>
-                        <p class="text-sm text-gray-500">{{ company.city or 'Ville non renseignée' }} - {{ company.users.count() }} utilisateurs</p>
+                        <p class="text-sm text-gray-500">{{ company.city or _('Ville non renseignée') }} - {{ company.users.count() }} {{ _('utilisateurs') }}</p>
                     </div>
                     <span class="px-2 py-1 text-xs rounded-full {% if company.is_active %}bg-green-100 text-green-600{% else %}bg-red-100 text-red-600{% endif %}">
-                        {{ 'Actif' if company.is_active else 'Inactif' }}
+                        {{ _('Actif') if company.is_active else _('Inactif') }}
                     </span>
                 </div>
             </a>
@@ -84,7 +84,7 @@
             {% else %}
             <div class="px-6 py-8 text-center text-gray-500">
                 <i class="fas fa-building text-4xl mb-2"></i>
-                <p>Aucune société</p>
+                <p>{{ _('Aucune société') }}</p>
             </div>
             {% endif %}
         </div>
@@ -92,15 +92,15 @@
     
     <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b flex justify-between items-center">
-            <h2 class="text-lg font-semibold">Actions rapides</h2>
+            <h2 class="text-lg font-semibold">{{ _('Actions rapides') }}</h2>
         </div>
         <div class="p-6 space-y-4">
             <a href="{{ url_for('admin.companies') }}" class="block p-4 border rounded-lg hover:bg-gray-50">
                 <div class="flex items-center">
                     <i class="fas fa-building text-blue-600 text-xl mr-4"></i>
                     <div>
-                        <p class="font-medium">Gérer les sociétés</p>
-                        <p class="text-sm text-gray-500">Créer, modifier, désactiver</p>
+                        <p class="font-medium">{{ _('Gérer les sociétés') }}</p>
+                        <p class="text-sm text-gray-500">{{ _('Créer, modifier, désactiver') }}</p>
                     </div>
                 </div>
             </a>
@@ -109,8 +109,8 @@
                 <div class="flex items-center">
                     <i class="fas fa-users text-green-600 text-xl mr-4"></i>
                     <div>
-                        <p class="font-medium">Gérer les utilisateurs</p>
-                        <p class="text-sm text-gray-500">Assigner, changer les rôles</p>
+                        <p class="font-medium">{{ _('Gérer les utilisateurs') }}</p>
+                        <p class="text-sm text-gray-500">{{ _('Assigner, changer les rôles') }}</p>
                     </div>
                 </div>
             </a>
@@ -120,13 +120,13 @@
                     <div class="flex items-center">
                         <i class="fas fa-book text-purple-600 text-xl mr-4"></i>
                         <div>
-                            <p class="font-medium">Dictionnaire BTP</p>
-                            <p class="text-sm text-gray-500">Gérer les termes et suggestions</p>
+                            <p class="font-medium">{{ _('Dictionnaire BTP') }}</p>
+                            <p class="text-sm text-gray-500">{{ _('Gérer les termes et suggestions') }}</p>
                         </div>
                     </div>
                     {% if pending_suggestions > 0 %}
                     <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
-                        {{ pending_suggestions }} en attente
+                        {{ pending_suggestions }} {{ _('en attente') }}
                     </span>
                     {% endif %}
                 </div>
