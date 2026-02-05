@@ -13,22 +13,6 @@
 {% block guest_content %}
 <div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-brand-bg">
 
-    <!-- Language Switcher (Top Right) -->
-    <div class="absolute top-4 right-4">
-        <div class="relative" x-data="{ langOpen: false }">
-            <button @click="langOpen = !langOpen" class="flex items-center text-gray-500 hover:text-brand-primary focus:outline-none transition-colors">
-                <i class="fas fa-globe mr-1 rtl:mr-0 rtl:ml-1"></i> <span class="uppercase font-medium text-sm">{{ get_locale() }}</span>
-            </button>
-            <div x-show="langOpen" x-cloak @click.away="langOpen = false" class="absolute right-0 rtl:right-auto rtl:left-0 z-20 mt-2 w-32 origin-top-right rtl:origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                {% for lang in supported_languages %}
-                <a href="{{ url_for('main.set_language', lang_code=lang) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    {{ lang|upper }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 class="mt-6 text-center text-3xl font-extrabold text-brand-text-title">
             BTP COMMAND
@@ -40,6 +24,23 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="bg-white py-8 px-4 shadow-sm sm:rounded-lg sm:px-10 border border-gray-100">
+            <!-- Language Selector (Inside Form) -->
+            <div class="flex justify-center space-x-4 mb-6 border-b border-gray-100 pb-4">
+                {% set current_lang = get_locale() %}
+                <a href="{{ url_for('main.set_language', lang_code='fr') }}"
+                   class="text-sm font-medium {{ 'text-brand-primary border-b-2 border-brand-primary' if current_lang == 'fr' else 'text-gray-500 hover:text-gray-700' }} pb-1 transition-colors">
+                    Français
+                </a>
+                <a href="{{ url_for('main.set_language', lang_code='en') }}"
+                   class="text-sm font-medium {{ 'text-brand-primary border-b-2 border-brand-primary' if current_lang == 'en' else 'text-gray-500 hover:text-gray-700' }} pb-1 transition-colors">
+                    English
+                </a>
+                <a href="{{ url_for('main.set_language', lang_code='ar') }}"
+                   class="text-sm font-medium {{ 'text-brand-primary border-b-2 border-brand-primary' if current_lang == 'ar' else 'text-gray-500 hover:text-gray-700' }} pb-1 transition-colors">
+                    Arabe(Darija)
+                </a>
+            </div>
+
             <form class="space-y-6" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
