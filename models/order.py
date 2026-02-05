@@ -61,8 +61,7 @@ class Order(db.Model):
     def get_total(self):
         total = 0
         for line in self.lines:
-            if line.unit_price:
-                total += line.quantity * float(line.unit_price)
+            total += line.get_subtotal()
         return total
     
     def __repr__(self):
