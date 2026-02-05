@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import or_
 from models import db
 from models.product import Product
+from services.i18n_service import i18n
 from security.decorators import tenant_required, admin_required
 from services.tenant_service import TenantService
 from config.settings import Config
@@ -41,7 +42,7 @@ def add():
                 labels[lang] = label
         
         if not labels.get('fr'):
-            flash('Le libellé en français est obligatoire.', 'danger')
+            flash(i18n.translate('Le libellé en français est obligatoire.'), 'danger')
             return render_template('products/form.html', product=None, languages=Config.SUPPORTED_LANGUAGES)
         
         product = Product(
@@ -57,7 +58,7 @@ def add():
         db.session.add(product)
         db.session.commit()
         
-        flash('Article créé avec succès.', 'success')
+        flash(i18n.translate('Article créé avec succès.'), 'success')
         return redirect(url_for('products.index'))
     
     return render_template('products/form.html', product=None, languages=Config.SUPPORTED_LANGUAGES)
@@ -70,7 +71,7 @@ def edit(product_id):
     product = Product.query.get_or_404(product_id)
     
     if not TenantService.validate_tenant_access(product):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('products.index'))
     
     if request.method == 'POST':
@@ -87,14 +88,14 @@ def edit(product_id):
                 labels[lang] = label
         
         if not labels.get('fr'):
-            flash('Le libellé en français est obligatoire.', 'danger')
+            flash(i18n.translate('Le libellé en français est obligatoire.'), 'danger')
             return render_template('products/form.html', product=product, languages=Config.SUPPORTED_LANGUAGES)
         
         product.labels = labels
         product.is_active = request.form.get('is_active') == 'on'
         
         db.session.commit()
-        flash('Article mis à jour.', 'success')
+        flash(i18n.translate('Article mis à jour.'), 'success')
         return redirect(url_for('products.index'))
     
     return render_template('products/form.html', product=product, languages=Config.SUPPORTED_LANGUAGES)
@@ -107,17 +108,17 @@ def delete(product_id):
     product = Product.query.get_or_404(product_id)
     
     if not TenantService.validate_tenant_access(product):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('products.index'))
     
     if product.order_lines.count() > 0:
         product.is_active = False
         db.session.commit()
-        flash('Article désactivé (il est utilisé dans des commandes).', 'warning')
+        flash(i18n.translate('Article désactivé (il est utilisé dans des commandes).'), 'warning')
     else:
         db.session.delete(product)
         db.session.commit()
-        flash('Article supprimé.', 'success')
+        flash(i18n.translate('Article supprimé.'), 'success')
     
     return redirect(url_for('products.index'))
 

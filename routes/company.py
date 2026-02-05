@@ -4,6 +4,7 @@ from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 from models import db
 from models.company import Company
+from services.i18n_service import i18n
 from models.user import User
 from security.decorators import admin_required, tenant_required
 
@@ -21,7 +22,7 @@ def settings():
     company = Company.query.get(current_user.company_id)
     
     if not company:
-        flash('Société non trouvée.', 'danger')
+        flash(i18n.translate('Société non trouvée.'), 'danger')
         return redirect(url_for('main.dashboard'))
     
     if request.method == 'POST':
@@ -48,7 +49,7 @@ def settings():
                 company.logo_path = f"uploads/logos/{filename}"
         
         db.session.commit()
-        flash('Paramètres de la société mis à jour.', 'success')
+        flash(i18n.translate('Paramètres de la société mis à jour.'), 'success')
     
     return render_template('company/settings.html', company=company)
 
@@ -75,14 +76,14 @@ def add_user():
         role = request.form.get('role', 'demandeur')
         
         if not all([email, password, first_name, last_name]):
-            flash('Veuillez remplir tous les champs obligatoires.', 'danger')
+            flash(i18n.translate('Veuillez remplir tous les champs obligatoires.'), 'danger')
             return render_template('company/user_form.html', user=None)
         
         if role not in ['admin', 'valideur', 'demandeur']:
             role = 'demandeur'
         
         if User.query.filter_by(email=email).first():
-            flash('Cet email est déjà utilisé.', 'danger')
+            flash(i18n.translate('Cet email est déjà utilisé.'), 'danger')
             return render_template('company/user_form.html', user=None)
         
         user = User(
@@ -99,7 +100,7 @@ def add_user():
         db.session.add(user)
         db.session.commit()
         
-        flash('Utilisateur créé avec succès.', 'success')
+        flash(i18n.translate('Utilisateur créé avec succès.'), 'success')
         return redirect(url_for('company.users'))
     
     return render_template('company/user_form.html', user=None)
@@ -112,7 +113,7 @@ def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     
     if user.company_id != current_user.company_id and current_user.role != 'super_admin':
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('company.users'))
     
     if request.method == 'POST':
@@ -131,7 +132,7 @@ def edit_user(user_id):
         user.is_active = request.form.get('is_active') == 'on'
         
         db.session.commit()
-        flash('Utilisateur mis à jour.', 'success')
+        flash(i18n.translate('Utilisateur mis à jour.'), 'success')
         return redirect(url_for('company.users'))
     
     return render_template('company/user_form.html', user=user)
@@ -144,15 +145,15 @@ def delete_user(user_id):
     user = User.query.get_or_404(user_id)
     
     if user.company_id != current_user.company_id and current_user.role != 'super_admin':
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('company.users'))
     
     if user.id == current_user.id:
-        flash('Vous ne pouvez pas supprimer votre propre compte.', 'danger')
+        flash(i18n.translate('Vous ne pouvez pas supprimer votre propre compte.'), 'danger')
         return redirect(url_for('company.users'))
     
     user.is_active = False
     db.session.commit()
     
-    flash('Utilisateur désactivé.', 'success')
+    flash(i18n.translate('Utilisateur désactivé.'), 'success')
     return redirect(url_for('company.users'))

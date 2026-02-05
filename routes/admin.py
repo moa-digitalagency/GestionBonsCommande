@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_required
 from models import db
 from models.company import Company
+from services.i18n_service import i18n
 from models.user import User
 from models.order import Order
 from models.lexique import LexiqueSuggestion
@@ -48,7 +49,7 @@ def add_company():
         bc_prefix = request.form.get('bc_prefix', 'BC').strip()
         
         if not name:
-            flash('Le nom de la société est obligatoire.', 'danger')
+            flash(i18n.translate('Le nom de la société est obligatoire.'), 'danger')
             return render_template('admin/company_form.html', company=None)
         
         company = Company(
@@ -68,7 +69,7 @@ def add_company():
         db.session.add(company)
         db.session.commit()
         
-        flash('Société créée avec succès.', 'success')
+        flash(i18n.translate('Société créée avec succès.'), 'success')
         return redirect(url_for('admin.companies'))
     
     return render_template('admin/company_form.html', company=None)
@@ -93,7 +94,7 @@ def edit_company(company_id):
         company.is_active = request.form.get('is_active') == 'on'
         
         db.session.commit()
-        flash('Société mise à jour.', 'success')
+        flash(i18n.translate('Société mise à jour.'), 'success')
         return redirect(url_for('admin.companies'))
     
     return render_template('admin/company_form.html', company=company)
@@ -119,7 +120,7 @@ def assign_user(user_id):
         user.company_id = None
     
     db.session.commit()
-    flash('Utilisateur assigné.', 'success')
+    flash(i18n.translate('Utilisateur assigné.'), 'success')
     return redirect(url_for('admin.users'))
 
 @admin_bp.route('/users/<int:user_id>/role', methods=['POST'])
@@ -132,7 +133,7 @@ def change_role(user_id):
     if role in ['super_admin', 'admin', 'valideur', 'demandeur']:
         user.role = role
         db.session.commit()
-        flash('Rôle modifié.', 'success')
+        flash(i18n.translate('Rôle modifié.'), 'success')
     
     return redirect(url_for('admin.users'))
 

@@ -4,6 +4,7 @@ from models import db
 from models.lexique import LexiqueEntry, LexiqueSuggestion
 from security.decorators import super_admin_required, tenant_required
 from services.lexique_service import LexiqueService
+from services.i18n_service import i18n
 from config.settings import Config
 
 lexique_bp = Blueprint('lexique', __name__)
@@ -77,11 +78,11 @@ def suggest():
                 translations[lang] = trans
         
         if not original_term:
-            flash('Le terme original est obligatoire.', 'danger')
+            flash(i18n.translate('Le terme original est obligatoire.'), 'danger')
             return render_template('lexique/suggest.html', languages=Config.SUPPORTED_LANGUAGES)
         
         if not translations:
-            flash('Veuillez fournir au moins une traduction.', 'danger')
+            flash(i18n.translate('Veuillez fournir au moins une traduction.'), 'danger')
             return render_template('lexique/suggest.html', languages=Config.SUPPORTED_LANGUAGES)
         
         try:
@@ -92,10 +93,10 @@ def suggest():
                 context=context,
                 source_language=source_language
             )
-            flash('Votre suggestion a été soumise. Elle sera examinée par un administrateur.', 'success')
+            flash(i18n.translate('Votre suggestion a été soumise. Elle sera examinée par un administrateur.'), 'success')
             return redirect(url_for('lexique.index'))
         except Exception as e:
-            flash(f'Erreur: {str(e)}', 'danger')
+            flash(i18n.translate('Erreur: {}').format(str(e)), 'danger')
     
     return render_template('lexique/suggest.html', languages=Config.SUPPORTED_LANGUAGES)
 
@@ -128,9 +129,9 @@ def approve_suggestion(suggestion_id):
     
     try:
         LexiqueService.approve_suggestion(suggestion_id, translations or None, category)
-        flash('Suggestion approuvée et ajoutée au dictionnaire.', 'success')
+        flash(i18n.translate('Suggestion approuvée et ajoutée au dictionnaire.'), 'success')
     except Exception as e:
-        flash(f'Erreur: {str(e)}', 'danger')
+        flash(i18n.translate('Erreur: {}').format(str(e)), 'danger')
     
     return redirect(url_for('lexique.admin'))
 
@@ -142,9 +143,9 @@ def reject_suggestion(suggestion_id):
     
     try:
         LexiqueService.reject_suggestion(suggestion_id, notes)
-        flash('Suggestion rejetée.', 'info')
+        flash(i18n.translate('Suggestion rejetée.'), 'info')
     except Exception as e:
-        flash(f'Erreur: {str(e)}', 'danger')
+        flash(i18n.translate('Erreur: {}').format(str(e)), 'danger')
     
     return redirect(url_for('lexique.admin'))
 
@@ -163,7 +164,7 @@ def add_entry():
                 translations[lang] = trans
         
         if not translations.get('fr'):
-            flash('La traduction française est obligatoire.', 'danger')
+            flash(i18n.translate('La traduction française est obligatoire.'), 'danger')
             return render_template('lexique/entry_form.html', entry=None, 
                                  languages=Config.SUPPORTED_LANGUAGES)
         
@@ -171,10 +172,10 @@ def add_entry():
         
         try:
             LexiqueService.add_entry(translations, category, aliases)
-            flash('Entrée ajoutée au dictionnaire.', 'success')
+            flash(i18n.translate('Entrée ajoutée au dictionnaire.'), 'success')
             return redirect(url_for('lexique.admin'))
         except Exception as e:
-            flash(f'Erreur: {str(e)}', 'danger')
+            flash(i18n.translate('Erreur: {}').format(str(e)), 'danger')
     
     return render_template('lexique/entry_form.html', entry=None, 
                          languages=Config.SUPPORTED_LANGUAGES)
@@ -196,7 +197,7 @@ def edit_entry(entry_id):
                 translations[lang] = trans
         
         if not translations.get('fr'):
-            flash('La traduction française est obligatoire.', 'danger')
+            flash(i18n.translate('La traduction française est obligatoire.'), 'danger')
             return render_template('lexique/entry_form.html', entry=entry, 
                                  languages=Config.SUPPORTED_LANGUAGES)
         
@@ -204,10 +205,10 @@ def edit_entry(entry_id):
         
         try:
             LexiqueService.update_entry(entry_id, translations, category, aliases)
-            flash('Entrée mise à jour.', 'success')
+            flash(i18n.translate('Entrée mise à jour.'), 'success')
             return redirect(url_for('lexique.admin'))
         except Exception as e:
-            flash(f'Erreur: {str(e)}', 'danger')
+            flash(i18n.translate('Erreur: {}').format(str(e)), 'danger')
     
     return render_template('lexique/entry_form.html', entry=entry, 
                          languages=Config.SUPPORTED_LANGUAGES)
@@ -218,8 +219,8 @@ def edit_entry(entry_id):
 def delete_entry(entry_id):
     try:
         LexiqueService.delete_entry(entry_id)
-        flash('Entrée supprimée.', 'success')
+        flash(i18n.translate('Entrée supprimée.'), 'success')
     except Exception as e:
-        flash(f'Erreur: {str(e)}', 'danger')
+        flash(i18n.translate('Erreur: {}').format(str(e)), 'danger')
     
     return redirect(url_for('lexique.admin'))

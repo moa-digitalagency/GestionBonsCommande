@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_required
 from models import db
 from models.project import Project
+from services.i18n_service import i18n
 from security.decorators import tenant_required, admin_required
 from services.tenant_service import TenantService
 
@@ -29,7 +30,7 @@ def add():
         contact_phone = request.form.get('contact_phone', '').strip()
         
         if not name:
-            flash('Le nom du chantier est obligatoire.', 'danger')
+            flash(i18n.translate('Le nom du chantier est obligatoire.'), 'danger')
             return render_template('projects/form.html', project=None)
         
         project = Project(
@@ -47,7 +48,7 @@ def add():
         db.session.add(project)
         db.session.commit()
         
-        flash('Chantier créé avec succès.', 'success')
+        flash(i18n.translate('Chantier créé avec succès.'), 'success')
         return redirect(url_for('projects.index'))
     
     return render_template('projects/form.html', project=None)
@@ -59,7 +60,7 @@ def view(project_id):
     project = Project.query.get_or_404(project_id)
     
     if not TenantService.validate_tenant_access(project):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('projects.index'))
     
     orders = project.orders.order_by('created_at desc').limit(20).all()
@@ -74,7 +75,7 @@ def edit(project_id):
     project = Project.query.get_or_404(project_id)
     
     if not TenantService.validate_tenant_access(project):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('projects.index'))
     
     if request.method == 'POST':
@@ -88,7 +89,7 @@ def edit(project_id):
         project.is_active = request.form.get('is_active') == 'on'
         
         db.session.commit()
-        flash('Chantier mis à jour.', 'success')
+        flash(i18n.translate('Chantier mis à jour.'), 'success')
         return redirect(url_for('projects.view', project_id=project.id))
     
     return render_template('projects/form.html', project=project)
@@ -101,16 +102,16 @@ def delete(project_id):
     project = Project.query.get_or_404(project_id)
     
     if not TenantService.validate_tenant_access(project):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('projects.index'))
     
     if project.orders.count() > 0:
         project.is_active = False
         db.session.commit()
-        flash('Chantier désactivé (il contient des commandes).', 'warning')
+        flash(i18n.translate('Chantier désactivé (il contient des commandes).'), 'warning')
     else:
         db.session.delete(project)
         db.session.commit()
-        flash('Chantier supprimé.', 'success')
+        flash(i18n.translate('Chantier supprimé.'), 'success')
     
     return redirect(url_for('projects.index'))
