@@ -25,50 +25,137 @@
 <body class="h-full bg-gray-100" x-data="{ sidebarOpen: false }">
     {% block body %}
     {% if current_user.is_authenticated %}
-    <div class="min-h-full">
-        <nav class="bg-blue-700 shadow-lg">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex h-16 items-center justify-between">
-                    <div class="flex items-center">
-                        <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-white mr-4">
-                            <i class="fas fa-bars text-xl"></i>
-                        </button>
-                        <a href="{{ url_for('main.dashboard') }}" class="flex-shrink-0">
-                            <span class="text-white text-xl font-bold">BTP Commande</span>
-                        </a>
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Desktop Sidebar -->
+        <aside class="hidden md:flex md:flex-col w-64 bg-blue-800 text-white shadow-xl z-20 flex-shrink-0">
+            <div class="flex h-16 items-center justify-center border-b border-blue-700 bg-blue-900">
+                 <a href="{{ url_for('main.dashboard') }}" class="flex items-center space-x-2">
+                    <span class="text-xl font-bold tracking-wider">BTP Commande</span>
+                 </a>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-1">
+                <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if request.endpoint == 'main.dashboard' }}">
+                    <i class="fas fa-home w-6 text-center text-lg {{ 'text-white' if request.endpoint == 'main.dashboard' else 'text-blue-300 group-hover:text-white' }}"></i>
+                    <span class="mx-3">{{ _('Tableau de bord') }}</span>
+                </a>
+
+                {% if current_user.role != 'super_admin' %}
+                <a href="{{ url_for('orders.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'orders' in request.endpoint }}">
+                    <i class="fas fa-file-alt w-6 text-center text-lg {{ 'text-white' if 'orders' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                    <span class="mx-3">{{ _('Bons de Commande') }}</span>
+                </a>
+                <a href="{{ url_for('projects.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'projects' in request.endpoint }}">
+                    <i class="fas fa-hard-hat w-6 text-center text-lg {{ 'text-white' if 'projects' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                    <span class="mx-3">{{ _('Chantiers') }}</span>
+                </a>
+                <a href="{{ url_for('products.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'products' in request.endpoint }}">
+                    <i class="fas fa-boxes w-6 text-center text-lg {{ 'text-white' if 'products' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                    <span class="mx-3">{{ _('Articles') }}</span>
+                </a>
+                {% endif %}
+
+                <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'lexique' in request.endpoint }}">
+                    <i class="fas fa-book w-6 text-center text-lg {{ 'text-white' if 'lexique' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                    <span class="mx-3">{{ _('Dictionnaire') }}</span>
+                </a>
+
+                {% if current_user.role == 'super_admin' %}
+                <a href="{{ url_for('admin.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-blue-700 transition-colors {{ 'bg-blue-700' if 'admin' in request.endpoint }}">
+                    <i class="fas fa-cog w-6 text-center text-lg {{ 'text-white' if 'admin' in request.endpoint else 'text-blue-300 group-hover:text-white' }}"></i>
+                    <span class="mx-3">{{ _('Administration') }}</span>
+                </a>
+                {% endif %}
+            </nav>
+
+             <div class="p-4 border-t border-blue-700 bg-blue-900">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                         <i class="fas fa-user-circle text-3xl text-blue-300"></i>
                     </div>
-                    <div class="hidden md:block">
-                        <div class="ml-10 flex items-baseline space-x-4">
-                            <a href="{{ url_for('main.dashboard') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                                <i class="fas fa-home mr-1"></i> {{ _('Tableau de bord') }}
+                    <div class="mx-3">
+                        <p class="text-sm font-medium text-white">{{ current_user.first_name }}</p>
+                        <p class="text-xs text-blue-300 truncate w-32" title="{{ current_user.email }}">{{ current_user.email }}</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar (Overlay) -->
+        <div x-show="sidebarOpen" x-cloak class="relative z-50 md:hidden" role="dialog" aria-modal="true">
+            <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/80" @click="sidebarOpen = false"></div>
+
+            <div class="fixed inset-0 flex">
+                <div x-show="sidebarOpen" x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="-translate-x-full rtl:translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full rtl:translate-x-full" class="relative flex w-full max-w-xs flex-1 flex-col bg-blue-800 pt-5 pb-4 text-white">
+                    <div class="absolute top-0 right-0 -mr-12 pt-2 rtl:left-0 rtl:-ml-12 rtl:mr-auto">
+                        <button type="button" class="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="sidebarOpen = false">
+                            <span class="sr-only">Close sidebar</span>
+                            <i class="fas fa-times text-white text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex flex-shrink-0 items-center px-4">
+                        <span class="text-xl font-bold">BTP Commande</span>
+                    </div>
+                    <div class="mt-5 h-0 flex-1 overflow-y-auto">
+                        <nav class="space-y-1 px-2">
+                             <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
+                                <i class="fas fa-home mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                                {{ _('Tableau de bord') }}
                             </a>
-                            {% if current_user.role != 'super_admin' %}
-                            <a href="{{ url_for('orders.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                                <i class="fas fa-file-alt mr-1"></i> {{ _('Bons de Commande') }}
+
+                             {% if current_user.role != 'super_admin' %}
+                            <a href="{{ url_for('orders.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
+                                <i class="fas fa-file-alt mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                                {{ _('Bons de Commande') }}
                             </a>
-                            <a href="{{ url_for('projects.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                                <i class="fas fa-hard-hat mr-1"></i> {{ _('Chantiers') }}
+                            <a href="{{ url_for('projects.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
+                                <i class="fas fa-hard-hat mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                                {{ _('Chantiers') }}
                             </a>
-                            <a href="{{ url_for('products.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                                <i class="fas fa-boxes mr-1"></i> {{ _('Articles') }}
+                            <a href="{{ url_for('products.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
+                                <i class="fas fa-boxes mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                                {{ _('Articles') }}
                             </a>
                             {% endif %}
-                            <a href="{{ url_for('lexique.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                                <i class="fas fa-book mr-1"></i> {{ _('Dictionnaire') }}
+                            <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
+                                <i class="fas fa-book mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                                {{ _('Dictionnaire') }}
                             </a>
                             {% if current_user.role == 'super_admin' %}
-                            <a href="{{ url_for('admin.index') }}" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                                <i class="fas fa-cog mr-1"></i> {{ _('Administration') }}
+                            <a href="{{ url_for('admin.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-blue-700 text-white">
+                                <i class="fas fa-cog mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-blue-300"></i>
+                                {{ _('Administration') }}
                             </a>
                             {% endif %}
-                        </div>
+                        </nav>
                     </div>
-                    <div class="flex items-center">
-                        <div class="relative ml-4" x-data="{ langOpen: false }">
-                            <button @click="langOpen = !langOpen" class="flex items-center text-white hover:bg-blue-600 px-3 py-2 rounded-md">
-                                <i class="fas fa-globe mr-1"></i> <span class="uppercase">{{ get_locale() }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Wrapper -->
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <!-- Top Header -->
+            <header class="flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 shadow-sm z-10 flex-shrink-0">
+                <button @click="sidebarOpen = true" class="md:hidden text-gray-500 focus:outline-none hover:text-gray-700">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+
+                <div class="flex-1 px-4 flex justify-between items-center">
+                    <!-- Title/Header Content from Blocks -->
+                    <div class="flex-1">
+                        <!-- We can put a block here for page title if needed, currently reusing title() or custom -->
+                    </div>
+
+                    <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                        <!-- Language Switcher -->
+                        <div class="relative" x-data="{ langOpen: false }">
+                            <button @click="langOpen = !langOpen" class="flex items-center text-gray-600 hover:text-blue-600 focus:outline-none transition-colors">
+                                <i class="fas fa-globe mr-1 rtl:mr-0 rtl:ml-1"></i> <span class="uppercase font-medium text-sm">{{ get_locale() }}</span>
                             </button>
-                            <div x-show="langOpen" x-cloak @click.away="langOpen = false" class="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                            <div x-show="langOpen" x-cloak @click.away="langOpen = false" class="absolute right-0 rtl:right-auto rtl:left-0 z-20 mt-2 w-32 origin-top-right rtl:origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 {% for lang in supported_languages %}
                                 <a href="{{ url_for('main.set_language', lang_code=lang) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     {{ lang|upper }}
@@ -76,87 +163,57 @@
                                 {% endfor %}
                             </div>
                         </div>
-                        <div class="relative ml-2" x-data="{ open: false }">
-                            <button @click="open = !open" class="flex items-center text-white hover:bg-blue-600 px-3 py-2 rounded-md">
-                                <span class="mr-2 hidden sm:block">{{ current_user.first_name }}</span>
-                                <i class="fas fa-user-circle text-xl"></i>
+
+                        <!-- User Dropdown -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center space-x-2 rtl:space-x-reverse text-gray-600 hover:text-blue-600 focus:outline-none transition-colors">
+                                <span class="hidden sm:inline font-medium text-sm">{{ current_user.first_name }}</span>
+                                <i class="fas fa-user-circle text-2xl"></i>
                             </button>
-                            <div x-show="open" x-cloak @click.away="open = false"
-                                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                             <div x-show="open" x-cloak @click.away="open = false"
+                                 class="absolute right-0 rtl:right-auto rtl:left-0 z-20 mt-2 w-48 origin-top-right rtl:origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-user mr-2"></i> {{ _('Mon profil') }}
+                                    <i class="fas fa-user mr-2 rtl:mr-0 rtl:ml-2 text-gray-400"></i> {{ _('Mon profil') }}
                                 </a>
                                 {% if current_user.role in ['admin', 'super_admin'] and current_user.company_id %}
                                 <a href="{{ url_for('company.settings') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-building mr-2"></i> {{ _('Paramètres société') }}
+                                    <i class="fas fa-building mr-2 rtl:mr-0 rtl:ml-2 text-gray-400"></i> {{ _('Paramètres société') }}
                                 </a>
                                 {% endif %}
-                                <hr class="my-1">
+                                <div class="border-t border-gray-100 my-1"></div>
                                 <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> {{ _('Déconnexion') }}
+                                    <i class="fas fa-sign-out-alt mr-2 rtl:mr-0 rtl:ml-2"></i> {{ _('Déconnexion') }}
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </nav>
-        
-        <div x-show="sidebarOpen" class="fixed inset-0 z-40 md:hidden" @click="sidebarOpen = false">
-            <div class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
-            <div class="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
-                <div class="flex h-16 items-center justify-between px-4 bg-blue-700">
-                    <span class="text-white font-bold">Menu</span>
-                    <button @click="sidebarOpen = false" class="text-white">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <nav class="flex-1 overflow-y-auto p-4">
-                    <a href="{{ url_for('main.dashboard') }}" class="block py-2 text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-home mr-2"></i> {{ _('Tableau de bord') }}
-                    </a>
-                    {% if current_user.role != 'super_admin' %}
-                    <a href="{{ url_for('orders.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-file-alt mr-2"></i> {{ _('Bons de Commande') }}
-                    </a>
-                    <a href="{{ url_for('projects.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-hard-hat mr-2"></i> {{ _('Chantiers') }}
-                    </a>
-                    <a href="{{ url_for('products.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-boxes mr-2"></i> {{ _('Articles') }}
-                    </a>
-                    {% endif %}
-                    <a href="{{ url_for('lexique.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-book mr-2"></i> {{ _('Dictionnaire BTP') }}
-                    </a>
-                    {% if current_user.role == 'super_admin' %}
-                    <a href="{{ url_for('admin.index') }}" class="block py-2 text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-cog mr-2"></i> {{ _('Administration') }}
-                    </a>
-                    {% endif %}
-                </nav>
-            </div>
-        </div>
+            </header>
 
-        <main class="py-6">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                <div class="mb-4">
-                    {% for category, message in messages %}
-                    <div class="p-4 mb-2 rounded-lg {% if category == 'success' %}bg-green-100 text-green-700{% elif category == 'danger' %}bg-red-100 text-red-700{% elif category == 'warning' %}bg-yellow-100 text-yellow-700{% else %}bg-blue-100 text-blue-700{% endif %}">
-                        {{ message }}
+            <!-- Main Scrollable Content -->
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-4 sm:p-6 lg:p-8">
+                <div class="mx-auto max-w-7xl">
+                     {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    <div class="mb-6 space-y-2">
+                        {% for category, message in messages %}
+                        <div class="flex p-4 rounded-lg shadow-sm {% if category == 'success' %}bg-green-50 text-green-700 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-green-500{% elif category == 'danger' %}bg-red-50 text-red-700 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-red-500{% elif category == 'warning' %}bg-yellow-50 text-yellow-700 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-yellow-500{% else %}bg-blue-50 text-blue-700 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-blue-500{% endif %}" role="alert">
+                             <div class="ml-3 rtl:ml-0 rtl:mr-3 text-sm font-medium">
+                                {{ message }}
+                             </div>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    {% block content %}{% endblock %}
                 </div>
-                {% endif %}
-                {% endwith %}
-                
-                {% block content %}{% endblock %}
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
     {% else %}
+    <!-- Guest Layout -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="fixed top-4 right-4 z-50 w-80">
