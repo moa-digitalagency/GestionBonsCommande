@@ -1,49 +1,53 @@
 {#
  /* * Nom de l'application : BTP Commande
-  * Description : Template de base
-  * Produit de : MOA Digital Agency, www.myoneart.com
-  * Fait par : Aisance KALONJI, www.aisancekalonji.com
-  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+  * Description : Template de base Premium
+  * Produit de : MOA Digital Agency
+  * Refonte Premium par : Jules (Lead Dev)
   */
 #}
 <!DOCTYPE html>
-<html lang="{{ get_locale() }}" dir="{{ 'rtl' if get_locale() == 'ar' else 'ltr' }}" class="h-full">
+<html lang="{{ get_locale() }}" dir="{{ 'rtl' if get_locale() == 'ar' else 'ltr' }}" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{% block title %}BTP Commande{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>{% block title %}BTP Premium{% endblock %}</title>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter & Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Alpine.js -->
     <script defer src="{{ url_for('static', filename='js/alpine.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            primary: '#005691',
-                            secondary: '#E2E8F0',
-                            bg: '#F3F4F6',
-                            card: '#FFFFFF',
-                            text: {
-                                title: '#111827',
-                                body: '#4B5563',
-                                label: '#6B7280'
-                            }
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
                         }
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        arabic: ['Cairo', 'sans-serif'],
                     }
                 }
             }
@@ -53,198 +57,176 @@
     <style>
         [x-cloak] { display: none !important; }
         body { font-family: 'Inter', sans-serif; }
+        .font-arabic { font-family: 'Cairo', sans-serif; }
     </style>
 </head>
-<body class="h-full bg-brand-bg text-brand-text-body" x-data="{ sidebarOpen: false }">
+<body class="h-full bg-slate-50 text-slate-600" x-data="{ sidebarOpen: false }">
+
     {% block body %}
     {% if current_user.is_authenticated %}
-    <div class="flex h-screen overflow-hidden">
+    <!-- Mobile Sidebar Backdrop -->
+    <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-900/80 z-40 md:hidden" @click="sidebarOpen = false" x-cloak></div>
 
-        <!-- Desktop Sidebar (White Background) -->
-        <aside class="hidden md:flex md:flex-col w-64 bg-white border-r border-gray-200 shadow-sm z-20 flex-shrink-0">
-            <div class="flex h-16 items-center justify-center border-b border-gray-200">
-                 <a href="{{ url_for('main.dashboard') }}" class="flex items-center space-x-2">
-                    <span class="text-xl font-bold tracking-wider text-brand-primary">BTP COMMAND</span>
-                 </a>
+    <!-- Mobile Sidebar -->
+    <div x-show="sidebarOpen" x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="-translate-x-full rtl:translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full rtl:translate-x-full" class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl md:hidden" x-cloak>
+        <div class="flex h-16 items-center justify-between px-4 border-b border-slate-100">
+            <span class="text-xl font-bold tracking-tight text-slate-900">PREMIUM<span class="text-blue-600">BTP</span></span>
+            <button @click="sidebarOpen = false" class="text-slate-500 hover:text-slate-700">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <nav class="p-4 space-y-1">
+            <a href="{{ url_for('main.dashboard') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 text-slate-400"></i>
+                Tableau de bord
+            </a>
+            {% if current_user.role != 'super_admin' %}
+            <a href="{{ url_for('orders.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
+                <i data-lucide="file-text" class="w-5 h-5 mr-3 text-slate-400"></i>
+                Bons de Commande
+            </a>
+            <a href="{{ url_for('projects.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
+                <i data-lucide="hard-hat" class="w-5 h-5 mr-3 text-slate-400"></i>
+                Chantiers
+            </a>
+            <a href="{{ url_for('products.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
+                <i data-lucide="package" class="w-5 h-5 mr-3 text-slate-400"></i>
+                Articles
+            </a>
+            {% endif %}
+            <a href="{{ url_for('lexique.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
+                <i data-lucide="book" class="w-5 h-5 mr-3 text-slate-400"></i>
+                Dictionnaire
+            </a>
+        </nav>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Desktop Sidebar -->
+        <aside class="hidden md:flex md:flex-col w-64 bg-white border-r border-slate-200 shadow-sm z-20 flex-shrink-0">
+            <div class="flex h-16 items-center justify-center border-b border-slate-100">
+                <a href="{{ url_for('main.dashboard') }}" class="flex items-center space-x-2">
+                   <span class="text-xl font-bold tracking-tight text-slate-900">PREMIUM<span class="text-blue-600">BTP</span></span>
+                </a>
             </div>
 
-            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
-                <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if request.endpoint == 'main.dashboard' else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
-                    <i class="fas fa-home w-6 text-center text-lg {{ 'text-brand-primary' if request.endpoint == 'main.dashboard' else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
-                    <span class="mx-3">{{ _('Tableau de bord') }}</span>
+            <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+                <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if request.endpoint == 'main.dashboard' else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 {{ 'text-blue-600' if request.endpoint == 'main.dashboard' else 'text-slate-400 group-hover:text-slate-500' }}"></i>
+                    Tableau de bord
                 </a>
 
                 {% if current_user.role != 'super_admin' %}
-                <a href="{{ url_for('orders.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'orders' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
-                    <i class="fas fa-file-alt w-6 text-center text-lg {{ 'text-brand-primary' if 'orders' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
-                    <span class="mx-3">{{ _('Bons de Commande') }}</span>
+                <a href="{{ url_for('orders.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'orders' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                    <i data-lucide="file-text" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'orders' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
+                    Bons de Commande
                 </a>
-                <a href="{{ url_for('projects.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'projects' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
-                    <i class="fas fa-hard-hat w-6 text-center text-lg {{ 'text-brand-primary' if 'projects' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
-                    <span class="mx-3">{{ _('Chantiers') }}</span>
+                <a href="{{ url_for('projects.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'projects' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                    <i data-lucide="hard-hat" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'projects' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
+                    Chantiers
                 </a>
-                <a href="{{ url_for('products.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'products' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
-                    <i class="fas fa-boxes w-6 text-center text-lg {{ 'text-brand-primary' if 'products' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
-                    <span class="mx-3">{{ _('Articles') }}</span>
+                <a href="{{ url_for('products.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'products' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                    <i data-lucide="package" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'products' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
+                    Articles
                 </a>
                 {% endif %}
 
-                <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'lexique' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
-                    <i class="fas fa-book w-6 text-center text-lg {{ 'text-brand-primary' if 'lexique' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
-                    <span class="mx-3">{{ _('Dictionnaire') }}</span>
+                <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'lexique' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                    <i data-lucide="book" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'lexique' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
+                    Dictionnaire
                 </a>
-
-                {% if current_user.role == 'super_admin' %}
-                <a href="{{ url_for('admin.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ 'bg-blue-50 text-brand-primary shadow-sm ring-1 ring-blue-100' if 'admin' in request.endpoint else 'text-gray-600 hover:bg-gray-50 hover:text-brand-primary' }}">
-                    <i class="fas fa-cog w-6 text-center text-lg {{ 'text-brand-primary' if 'admin' in request.endpoint else 'text-gray-400 group-hover:text-brand-primary' }}"></i>
-                    <span class="mx-3">{{ _('Administration') }}</span>
-                </a>
-                {% endif %}
             </nav>
 
-             <div class="p-4 border-t border-gray-200">
-                <div class="flex items-center">
+            <div class="border-t border-slate-100 p-3 bg-slate-50/50">
+                {% if current_user.role == 'super_admin' %}
+                <div class="mb-2">
+                     <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Administration</p>
+                     <a href="{{ url_for('admin.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                        <i data-lucide="settings" class="w-5 h-5 mr-3 text-slate-400 group-hover:text-slate-500"></i>
+                        Paramètres
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="flex items-center px-3 py-2 rounded-lg hover:bg-white hover:shadow-sm transition-all cursor-pointer">
                     <div class="flex-shrink-0">
-                         <div class="h-8 w-8 rounded-full bg-brand-primary flex items-center justify-center text-white font-bold">
+                        <div class="h-9 w-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm ring-2 ring-white">
                              {{ current_user.first_name[0] }}
-                         </div>
+                        </div>
                     </div>
-                    <div class="mx-3">
-                        <p class="text-sm font-medium text-gray-700">{{ current_user.first_name }}</p>
-                        <p class="text-xs text-gray-500 truncate w-32" title="{{ current_user.email }}">{{ current_user.email }}</p>
+                    <div class="ml-3 min-w-0">
+                        <p class="text-sm font-medium text-slate-700 truncate">{{ current_user.first_name }}</p>
+                        <p class="text-xs text-slate-500 truncate capitalize">{{ current_user.role|replace('_', ' ') }}</p>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <!-- Mobile Sidebar (Overlay) -->
-        <div x-show="sidebarOpen" x-cloak class="relative z-50 md:hidden" role="dialog" aria-modal="true">
-            <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/80" @click="sidebarOpen = false"></div>
-
-            <div class="fixed inset-0 flex">
-                <div x-show="sidebarOpen" x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="-translate-x-full rtl:translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full rtl:translate-x-full" class="relative flex w-full max-w-xs flex-1 flex-col bg-white pt-5 pb-4">
-                    <div class="absolute top-0 right-0 -mr-12 pt-2 rtl:left-0 rtl:-ml-12 rtl:mr-auto">
-                        <button type="button" class="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="sidebarOpen = false">
-                            <span class="sr-only">Close sidebar</span>
-                            <i class="fas fa-times text-white text-xl"></i>
-                        </button>
-                    </div>
-
-                    <div class="flex flex-shrink-0 items-center px-4">
-                        <span class="text-xl font-bold text-brand-primary">BTP COMMAND</span>
-                    </div>
-                    <div class="mt-5 h-0 flex-1 overflow-y-auto">
-                        <nav class="space-y-1 px-3">
-                             <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
-                                <i class="fas fa-home mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
-                                {{ _('Tableau de bord') }}
-                            </a>
-
-                             {% if current_user.role != 'super_admin' %}
-                            <a href="{{ url_for('orders.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
-                                <i class="fas fa-file-alt mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
-                                {{ _('Bons de Commande') }}
-                            </a>
-                            <a href="{{ url_for('projects.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
-                                <i class="fas fa-hard-hat mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
-                                {{ _('Chantiers') }}
-                            </a>
-                            <a href="{{ url_for('products.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
-                                <i class="fas fa-boxes mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
-                                {{ _('Articles') }}
-                            </a>
-                            {% endif %}
-                            <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
-                                <i class="fas fa-book mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
-                                {{ _('Dictionnaire') }}
-                            </a>
-                            {% if current_user.role == 'super_admin' %}
-                            <a href="{{ url_for('admin.index') }}" class="group flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-900 hover:bg-gray-50 hover:text-brand-primary">
-                                <i class="fas fa-cog mr-4 rtl:mr-0 rtl:ml-4 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-brand-primary"></i>
-                                {{ _('Administration') }}
-                            </a>
-                            {% endif %}
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Main Content Wrapper -->
         <div class="flex flex-col flex-1 overflow-hidden">
-            <!-- Top Header -->
-            <header class="flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 shadow-sm z-10 flex-shrink-0">
-                <button @click="sidebarOpen = true" class="md:hidden text-gray-500 focus:outline-none hover:text-gray-700">
-                    <i class="fas fa-bars text-2xl"></i>
+            <!-- Topbar -->
+            <header class="flex items-center justify-between h-16 bg-white border-b border-slate-200 px-6 shadow-sm z-10">
+                <!-- Mobile Menu Button -->
+                <button @click="sidebarOpen = true" class="md:hidden text-slate-500 hover:text-slate-700 mr-4">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
 
-                <div class="flex-1 px-4 flex justify-between items-center">
-                    <!-- Title/Header Content from Blocks -->
-                    <div class="flex-1">
-                         <!-- Placeholder for page titles -->
-                    </div>
+                <!-- Breadcrumbs -->
+                <div class="flex items-center text-sm text-slate-500 overflow-hidden whitespace-nowrap">
+                     <i data-lucide="home" class="w-4 h-4 mr-2 text-slate-400"></i>
+                     <span class="mx-2 text-slate-300">/</span>
+                     {% block breadcrumbs %}
+                     <span class="font-medium text-slate-700">Tableau de bord</span>
+                     {% endblock %}
+                </div>
 
-                    <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                        <!-- Language Switcher -->
-                        <div class="relative" x-data="{ langOpen: false }">
-                            <button @click="langOpen = !langOpen" class="flex items-center text-gray-600 hover:text-brand-primary focus:outline-none transition-colors">
-                                <i class="fas fa-globe mr-1 rtl:mr-0 rtl:ml-1"></i> <span class="uppercase font-medium text-sm">{{ get_locale() }}</span>
-                            </button>
-                            <div x-show="langOpen" x-cloak @click.away="langOpen = false" class="absolute right-0 rtl:right-auto rtl:left-0 z-20 mt-2 w-32 origin-top-right rtl:origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                {% for lang in supported_languages %}
-                                <a href="{{ url_for('main.set_language', lang_code=lang) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    {{ lang|upper }}
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </div>
+                <!-- Right Actions -->
+                <div class="flex items-center space-x-4">
+                     <!-- Language Selector -->
+                     <div class="relative" x-data="{ open: false }">
+                         <button @click="open = !open" class="flex items-center space-x-2 text-slate-600 hover:text-slate-900 text-sm font-medium p-2 rounded-md hover:bg-slate-50 transition-colors">
+                             <span class="uppercase">{{ get_locale() }}</span>
+                             <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                         </button>
+                         <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-slate-100 py-1 z-50" x-cloak>
+                            {% for lang in supported_languages %}
+                            <a href="{{ url_for('main.set_language', lang_code=lang) }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center">
+                                <!-- Simple flag representation or just text -->
+                                <span class="uppercase">{{ lang }}</span>
+                            </a>
+                            {% endfor %}
+                         </div>
+                     </div>
 
-                        <!-- User Dropdown -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="flex items-center space-x-2 rtl:space-x-reverse text-gray-600 hover:text-brand-primary focus:outline-none transition-colors">
-                                <span class="hidden sm:inline font-medium text-sm">{{ current_user.first_name }}</span>
-                                <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                            </button>
-                             <div x-show="open" x-cloak @click.away="open = false"
-                                 class="absolute right-0 rtl:right-auto rtl:left-0 z-20 mt-2 w-48 origin-top-right rtl:origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-user mr-2 rtl:mr-0 rtl:ml-2 text-gray-400"></i> {{ _('Mon profil') }}
-                                </a>
-                                {% if current_user.role in ['admin', 'super_admin'] and current_user.company_id %}
-                                <a href="{{ url_for('company.settings') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-building mr-2 rtl:mr-0 rtl:ml-2 text-gray-400"></i> {{ _('Paramètres société') }}
-                                </a>
-                                {% endif %}
-                                <div class="border-t border-gray-100 my-1"></div>
-                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                    <i class="fas fa-sign-out-alt mr-2 rtl:mr-0 rtl:ml-2"></i> {{ _('Déconnexion') }}
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                     <!-- Notifications -->
+                     <button class="p-2 text-slate-400 hover:text-blue-600 transition-colors relative">
+                         <i data-lucide="bell" class="w-5 h-5"></i>
+                         <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 border-2 border-white"></span>
+                     </button>
                 </div>
             </header>
 
             <!-- Main Scrollable Content -->
-            <main class="flex-1 overflow-y-auto bg-brand-bg p-4 sm:p-6 lg:p-8">
+            <main class="flex-1 overflow-y-auto bg-slate-50 p-6 lg:p-8">
                 <div class="mx-auto max-w-7xl">
                      {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                    <div class="mb-6 space-y-2">
-                        {% for category, message in messages %}
-                        <div class="flex p-4 rounded-md shadow-sm {% if category == 'success' %}bg-green-50 text-green-800 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-green-500{% elif category == 'danger' %}bg-red-50 text-red-800 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-red-500{% elif category == 'warning' %}bg-yellow-50 text-yellow-800 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-yellow-500{% else %}bg-blue-50 text-blue-800 border-l-4 border-r-0 rtl:border-l-0 rtl:border-r-4 border-blue-500{% endif %}" role="alert">
-                             <div class="ml-3 rtl:ml-0 rtl:mr-3 text-sm font-medium">
-                                {{ message }}
-                             </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    {% endwith %}
+                     {% if messages %}
+                     <div class="mb-6 space-y-2">
+                         {% for category, message in messages %}
+                         <div class="p-4 rounded-lg shadow-sm border text-sm font-medium flex items-start
+                             {% if category == 'success' %} bg-green-50 text-green-700 border-green-200
+                             {% elif category == 'danger' %} bg-red-50 text-red-700 border-red-200
+                             {% elif category == 'warning' %} bg-yellow-50 text-yellow-700 border-yellow-200
+                             {% else %} bg-blue-50 text-blue-700 border-blue-200 {% endif %}">
+                             <i data-lucide="{{ 'check-circle' if category == 'success' else 'alert-circle' }}" class="w-5 h-5 mr-2 flex-shrink-0"></i>
+                             <span>{{ message }}</span>
+                         </div>
+                         {% endfor %}
+                     </div>
+                     {% endif %}
+                     {% endwith %}
 
-                    {% block content %}{% endblock %}
+                     {% block content %}{% endblock %}
                 </div>
             </main>
         </div>
@@ -267,7 +249,13 @@
     {% endif %}
     {% endblock %}
     
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', () => {
+             lucide.createIcons();
+        });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
