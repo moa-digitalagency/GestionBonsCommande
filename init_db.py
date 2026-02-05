@@ -63,18 +63,30 @@ def init_database():
 
         print("Schema verification complete!")
         
-        if not User.query.filter_by(email='admin@btpcommande.ma').first():
+        # Create or Update Super Admin using configuration
+        admin_email = app.config['SUPER_ADMIN_EMAIL']
+        admin_password = app.config['SUPER_ADMIN_PASSWORD']
+
+        admin = User.query.filter_by(email=admin_email).first()
+
+        if not admin:
             admin = User(
-                email='admin@btpcommande.ma',
-                first_name='Super',
-                last_name='Admin',
+                email=admin_email,
+                first_name=app.config['SUPER_ADMIN_FIRST_NAME'],
+                last_name=app.config['SUPER_ADMIN_LAST_NAME'],
                 role='super_admin',
                 preferred_language='fr'
             )
-            admin.set_password('admin123')
+            admin.set_password(admin_password)
             db.session.add(admin)
-            db.session.commit()
-            print("Super Admin created: admin@btpcommande.ma / admin123")
+            print(f"Super Admin created: {admin_email}")
+        else:
+            admin.first_name = app.config['SUPER_ADMIN_FIRST_NAME']
+            admin.last_name = app.config['SUPER_ADMIN_LAST_NAME']
+            admin.set_password(admin_password)
+            print(f"Super Admin updated: {admin_email}")
+
+        db.session.commit()
         
         if LexiqueEntry.query.count() == 0:
             populate_btp_dictionary()
