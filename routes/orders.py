@@ -18,6 +18,7 @@ from services.tenant_service import TenantService
 from services.order_service import OrderService
 from services.pdf_service import PDFService
 from services.lexique_service import LexiqueService
+from services.i18n_service import i18n
 
 orders_bp = Blueprint('orders', __name__)
 
@@ -57,12 +58,12 @@ def create():
         supplier_phone = request.form.get('supplier_phone', '').strip()
         
         if not project_id:
-            flash('Veuillez sélectionner un chantier.', 'danger')
+            flash(i18n.translate('Veuillez sélectionner un chantier.'), 'danger')
             return render_template('orders/create.html', projects=projects, products=products)
         
         project = Project.query.get(project_id)
         if not project or not TenantService.validate_tenant_access(project):
-            flash('Chantier non valide.', 'danger')
+            flash(i18n.translate('Chantier non valide.'), 'danger')
             return render_template('orders/create.html', projects=projects, products=products)
         
         requested_date = None
@@ -82,13 +83,13 @@ def create():
                 supplier_phone=supplier_phone
             )
             
-            flash(f'Bon de commande {order.bc_number} créé.', 'success')
+            flash(i18n.translate('Bon de commande {} créé.').format(order.bc_number), 'success')
             return redirect(url_for('orders.edit', order_id=order.id))
         except ValueError as e:
             flash(str(e), 'warning')
         except Exception as e:
             current_app.logger.error(f"Error creating order: {e}")
-            flash('Une erreur est survenue lors de la création.', 'danger')
+            flash(i18n.translate('Une erreur est survenue lors de la création.'), 'danger')
     
     return render_template('orders/create.html', projects=projects, products=products)
 
@@ -99,7 +100,7 @@ def view(order_id):
     order = Order.query.get_or_404(order_id)
     
     if not TenantService.validate_tenant_access(order):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('orders.index'))
     
     lines = order.lines.order_by(OrderLine.line_number).all()
@@ -114,11 +115,11 @@ def edit(order_id):
     order = Order.query.get_or_404(order_id)
     
     if not TenantService.validate_tenant_access(order):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('orders.index'))
     
     if not order.can_edit(current_user):
-        flash('Vous ne pouvez pas modifier ce bon de commande.', 'warning')
+        flash(i18n.translate('Vous ne pouvez pas modifier ce bon de commande.'), 'warning')
         return redirect(url_for('orders.view', order_id=order.id))
     
     products = TenantService.get_tenant_products().all()
@@ -141,7 +142,7 @@ def edit(order_id):
                     pass
             
             db.session.commit()
-            flash('Informations mises à jour.', 'success')
+            flash(i18n.translate('Informations mises à jour.'), 'success')
         
         elif action == 'add_line':
             product_id = request.form.get('product_id')
@@ -152,7 +153,7 @@ def edit(order_id):
             note = request.form.get('note', '').strip()
             
             if not description:
-                flash('La description est obligatoire.', 'danger')
+                flash(i18n.translate('La description est obligatoire.'), 'danger')
             else:
                 translation_result = LexiqueService.translate(description)
                 
@@ -168,12 +169,12 @@ def edit(order_id):
                         description_translated=translation_result['translation'],
                         translation_snapshot=translation_result
                     )
-                    flash('Ligne ajoutée.', 'success')
+                    flash(i18n.translate('Ligne ajoutée.'), 'success')
                 except ValueError as e:
                     flash(str(e), 'warning')
                 except Exception as e:
                     current_app.logger.error(f"Error adding line: {e}")
-                    flash('Une erreur est survenue lors de l\'ajout de la ligne.', 'danger')
+                    flash(i18n.translate('Une erreur est survenue lors de l\'ajout de la ligne.'), 'danger')
         
         return redirect(url_for('orders.edit', order_id=order.id))
     
@@ -187,21 +188,21 @@ def delete_line(order_id, line_id):
     line = OrderLine.query.get_or_404(line_id)
     
     if not TenantService.validate_tenant_access(order) or line.order_id != order.id:
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('orders.index'))
     
     if not order.can_edit(current_user):
-        flash('Vous ne pouvez pas modifier ce bon de commande.', 'warning')
+        flash(i18n.translate('Vous ne pouvez pas modifier ce bon de commande.'), 'warning')
         return redirect(url_for('orders.view', order_id=order.id))
     
     try:
         OrderService.delete_line(line)
-        flash('Ligne supprimée.', 'success')
+        flash(i18n.translate('Ligne supprimée.'), 'success')
     except ValueError as e:
         flash(str(e), 'warning')
     except Exception as e:
         current_app.logger.error(f"Error deleting line: {e}")
-        flash('Une erreur est survenue lors de la suppression.', 'danger')
+        flash(i18n.translate('Une erreur est survenue lors de la suppression.'), 'danger')
 
     return redirect(url_for('orders.edit', order_id=order.id))
 
@@ -212,17 +213,17 @@ def submit(order_id):
     order = Order.query.get_or_404(order_id)
     
     if not TenantService.validate_tenant_access(order):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('orders.index'))
     
     try:
         OrderService.submit_order(order)
-        flash('Bon de commande soumis pour validation.', 'success')
+        flash(i18n.translate('Bon de commande soumis pour validation.'), 'success')
     except ValueError as e:
         flash(str(e), 'warning')
     except Exception as e:
         current_app.logger.error(f"Error submitting order: {e}")
-        flash('Une erreur est survenue lors de la soumission.', 'danger')
+        flash(i18n.translate('Une erreur est survenue lors de la soumission.'), 'danger')
     
     return redirect(url_for('orders.view', order_id=order.id))
 
@@ -233,17 +234,17 @@ def validate(order_id):
     order = Order.query.get_or_404(order_id)
     
     if not TenantService.validate_tenant_access(order):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('orders.index'))
     
     try:
         OrderService.validate_order(order)
-        flash('Bon de commande validé.', 'success')
+        flash(i18n.translate('Bon de commande validé.'), 'success')
     except ValueError as e:
         flash(str(e), 'warning')
     except Exception as e:
         current_app.logger.error(f"Error validating order: {e}")
-        flash('Une erreur est survenue lors de la validation.', 'danger')
+        flash(i18n.translate('Une erreur est survenue lors de la validation.'), 'danger')
     
     return redirect(url_for('orders.view', order_id=order.id))
 
@@ -254,19 +255,19 @@ def reject(order_id):
     order = Order.query.get_or_404(order_id)
     
     if not TenantService.validate_tenant_access(order):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('orders.index'))
     
     reason = request.form.get('reason', '')
     
     try:
         OrderService.reject_order(order, reason)
-        flash('Bon de commande rejeté.', 'info')
+        flash(i18n.translate('Bon de commande rejeté.'), 'info')
     except ValueError as e:
         flash(str(e), 'warning')
     except Exception as e:
         current_app.logger.error(f"Error rejecting order: {e}")
-        flash('Une erreur est survenue lors du rejet.', 'danger')
+        flash(i18n.translate('Une erreur est survenue lors du rejet.'), 'danger')
     
     return redirect(url_for('orders.view', order_id=order.id))
 
@@ -277,7 +278,7 @@ def generate_pdf(order_id):
     order = Order.query.get_or_404(order_id)
     
     if not TenantService.validate_tenant_access(order):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('orders.index'))
     
     try:
@@ -293,7 +294,7 @@ def generate_pdf(order_id):
         return redirect(url_for('orders.view', order_id=order.id))
     except Exception as e:
         current_app.logger.error(f"Error generating PDF: {e}")
-        flash('Une erreur est survenue lors de la génération du PDF.', 'danger')
+        flash(i18n.translate('Une erreur est survenue lors de la génération du PDF.'), 'danger')
         return redirect(url_for('orders.view', order_id=order.id))
 
 @orders_bp.route('/<int:order_id>/share/<method>')
@@ -303,11 +304,11 @@ def share(order_id, method):
     order = Order.query.get_or_404(order_id)
     
     if not TenantService.validate_tenant_access(order):
-        flash('Accès non autorisé.', 'danger')
+        flash(i18n.translate('Accès non autorisé.'), 'danger')
         return redirect(url_for('orders.index'))
     
     if not order.can_share():
-        flash('Le bon de commande doit être validé avant le partage.', 'warning')
+        flash(i18n.translate('Le bon de commande doit être validé avant le partage.'), 'warning')
         return redirect(url_for('orders.view', order_id=order.id))
     
     try:
@@ -336,7 +337,7 @@ def share(order_id, method):
             return redirect(f"mailto:?subject={subject}&body={body}")
     except Exception as e:
         current_app.logger.error(f"Error sharing order: {e}")
-        flash('Une erreur est survenue lors du partage.', 'danger')
+        flash(i18n.translate('Une erreur est survenue lors du partage.'), 'danger')
     
     return redirect(url_for('orders.view', order_id=order.id))
 

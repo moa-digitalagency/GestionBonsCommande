@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Tableau de bord</h1>
+    <h1 class="text-2xl font-bold text-gray-900">{{ _('Tableau de bord') }}</h1>
     {% if current_company() %}
     <p class="text-gray-600">{{ current_company().name }}</p>
     {% endif %}
@@ -17,7 +17,7 @@
                 <i class="fas fa-file-alt text-2xl"></i>
             </div>
             <div class="ml-4">
-                <p class="text-sm text-gray-500">Commandes</p>
+                <p class="text-sm text-gray-500">{{ _('Commandes') }}</p>
                 <p class="text-2xl font-bold">{{ orders|length }}</p>
             </div>
         </div>
@@ -29,7 +29,7 @@
                 <i class="fas fa-clock text-2xl"></i>
             </div>
             <div class="ml-4">
-                <p class="text-sm text-gray-500">En attente</p>
+                <p class="text-sm text-gray-500">{{ _('En attente') }}</p>
                 <p class="text-2xl font-bold">{{ pending_orders }}</p>
             </div>
         </div>
@@ -41,7 +41,7 @@
                 <i class="fas fa-hard-hat text-2xl"></i>
             </div>
             <div class="ml-4">
-                <p class="text-sm text-gray-500">Chantiers</p>
+                <p class="text-sm text-gray-500">{{ _('Chantiers') }}</p>
                 <p class="text-2xl font-bold">{{ projects|length }}</p>
             </div>
         </div>
@@ -53,7 +53,7 @@
                 <i class="fas fa-boxes text-2xl"></i>
             </div>
             <div class="ml-4">
-                <p class="text-sm text-gray-500">Articles</p>
+                <p class="text-sm text-gray-500">{{ _('Articles') }}</p>
                 <p class="text-2xl font-bold">{{ products_count }}</p>
             </div>
         </div>
@@ -63,9 +63,9 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b flex justify-between items-center">
-            <h2 class="text-lg font-semibold">Dernières commandes</h2>
+            <h2 class="text-lg font-semibold">{{ _('Dernières commandes') }}</h2>
             <a href="{{ url_for('orders.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
-                <i class="fas fa-plus mr-1"></i> Nouveau BC
+                <i class="fas fa-plus mr-1"></i> {{ _('Nouveau BC') }}
             </a>
         </div>
         <div class="divide-y">
@@ -91,8 +91,8 @@
             {% else %}
             <div class="px-6 py-8 text-center text-gray-500">
                 <i class="fas fa-file-alt text-4xl mb-2"></i>
-                <p>Aucune commande</p>
-                <a href="{{ url_for('orders.create') }}" class="text-blue-600 hover:underline">Créer votre premier BC</a>
+                <p>{{ _('Aucune commande') }}</p>
+                <a href="{{ url_for('orders.create') }}" class="text-blue-600 hover:underline">{{ _('Créer votre premier BC') }}</a>
             </div>
             {% endif %}
         </div>
@@ -100,10 +100,10 @@
     
     <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b flex justify-between items-center">
-            <h2 class="text-lg font-semibold">Chantiers actifs</h2>
+            <h2 class="text-lg font-semibold">{{ _('Chantiers actifs') }}</h2>
             {% if current_user.role in ['admin', 'super_admin'] %}
             <a href="{{ url_for('projects.add') }}" class="text-blue-600 hover:underline text-sm">
-                <i class="fas fa-plus mr-1"></i> Ajouter
+                <i class="fas fa-plus mr-1"></i> {{ _('Ajouter') }}
             </a>
             {% endif %}
         </div>
@@ -114,7 +114,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <p class="font-medium text-gray-900">{{ project.name }}</p>
-                        <p class="text-sm text-gray-500">{{ project.city or project.address or 'Adresse non renseignée' }}</p>
+                        <p class="text-sm text-gray-500">{{ project.city or project.address or _('Adresse non renseignée') }}</p>
                     </div>
                     <i class="fas fa-chevron-right text-gray-400"></i>
                 </div>
@@ -123,9 +123,9 @@
             {% else %}
             <div class="px-6 py-8 text-center text-gray-500">
                 <i class="fas fa-hard-hat text-4xl mb-2"></i>
-                <p>Aucun chantier</p>
+                <p>{{ _('Aucun chantier') }}</p>
                 {% if current_user.role in ['admin', 'super_admin'] %}
-                <a href="{{ url_for('projects.add') }}" class="text-blue-600 hover:underline">Ajouter un chantier</a>
+                <a href="{{ url_for('projects.add') }}" class="text-blue-600 hover:underline">{{ _('Ajouter un chantier') }}</a>
                 {% endif %}
             </div>
             {% endif %}

@@ -11,6 +11,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from models import db
 from models.user import User
+from services.i18n_service import i18n
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -25,14 +26,14 @@ def login():
         remember = request.form.get('remember', False)
         
         if not email or not password:
-            flash('Veuillez remplir tous les champs.', 'danger')
+            flash(i18n.translate('Veuillez remplir tous les champs.'), 'danger')
             return render_template('auth/login.html')
         
         user = User.query.filter_by(email=email).first()
         
         if user and user.check_password(password):
             if not user.is_active:
-                flash('Votre compte a été désactivé.', 'danger')
+                flash(i18n.translate('Votre compte a été désactivé.'), 'danger')
                 return render_template('auth/login.html')
             
             login_user(user, remember=remember)
@@ -45,7 +46,7 @@ def login():
                 return redirect(next_page)
             return redirect(url_for('main.dashboard'))
         
-        flash('Email ou mot de passe incorrect.', 'danger')
+        flash(i18n.translate('Email ou mot de passe incorrect.'), 'danger')
     
     return render_template('auth/login.html')
 
@@ -53,7 +54,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('Vous avez été déconnecté.', 'info')
+    flash(i18n.translate('Vous avez été déconnecté.'), 'info')
     return redirect(url_for('main.index'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
@@ -70,19 +71,19 @@ def register():
         phone = request.form.get('phone', '').strip()
         
         if not all([email, password, first_name, last_name]):
-            flash('Veuillez remplir tous les champs obligatoires.', 'danger')
+            flash(i18n.translate('Veuillez remplir tous les champs obligatoires.'), 'danger')
             return render_template('auth/register.html')
         
         if password != confirm_password:
-            flash('Les mots de passe ne correspondent pas.', 'danger')
+            flash(i18n.translate('Les mots de passe ne correspondent pas.'), 'danger')
             return render_template('auth/register.html')
         
         if len(password) < 8:
-            flash('Le mot de passe doit contenir au moins 8 caractères.', 'danger')
+            flash(i18n.translate('Le mot de passe doit contenir au moins 8 caractères.'), 'danger')
             return render_template('auth/register.html')
         
         if User.query.filter_by(email=email).first():
-            flash('Cet email est déjà utilisé.', 'danger')
+            flash(i18n.translate('Cet email est déjà utilisé.'), 'danger')
             return render_template('auth/register.html')
         
         user = User(
@@ -98,7 +99,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         
-        flash('Votre compte a été créé. Un administrateur doit vous associer à une société.', 'success')
+        flash(i18n.translate('Votre compte a été créé. Un administrateur doit vous associer à une société.'), 'success')
         return redirect(url_for('auth.login'))
     
     return render_template('auth/register.html')
@@ -116,7 +117,7 @@ def profile():
         new_password = request.form.get('new_password', '')
         
         if not all([first_name, last_name]):
-            flash('Le prénom et le nom sont obligatoires.', 'danger')
+            flash(i18n.translate('Le prénom et le nom sont obligatoires.'), 'danger')
             return render_template('auth/profile.html')
         
         current_user.first_name = first_name
@@ -126,16 +127,16 @@ def profile():
         
         if new_password:
             if not current_user.check_password(current_password):
-                flash('Mot de passe actuel incorrect.', 'danger')
+                flash(i18n.translate('Mot de passe actuel incorrect.'), 'danger')
                 return render_template('auth/profile.html')
             
             if len(new_password) < 8:
-                flash('Le nouveau mot de passe doit contenir au moins 8 caractères.', 'danger')
+                flash(i18n.translate('Le nouveau mot de passe doit contenir au moins 8 caractères.'), 'danger')
                 return render_template('auth/profile.html')
             
             current_user.set_password(new_password)
         
         db.session.commit()
-        flash('Profil mis à jour avec succès.', 'success')
+        flash(i18n.translate('Profil mis à jour avec succès.'), 'success')
     
     return render_template('auth/profile.html')
