@@ -11,9 +11,43 @@ from config.settings import Config
 
 lexique_bp = Blueprint('lexique', __name__)
 
-@lexique_bp.route('/')
+@lexique_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
+    if request.method == 'POST':
+        category = request.form.get('category', 'general')
+        translations = {}
+
+        # Collect translations from form (expecting keys like 'term_fr', 'term_ar', etc.)
+        for lang in Config.SUPPORTED_LANGUAGES:
+            val = request.form.get(f'term_{lang}', '').strip()
+            if val:
+                translations[lang] = val
+
+        # Basic Validation
+        if not translations.get('fr'):
+             flash(i18n.translate('Le terme en français est obligatoire.'), 'danger')
+        else:
+            try:
+                # If Super Admin, add directly
+                if current_user.role == 'super_admin':
+                    LexiqueService.add_entry(translations, category, [])
+                    flash(i18n.translate('Terme ajouté avec succès.'), 'success')
+                else:
+                    # Else, suggest
+                    LexiqueService.suggest_term(
+                        original_term=translations['fr'],
+                        suggested_translations=translations,
+                        category=category,
+                        context="Ajout rapide via dictionnaire",
+                        source_language='fr'
+                    )
+                    flash(i18n.translate('Suggestion envoyée pour validation.'), 'info')
+            except Exception as e:
+                flash(i18n.translate('Erreur lors de l\'ajout: {}').format(str(e)), 'danger')
+
+        return redirect(url_for('lexique.index'))
+
     category = request.args.get('category', '')
     search = request.args.get('search', '').strip()
     
