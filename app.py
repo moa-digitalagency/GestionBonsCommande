@@ -1,98 +1,85 @@
-# /* * Nom de l'application : BTP Commande
-#  * Description : Point d'entrée de l'application
-#  * Produit de : MOA Digital Agency, www.myoneart.com
-#  * Fait par : Aisance KALONJI, www.aisancekalonji.com
-#  * Auditer par : La CyberConfiance, www.cyberconfiance.com
-#  */
+from flask import Flask, render_template, request, redirect, url_for
 
-import os
-from flask import Flask, g, request, session
-from flask_login import LoginManager, current_user
-from flask_wtf.csrf import CSRFProtect
-# from flask_babel import Babel # Removed in favor of custom JSON i18n
-from services.i18n_service import i18n
-from config.settings import Config
-from models import db
+app = Flask(__name__, static_folder='statics', static_url_path='/static')
+app.secret_key = 'super_secret_key_dev_mode'
 
-login_manager = LoginManager()
-csrf = CSRFProtect()
-# babel = Babel()
+# --- MOCK DATA ---
 
-def create_app():
-    app = Flask(__name__, 
-                static_folder='statics',
-                static_url_path='/static')
-    
-    app.config.from_object(Config)
-    
-    db.init_app(app)
-    csrf.init_app(app)
-    # babel.init_app(app, locale_selector=get_locale)
-    i18n.init_app(app)
-    
-    login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Veuillez vous connecter pour accéder à cette page.'
-    login_manager.login_message_category = 'warning'
-    
-    from models.user import User
-    
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
-    
-    @app.before_request
-    def before_request():
-        g.current_company = None
-        if current_user.is_authenticated and current_user.company_id:
-            from models.company import Company
-            g.current_company = Company.query.get(current_user.company_id)
-    
-    @app.context_processor
-    def utility_processor():
-        return {
-            'current_company': lambda: g.get('current_company'),
-            'supported_languages': Config.SUPPORTED_LANGUAGES,
-            'bc_statuses': Config.BC_STATUSES,
-            'user_roles': Config.USER_ROLES,
+MOCK_STATS = {
+    'orders_count': 12,
+    'pending_count': 3,
+    'projects_count': 5
+}
+
+MOCK_ORDERS = [
+    {'id': 'CMD-2024-001', 'project': 'Résidence Al Manar', 'date': '12/10/2024', 'status': 'Validé'},
+    {'id': 'CMD-2024-002', 'project': 'Villa Jasmine', 'date': '14/10/2024', 'status': 'Soumis'},
+    {'id': 'CMD-2024-003', 'project': 'Complexe Sportif', 'date': '15/10/2024', 'status': 'Brouillon'},
+    {'id': 'CMD-2024-004', 'project': 'Résidence Al Manar', 'date': '18/10/2024', 'status': 'Soumis'},
+]
+
+MOCK_PROJECTS = [
+    {'name': 'Résidence Al Manar', 'city': 'Casablanca'},
+    {'name': 'Villa Jasmine', 'city': 'Marrakech'},
+    {'name': 'Complexe Sportif', 'city': 'Rabat'},
+    {'name': 'Immeuble Hicham', 'city': 'Tanger'},
+    {'name': 'École Primaire B', 'city': 'Fès'},
+]
+
+MOCK_LEXIQUE = [
+    {'fr': 'Béton armé', 'ar': 'خرسانة مسلحة', 'darija': 'Béton armé', 'en': 'Reinforced concrete', 'category': 'Gros Œuvre'},
+    {'fr': 'Grue à tour', 'ar': 'رافعة برجية', 'darija': 'Gru', 'en': 'Tower crane', 'category': 'Outillage'},
+    {'fr': 'Maçonnerie', 'ar': 'بناء', 'darija': 'Bni', 'en': 'Masonry', 'category': 'Gros Œuvre'},
+    {'fr': 'Peinture', 'ar': 'صباغة', 'darija': 'Sbigha', 'en': 'Painting', 'category': 'Second Œuvre'},
+    {'fr': 'Carrelage', 'ar': 'تبليط', 'darija': 'Zellij', 'en': 'Tiling', 'category': 'Second Œuvre'},
+]
+
+# --- ROUTES ---
+
+@app.route('/')
+def index():
+    return render_template('dashboard.html',
+                           stats=MOCK_STATS,
+                           orders=MOCK_ORDERS,
+                           projects=MOCK_PROJECTS)
+
+@app.route('/commandes')
+def commandes():
+    # Placeholder: Reusing dashboard layout or specific view if requested.
+    # For now, listing orders.
+    return render_template('dashboard.html',
+                           stats=MOCK_STATS,
+                           orders=MOCK_ORDERS,
+                           projects=MOCK_PROJECTS) # Or a dedicated list page
+
+@app.route('/chantiers')
+def chantiers():
+    return render_template('dashboard.html',
+                           stats=MOCK_STATS,
+                           orders=MOCK_ORDERS,
+                           projects=MOCK_PROJECTS)
+
+@app.route('/articles')
+def articles():
+    return render_template('dashboard.html',
+                           stats=MOCK_STATS,
+                           orders=MOCK_ORDERS,
+                           projects=MOCK_PROJECTS)
+
+@app.route('/dictionnaire', methods=['GET', 'POST'])
+def dictionnaire():
+    if request.method == 'POST':
+        new_term = {
+            'fr': request.form.get('fr'),
+            'ar': request.form.get('ar'),
+            'darija': request.form.get('darija'),
+            'en': request.form.get('en'),
+            'category': request.form.get('category')
         }
+        MOCK_LEXIQUE.insert(0, new_term) # Add to top
+        return redirect(url_for('dictionnaire'))
     
-    @app.after_request
-    def add_security_headers(response):
-        # Cache control
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-
-        # Security Headers
-        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-        response.headers['X-Content-Type-Options'] = 'nosniff'
-        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-        # Add 'unsafe-eval' to script-src for Alpine.js
-        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data:;"
-
-        return response
-    
-    from routes.main import main_bp
-    from routes.auth import auth_bp
-    from routes.company import company_bp
-    from routes.projects import projects_bp
-    from routes.products import products_bp
-    from routes.orders import orders_bp
-    from routes.lexique import lexique_bp
-    from routes.admin import admin_bp
-    
-    app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(company_bp, url_prefix='/company')
-    app.register_blueprint(projects_bp, url_prefix='/projects')
-    app.register_blueprint(products_bp, url_prefix='/products')
-    app.register_blueprint(orders_bp, url_prefix='/orders')
-    app.register_blueprint(lexique_bp, url_prefix='/lexique')
-    app.register_blueprint(admin_bp, url_prefix='/admin')
-    
-    return app
+    return render_template('dictionnaire.html', lexique_entries=MOCK_LEXIQUE)
 
 if __name__ == '__main__':
-    app = create_app()
     app.run(host='0.0.0.0', port=5000, debug=True)
