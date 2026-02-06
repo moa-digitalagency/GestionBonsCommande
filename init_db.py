@@ -23,6 +23,7 @@ from models import db
 from models.company import Company
 from models.user import User
 from models.lexique import LexiqueEntry
+from models.settings import SiteSettings
 
 def init_database():
     print("Starting database initialization...")
@@ -68,6 +69,13 @@ def init_database():
 
         print("Schema verification complete!")
         
+        # Initialize Site Settings
+        try:
+            settings = SiteSettings.get_instance()
+            print(f"Site settings initialized: {settings.app_name}")
+        except Exception as e:
+            print(f"Error initializing site settings: {e}")
+
         # Create or Update Super Admin
         try:
             admin_email = app.config.get('SUPER_ADMIN_EMAIL')
