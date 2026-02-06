@@ -11,8 +11,8 @@
             <p class="text-gray-500 text-sm">Gérez vos approvisionnements et validations.</p>
         </div>
         <div class="flex space-x-3">
-             <a href="{{ url_for('orders.create') }}" class="inline-flex items-center px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-brand-dark shadow-sm">
-                <i class="fas fa-plus mr-2"></i> Nouvelle Commande
+             <a href="{{ url_for('orders.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-sm transition-colors">
+                <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Nouvelle Commande
             </a>
         </div>
     </div>
@@ -60,13 +60,13 @@
             <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
                  <div class="flex-1 relative">
                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-search text-gray-400"></i>
+                        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
                     </div>
-                    <input type="text" placeholder="Recherche par référence..." class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                    <input type="text" placeholder="Recherche par référence..." class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                 </div>
                  <div class="w-full md:w-48">
                      <form id="filter-form" method="GET">
-                        <select name="status" onchange="document.getElementById('filter-form').submit()" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm border p-2">
+                        <select name="status" onchange="document.getElementById('filter-form').submit()" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                             <option value="">Tous les statuts</option>
                             <option value="BROUILLON" {% if current_status == 'BROUILLON' %}selected{% endif %}>Brouillon</option>
                             <option value="SOUMIS" {% if current_status == 'SOUMIS' %}selected{% endif %}>Soumis</option>
@@ -95,7 +95,7 @@
                         {% for order in orders %}
                         <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{{ url_for('orders.view', order_id=order.id) }}'">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-sm font-bold text-brand-primary">{{ order.bc_number }}</span>
+                                <span class="text-sm font-bold text-blue-600">{{ order.bc_number }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ order.project.name }}</div>
@@ -122,14 +122,16 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <button class="text-gray-400 hover:text-gray-600">
-                                    <i class="fas fa-ellipsis-v"></i>
+                                    <i data-lucide="more-vertical" class="w-4 h-4"></i>
                                 </button>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
                             <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                                <i class="fas fa-file-invoice text-4xl mb-3 text-gray-300"></i>
+                                <div class="flex justify-center mb-3">
+                                    <i data-lucide="file-text" class="w-10 h-10 text-gray-300"></i>
+                                </div>
                                 <p>Aucune commande trouvée.</p>
                             </td>
                         </tr>
@@ -161,12 +163,12 @@
                                             {% elif history.action == 'PDF_GENERATION' %}bg-blue-500
                                             {% else %}bg-gray-500{% endif %}">
 
-                                            {% if history.action == 'CREATION' %}<i class="fas fa-plus text-white text-xs"></i>
-                                            {% elif history.action == 'SOUMISSION' %}<i class="fas fa-paper-plane text-white text-xs"></i>
-                                            {% elif history.action == 'VALIDATION' %}<i class="fas fa-check text-white text-xs"></i>
-                                            {% elif history.action == 'REJET' %}<i class="fas fa-times text-white text-xs"></i>
-                                            {% elif history.action == 'PDF_GENERATION' %}<i class="fas fa-file-pdf text-white text-xs"></i>
-                                            {% else %}<i class="fas fa-history text-white text-xs"></i>{% endif %}
+                                            {% if history.action == 'CREATION' %}<i data-lucide="plus" class="text-white w-4 h-4"></i>
+                                            {% elif history.action == 'SOUMISSION' %}<i data-lucide="send" class="text-white w-4 h-4"></i>
+                                            {% elif history.action == 'VALIDATION' %}<i data-lucide="check" class="text-white w-4 h-4"></i>
+                                            {% elif history.action == 'REJET' %}<i data-lucide="x" class="text-white w-4 h-4"></i>
+                                            {% elif history.action == 'PDF_GENERATION' %}<i data-lucide="file" class="text-white w-4 h-4"></i>
+                                            {% else %}<i data-lucide="history" class="text-white w-4 h-4"></i>{% endif %}
                                         </span>
                                     </div>
                                     <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">

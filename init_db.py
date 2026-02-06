@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import os
 import sys
+from sqlalchemy import inspect, text
+from sqlalchemy.exc import OperationalError
 
 # /* * Nom de l'application : BTP Commande
 #  * Description : Script d'initialisation de la base de données
@@ -13,7 +15,6 @@ import sys
 if os.path.exists('venv') and sys.prefix == sys.base_prefix:
     print("WARNING: You seem to be running outside the virtual environment.")
     print("Please activate it first: source venv/bin/activate")
-    # We don't exit to allow manual overrides, but it's a strong hint.
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -22,9 +23,9 @@ from models import db
 from models.company import Company
 from models.user import User
 from models.lexique import LexiqueEntry
-from sqlalchemy import inspect, text
 
 def init_database():
+    print("Starting database initialization...")
     app = create_app()
     
     with app.app_context():
@@ -37,61 +38,81 @@ def init_database():
                 print(f"Creating table: {table_name}")
                 table.create(db.engine)
             else:
-                print(f"Checking table: {table_name}")
+                print(f"Checking schema for table: {table_name}")
                 existing_columns = [c['name'] for c in inspector.get_columns(table_name)]
 
                 for column in table.columns:
                     if column.name not in existing_columns:
                         print(f"Adding missing column: {column.name} to {table_name}")
-                        # Compile the column type to SQL string
                         col_type = column.type.compile(db.engine.dialect)
 
-                        # Handle Nullability (SQLite ADD COLUMN implies nullable usually unless DEFAULT is provided)
-                        # We will default to simply adding the column. Ideally we should handle defaults.
-                        # If the column is NOT NULL but has no default, SQLite will error.
-                        # We assume for now that schema updates are compatible (nullable or with default).
+                        # SQLite ALTER TABLE ADD COLUMN limitation:
+                        # Cannot add NOT NULL column without DEFAULT value.
+                        # We append DEFAULT NULL if it's nullable, or we rely on the DB engine to handle it if provided.
+                        # For this script, we assume the column definition is compatible or we catch the error.
 
                         try:
                             with db.engine.connect() as conn:
-                                # SQLite requires separate ALTER TABLE statements for each column
                                 sql = f'ALTER TABLE "{table_name}" ADD COLUMN "{column.name}" {col_type}'
                                 conn.execute(text(sql))
                                 conn.commit()
                                 print(f"Successfully added column {column.name}")
+                        except OperationalError as e:
+                            print(f"Operational Error adding column {column.name}: {e}")
+                            if "duplicate column name" in str(e).lower():
+                                print("Column already exists (race condition?), skipping.")
+                            else:
+                                print("CRITICAL: Could not add column. Manual intervention may be required.")
                         except Exception as e:
                             print(f"Error adding column {column.name} to {table_name}: {e}")
 
         print("Schema verification complete!")
         
-        # Create or Update Super Admin using configuration
-        admin_email = app.config['SUPER_ADMIN_EMAIL']
-        admin_password = app.config['SUPER_ADMIN_PASSWORD']
+        # Create or Update Super Admin
+        try:
+            admin_email = app.config.get('SUPER_ADMIN_EMAIL')
+            admin_password = app.config.get('SUPER_ADMIN_PASSWORD')
 
-        admin = User.query.filter_by(email=admin_email).first()
+            if admin_email and admin_password:
+                admin = User.query.filter_by(email=admin_email).first()
 
-        if not admin:
-            admin = User(
-                email=admin_email,
-                first_name=app.config['SUPER_ADMIN_FIRST_NAME'],
-                last_name=app.config['SUPER_ADMIN_LAST_NAME'],
-                role='super_admin',
-                preferred_language='fr'
-            )
-            admin.set_password(admin_password)
-            db.session.add(admin)
-            print(f"Super Admin created: {admin_email}")
-        else:
-            admin.first_name = app.config['SUPER_ADMIN_FIRST_NAME']
-            admin.last_name = app.config['SUPER_ADMIN_LAST_NAME']
-            admin.set_password(admin_password)
-            print(f"Super Admin updated: {admin_email}")
+                if not admin:
+                    admin = User(
+                        email=admin_email,
+                        first_name=app.config.get('SUPER_ADMIN_FIRST_NAME', 'Super'),
+                        last_name=app.config.get('SUPER_ADMIN_LAST_NAME', 'Admin'),
+                        role='super_admin',
+                        preferred_language='fr',
+                        is_active=True
+                    )
+                    admin.set_password(admin_password)
+                    db.session.add(admin)
+                    print(f"Super Admin created: {admin_email}")
+                else:
+                    # Update admin details if config changed
+                    admin.first_name = app.config.get('SUPER_ADMIN_FIRST_NAME', admin.first_name)
+                    admin.last_name = app.config.get('SUPER_ADMIN_LAST_NAME', admin.last_name)
+                    # Only reset password if you want to enforce config password on every deploy
+                    # admin.set_password(admin_password)
+                    print(f"Super Admin exists: {admin_email}")
 
-        db.session.commit()
+                db.session.commit()
+            else:
+                print("Skipping Super Admin creation: Credentials not found in config.")
+        except Exception as e:
+            print(f"Error managing Super Admin: {e}")
+            db.session.rollback()
         
-        if LexiqueEntry.query.count() == 0:
-            populate_btp_dictionary()
-            print("BTP Dictionary populated with initial terms!")
-        
+        # Populate Dictionary
+        try:
+            if LexiqueEntry.query.count() == 0:
+                populate_btp_dictionary()
+                print("BTP Dictionary populated with initial terms!")
+            else:
+                print("Dictionary already populated.")
+        except Exception as e:
+            print(f"Error checking/populating dictionary: {e}")
+
         print("Database initialization complete!")
 
 def populate_btp_dictionary():
@@ -359,8 +380,6 @@ def populate_btp_dictionary():
         db.session.add(entry)
     
     db.session.commit()
-    print(f"Added {len(btp_terms)} BTP terms to the dictionary")
-
 
 if __name__ == '__main__':
     init_database()
