@@ -80,7 +80,6 @@
                 <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 text-slate-400"></i>
                 Tableau de bord
             </a>
-            {% if current_user.role != 'super_admin' %}
             <a href="{{ url_for('orders.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
                 <i data-lucide="file-text" class="w-5 h-5 mr-3 text-slate-400"></i>
                 Bons de Commande
@@ -93,7 +92,6 @@
                 <i data-lucide="package" class="w-5 h-5 mr-3 text-slate-400"></i>
                 Articles
             </a>
-            {% endif %}
             <a href="{{ url_for('lexique.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
                 <i data-lucide="book" class="w-5 h-5 mr-3 text-slate-400"></i>
                 Dictionnaire
@@ -116,7 +114,6 @@
                     Tableau de bord
                 </a>
 
-                {% if current_user.role != 'super_admin' %}
                 <a href="{{ url_for('orders.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'orders' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <i data-lucide="file-text" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'orders' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
                     Bons de Commande
@@ -129,7 +126,6 @@
                     <i data-lucide="package" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'products' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
                     Articles
                 </a>
-                {% endif %}
 
                 <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'lexique' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <i data-lucide="book" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'lexique' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
