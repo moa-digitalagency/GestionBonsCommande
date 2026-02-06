@@ -93,23 +93,23 @@
         <nav class="p-4 space-y-1">
             <a href="{{ url_for('main.dashboard') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
                 <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 text-slate-400"></i>
-                Tableau de bord
+                {{ _('Tableau de bord') }}
             </a>
             <a href="{{ url_for('orders.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
                 <i data-lucide="file-text" class="w-5 h-5 mr-3 text-slate-400"></i>
-                Bons de Commande
+                {{ _('Bons de Commande') }}
             </a>
             <a href="{{ url_for('projects.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
                 <i data-lucide="hard-hat" class="w-5 h-5 mr-3 text-slate-400"></i>
-                Chantiers
+                {{ _('Chantiers') }}
             </a>
             <a href="{{ url_for('products.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
                 <i data-lucide="package" class="w-5 h-5 mr-3 text-slate-400"></i>
-                Articles
+                {{ _('Articles') }}
             </a>
             <a href="{{ url_for('lexique.index') }}" class="flex items-center px-3 py-2 text-base font-medium rounded-lg text-slate-900 hover:bg-slate-50">
                 <i data-lucide="book" class="w-5 h-5 mr-3 text-slate-400"></i>
-                Dictionnaire
+                {{ _('Dictionnaire') }}
             </a>
         </nav>
     </div>
@@ -130,50 +130,50 @@
             <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
                 <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if request.endpoint == 'main.dashboard' else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 {{ 'text-blue-600' if request.endpoint == 'main.dashboard' else 'text-slate-400 group-hover:text-slate-500' }}"></i>
-                    Tableau de bord
+                    {{ _('Tableau de bord') }}
                 </a>
 
                 <a href="{{ url_for('orders.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'orders' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <i data-lucide="file-text" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'orders' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
-                    Bons de Commande
+                    {{ _('Bons de Commande') }}
                 </a>
                 <a href="{{ url_for('projects.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'projects' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <i data-lucide="hard-hat" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'projects' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
-                    Chantiers
+                    {{ _('Chantiers') }}
                 </a>
                 <a href="{{ url_for('products.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'products' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <i data-lucide="package" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'products' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
-                    Articles
+                    {{ _('Articles') }}
                 </a>
 
                 <a href="{{ url_for('lexique.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{ 'bg-blue-50 text-blue-700' if 'lexique' in request.endpoint else 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <i data-lucide="book" class="w-5 h-5 mr-3 {{ 'text-blue-600' if 'lexique' in request.endpoint else 'text-slate-400 group-hover:text-slate-500' }}"></i>
-                    Dictionnaire
+                    {{ _('Dictionnaire') }}
                 </a>
             </nav>
 
             <div class="border-t border-slate-100 p-3 bg-slate-50/50">
                 {% if current_user.has_permission('manage_users') or current_user.has_permission('manage_roles') or current_user.role == 'super_admin' %}
                 <div class="mb-2">
-                     <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Administration</p>
+                     <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{{ _('Administration') }}</p>
 
                      {% if current_user.has_permission('manage_users') or current_user.role == 'super_admin' %}
                      <a href="{{ url_for('admin.users') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900">
                         <i data-lucide="users" class="w-5 h-5 mr-3 text-slate-400 group-hover:text-slate-500"></i>
-                        Utilisateurs
+                        {{ _('Utilisateurs') }}
                     </a>
                     {% endif %}
 
                     {% if current_user.has_permission('manage_roles') or current_user.role == 'super_admin' %}
                      <a href="{{ url_for('admin.roles') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900">
                         <i data-lucide="shield" class="w-5 h-5 mr-3 text-slate-400 group-hover:text-slate-500"></i>
-                        Rôles & Permissions
+                        {{ _('Rôles & Permissions') }}
                     </a>
                     {% endif %}
 
                      <a href="{{ url_for('settings.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900">
                         <i data-lucide="settings" class="w-5 h-5 mr-3 text-slate-400 group-hover:text-slate-500"></i>
-                        Paramètres Site
+                        {{ _('Paramètres Site') }}
                     </a>
                 </div>
                 {% endif %}
@@ -206,7 +206,7 @@
                      <i data-lucide="home" class="w-4 h-4 mr-2 text-slate-400"></i>
                      <span class="mx-2 text-slate-300">/</span>
                      {% block breadcrumbs %}
-                     <span class="font-medium text-slate-700">Tableau de bord</span>
+                     <span class="font-medium text-slate-700">{{ _('Tableau de bord') }}</span>
                      {% endblock %}
                 </div>
 
