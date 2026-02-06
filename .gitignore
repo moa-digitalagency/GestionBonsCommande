@@ -31,3 +31,4 @@ instance/
 .webassets-cache
 *.db
 *.sqlite
+verification/

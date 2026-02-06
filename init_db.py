@@ -33,13 +33,18 @@ def init_database():
         inspector = inspect(db.engine)
         existing_tables = inspector.get_table_names()
 
+        tables_created = 0
+        tables_checked = 0
+
         # Iterate over all models defined in SQLAlchemy metadata
         for table_name, table in db.metadata.tables.items():
             if table_name not in existing_tables:
                 print(f"Creating table: {table_name}")
                 table.create(db.engine)
+                tables_created += 1
             else:
                 print(f"Checking schema for table: {table_name}")
+                tables_checked += 1
                 existing_columns = [c['name'] for c in inspector.get_columns(table_name)]
 
                 for column in table.columns:
@@ -67,7 +72,7 @@ def init_database():
                         except Exception as e:
                             print(f"Error adding column {column.name} to {table_name}: {e}")
 
-        print("Schema verification complete!")
+        print(f"Schema verification complete! (Tables created: {tables_created}, Checked: {tables_checked})")
         
         # Initialize Site Settings
         try:
