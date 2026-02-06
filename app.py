@@ -43,6 +43,17 @@ def index():
                            orders=MOCK_ORDERS,
                            projects=MOCK_PROJECTS)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Mock login logic
+        return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    return redirect(url_for('login'))
+
 @app.route('/commandes')
 def commandes():
     return render_template('placeholder.html',
