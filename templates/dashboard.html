@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block breadcrumbs %}Tableau de bord{% endblock %}
+{% block breadcrumbs %}{{ _('Tableau de bord') }}{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
@@ -13,7 +13,7 @@
                 <i data-lucide="file-text" class="w-6 h-6"></i>
             </div>
             <div>
-                <p class="text-sm font-medium text-slate-500">Commandes</p>
+                <p class="text-sm font-medium text-slate-500">{{ _('Commandes') }}</p>
                 <p class="text-2xl font-bold text-slate-900">{{ stats.orders_count }}</p>
             </div>
         </div>
@@ -24,7 +24,7 @@
                 <i data-lucide="clock" class="w-6 h-6"></i>
             </div>
             <div>
-                <p class="text-sm font-medium text-slate-500">En attente</p>
+                <p class="text-sm font-medium text-slate-500">{{ _('En attente') }}</p>
                 <p class="text-2xl font-bold text-slate-900">{{ stats.pending_count }}</p>
             </div>
         </div>
@@ -35,7 +35,7 @@
                 <i data-lucide="hard-hat" class="w-6 h-6"></i>
             </div>
             <div>
-                <p class="text-sm font-medium text-slate-500">Chantiers</p>
+                <p class="text-sm font-medium text-slate-500">{{ _('Chantiers') }}</p>
                 <p class="text-2xl font-bold text-slate-900">{{ stats.projects_count }}</p>
             </div>
         </div>
@@ -46,19 +46,19 @@
         <!-- Dernières Commandes -->
         <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-slate-900">Dernières commandes</h3>
+                <h3 class="text-lg font-semibold text-slate-900">{{ _('Dernières commandes') }}</h3>
                 <button class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Nouveau BC
+                    <i data-lucide="plus" class="w-4 h-4 mr-1"></i> {{ _('Nouveau BC') }}
                 </button>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">ID</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Projet</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Statut</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">{{ _('ID') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">{{ _('Projet') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">{{ _('Date') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">{{ _('Statut') }}</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-200">
@@ -88,7 +88,7 @@
             </div>
             <div class="px-6 py-3 border-t border-slate-100 bg-slate-50">
                 <a href="/commandes" class="text-sm font-medium text-blue-600 hover:text-blue-500 flex items-center">
-                    Voir toutes les commandes <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    {{ _('Voir toutes les commandes') }} <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
                 </a>
             </div>
         </div>
@@ -96,7 +96,7 @@
         <!-- Chantiers Actifs -->
         <div class="lg:col-span-1 bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100">
-                <h3 class="text-lg font-semibold text-slate-900">Chantiers actifs</h3>
+                <h3 class="text-lg font-semibold text-slate-900">{{ _('Chantiers actifs') }}</h3>
             </div>
             <ul class="divide-y divide-slate-100">
                 {% for project in projects %}
@@ -118,7 +118,7 @@
             </ul>
              <div class="px-6 py-3 border-t border-slate-100 bg-slate-50">
                 <a href="/chantiers" class="text-sm font-medium text-blue-600 hover:text-blue-500 flex items-center">
-                    Voir tous les chantiers <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    {{ _('Voir tous les chantiers') }} <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
                 </a>
             </div>
         </div>

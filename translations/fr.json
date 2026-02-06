@@ -106,5 +106,16 @@
     "Accès réservé aux super administrateurs.": "Accès réservé aux super administrateurs.",
     "Accès réservé aux administrateurs.": "Accès réservé aux administrateurs.",
     "Vous n'avez pas les droits de validation.": "Vous n'avez pas les droits de validation.",
-    "Erreur: {}": "Erreur: {}"
+    "Erreur: {}": "Erreur: {}",
+    "Utilisateurs": "Utilisateurs",
+    "Rôles & Permissions": "Rôles & Permissions",
+    "Paramètres Site": "Paramètres Site",
+    "ID": "ID",
+    "Projet": "Projet",
+    "Date": "Date",
+    "Statut": "Statut",
+    "Voir toutes les commandes": "Voir toutes les commandes",
+    "Voir tous les chantiers": "Voir tous les chantiers",
+    "BTP Premium": "BTP Premium",
+    "Plateforme de gestion BTP": "Plateforme de gestion BTP"
 }
