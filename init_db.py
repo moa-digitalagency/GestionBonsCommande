@@ -22,6 +22,8 @@ from app import create_app
 from models import db
 from models.company import Company
 from models.user import User
+from models.role import Role
+from models.permission import Permission
 from models.lexique import LexiqueEntry
 from models.settings import SiteSettings
 
@@ -52,11 +54,6 @@ def init_database():
                         print(f"Adding missing column: {column.name} to {table_name}")
                         col_type = column.type.compile(db.engine.dialect)
 
-                        # SQLite ALTER TABLE ADD COLUMN limitation:
-                        # Cannot add NOT NULL column without DEFAULT value.
-                        # We append DEFAULT NULL if it's nullable, or we rely on the DB engine to handle it if provided.
-                        # For this script, we assume the column definition is compatible or we catch the error.
-
                         try:
                             with db.engine.connect() as conn:
                                 sql = f'ALTER TABLE "{table_name}" ADD COLUMN "{column.name}" {col_type}'
@@ -81,6 +78,9 @@ def init_database():
         except Exception as e:
             print(f"Error initializing site settings: {e}")
 
+        # Populate RBAC (Permissions and Roles)
+        populate_rbac()
+
         # Create or Update Super Admin
         try:
             admin_email = app.config.get('SUPER_ADMIN_EMAIL')
@@ -88,13 +88,15 @@ def init_database():
 
             if admin_email and admin_password:
                 admin = User.query.filter_by(email=admin_email).first()
+                super_admin_role = Role.query.filter_by(name='Super Admin').first()
 
                 if not admin:
                     admin = User(
                         email=admin_email,
                         first_name=app.config.get('SUPER_ADMIN_FIRST_NAME', 'Super'),
                         last_name=app.config.get('SUPER_ADMIN_LAST_NAME', 'Admin'),
-                        role='super_admin',
+                        role='super_admin', # Keep legacy role for now
+                        role_id=super_admin_role.id if super_admin_role else None,
                         preferred_language='fr',
                         is_active=True
                     )
@@ -105,8 +107,12 @@ def init_database():
                     # Update admin details if config changed
                     admin.first_name = app.config.get('SUPER_ADMIN_FIRST_NAME', admin.first_name)
                     admin.last_name = app.config.get('SUPER_ADMIN_LAST_NAME', admin.last_name)
-                    # Only reset password if you want to enforce config password on every deploy
-                    # admin.set_password(admin_password)
+
+                    # Assign Role if missing
+                    if super_admin_role and admin.role_id != super_admin_role.id:
+                        admin.role_id = super_admin_role.id
+                        print(f"Assigned 'Super Admin' role to {admin_email}")
+
                     print(f"Super Admin exists: {admin_email}")
 
                 db.session.commit()
@@ -127,6 +133,76 @@ def init_database():
             print(f"Error checking/populating dictionary: {e}")
 
         print("Database initialization complete!")
+
+def populate_rbac():
+    """Seeds the database with default Permissions and Roles."""
+
+    # 1. Define Default Permissions
+    permissions_data = [
+        ('view_dashboard', 'Voir le tableau de bord'),
+        ('manage_users', 'Gérer les utilisateurs'),
+        ('manage_roles', 'Gérer les rôles et permissions'),
+        ('create_order', 'Créer une commande'),
+        ('approve_order', 'Valider une commande'),
+        ('manage_dictionary', 'Gérer le dictionnaire'),
+        ('view_projects', 'Voir les chantiers'), # Added for consistency
+        ('manage_projects', 'Gérer les chantiers'), # Added for consistency
+    ]
+
+    existing_perms = {p.code: p for p in Permission.query.all()}
+
+    for code, description in permissions_data:
+        if code not in existing_perms:
+            perm = Permission(code=code, description=description)
+            db.session.add(perm)
+            print(f"Created Permission: {code}")
+        else:
+            # Update description if needed
+            existing_perms[code].description = description
+
+    db.session.commit()
+
+    # Reload permissions to make sure we have IDs
+    all_perms = {p.code: p for p in Permission.query.all()}
+
+    # 2. Define Default Roles
+    roles_data = [
+        {
+            'name': 'Super Admin',
+            'color': 'red',
+            'permissions': list(all_perms.keys()) # All permissions
+        },
+        {
+            'name': 'Chef de Chantier',
+            'color': 'blue',
+            'permissions': ['view_dashboard', 'create_order', 'view_projects']
+        }
+    ]
+
+    for role_info in roles_data:
+        role = Role.query.filter_by(name=role_info['name']).first()
+        if not role:
+            role = Role(name=role_info['name'], color=role_info['color'])
+            db.session.add(role)
+            print(f"Created Role: {role_info['name']}")
+
+        # Update permissions
+        current_role_perms = set(role.permissions)
+        target_perms = set([all_perms[code] for code in role_info['permissions'] if code in all_perms])
+
+        # Add missing
+        for perm in target_perms:
+            if perm not in current_role_perms:
+                role.permissions.append(perm)
+
+        # Remove extras (optional, but good for enforcing seed state.
+        # For now, let's just add missing ones to avoid removing user-added perms if we were updating)
+        # But for 'Super Admin', we want ALL.
+        if role_info['name'] == 'Super Admin':
+             role.permissions = list(all_perms.values())
+
+    db.session.commit()
+    print("RBAC seeded successfully.")
 
 def populate_btp_dictionary():
     btp_terms = [

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Rôles & Permissions - Administration{% endblock %}
+
+{% block content %}
+<div x-data="{ editingRole: null,
+               name: '',
+               color: 'blue',
+               selectedPermissions: [],
+               edit(role) {
+                   this.editingRole = role;
+                   this.name = role.name;
+                   this.color = role.color;
+                   this.selectedPermissions = role.permissions;
+               },
+               reset() {
+                   this.editingRole = null;
+                   this.name = '';
+                   this.color = 'blue';
+                   this.selectedPermissions = [];
+               }
+             }">
+
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Rôles & Permissions</h1>
+            <p class="text-slate-600">Définir les profils utilisateurs</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- List (Left) -->
+        <div class="lg:col-span-1 space-y-4">
+            <button @click="reset()" class="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center justify-center font-medium">
+                <i data-lucide="plus" class="w-5 h-5 mr-2"></i>
+                Nouveau Rôle
+            </button>
+
+            {% for role in roles %}
+            <div @click="edit({{ {'id': role.id, 'name': role.name, 'color': role.color, 'permissions': role.permissions|map(attribute='id')|list }|tojson }})"
+                 class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all group"
+                 :class="{ 'ring-2 ring-blue-500 border-blue-500': editingRole && editingRole.id === {{ role.id }} }">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-lg bg-{{ role.color }}-100 text-{{ role.color }}-600 flex items-center justify-center">
+                             <i data-lucide="shield" class="w-5 h-5"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="font-semibold text-slate-900">{{ role.name }}</h3>
+                            <p class="text-xs text-slate-500">{{ role.permissions|length }} permissions</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:text-blue-500"></i>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Form (Right) -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-lg font-bold text-slate-900 mb-6" x-text="editingRole ? 'Modifier le rôle' : 'Créer un rôle'"></h2>
+
+                <form action="{{ url_for('admin.roles') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="role_id" :value="editingRole ? editingRole.id : ''">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Nom du Rôle</label>
+                            <input type="text" name="name" x-model="name" required class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Couleur du Badge</label>
+                            <select name="color" x-model="color" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                <option value="blue">Bleu</option>
+                                <option value="red">Rouge</option>
+                                <option value="green">Vert</option>
+                                <option value="yellow">Jaune</option>
+                                <option value="purple">Violet</option>
+                                <option value="gray">Gris</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-3">Permissions</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {% for perm in permissions %}
+                            <label class="flex items-start p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                                <input type="checkbox" name="permissions" value="{{ perm.id }}" x-model="selectedPermissions" class="mt-0.5 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <div class="ml-3">
+                                    <span class="block text-sm font-medium text-slate-900">{{ perm.description }}</span>
+                                    <span class="block text-xs text-slate-500">{{ perm.code }}</span>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-4 border-t border-slate-100">
+                        <button type="button" @click="reset()" class="mr-3 px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900">Annuler</button>
+                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-sm flex items-center">
+                            <i data-lucide="save" class="w-4 h-4 mr-2"></i>
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

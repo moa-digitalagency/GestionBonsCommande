@@ -8,16 +8,20 @@ class User(UserMixin, db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=True)
     
     email = db.Column(db.String(200), unique=True, nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=True)
     password_hash = db.Column(db.String(256), nullable=False)
     
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(50), nullable=True)
     
+    # Deprecated role string, kept for backward compatibility during migration
     role = db.Column(db.String(20), nullable=False, default='demandeur')
     preferred_language = db.Column(db.String(10), default='fr')
+    avatar_color = db.Column(db.String(20), default='blue')
     
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -54,5 +58,17 @@ class User(UserMixin, db.Model):
     def can_create_orders(self):
         return self.role in ['super_admin', 'admin', 'valideur', 'demandeur']
     
+    def has_permission(self, permission_code):
+        if self.role == 'super_admin':  # Legacy Super Admin check
+            return True
+        if self.user_role and self.user_role.name == 'Super Admin': # New RBAC Super Admin
+            return True
+
+        if self.user_role:
+            for perm in self.user_role.permissions:
+                if perm.code == permission_code:
+                    return True
+        return False
+
     def __repr__(self):
         return f'<User {self.email}>'

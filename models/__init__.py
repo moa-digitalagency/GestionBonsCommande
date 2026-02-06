@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 from models.company import Company
+from models.permission import Permission
+from models.role import Role
 from models.user import User
 from models.project import Project
 from models.product import Product
