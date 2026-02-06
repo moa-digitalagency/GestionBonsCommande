@@ -17,6 +17,8 @@ from routes.projects import projects_bp
 from routes.products import products_bp
 from routes.company import company_bp
 from routes.lexique import lexique_bp
+from routes.settings import settings_bp
+from models.settings import SiteSettings
 
 def create_app(config_class=Config):
     app = Flask(__name__, static_folder='statics', static_url_path='/static')
@@ -44,6 +46,14 @@ def create_app(config_class=Config):
             'supported_languages': Config.SUPPORTED_LANGUAGES
         }
 
+    @app.context_processor
+    def inject_settings():
+        try:
+            settings = SiteSettings.get_instance()
+            return {'settings': settings}
+        except Exception:
+            return {'settings': None}
+
     # Register Blueprints
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -53,6 +63,7 @@ def create_app(config_class=Config):
     app.register_blueprint(products_bp, url_prefix='/products')
     app.register_blueprint(company_bp, url_prefix='/company')
     app.register_blueprint(lexique_bp, url_prefix='/lexique')
+    app.register_blueprint(settings_bp, url_prefix='/parametres')
 
     return app
 

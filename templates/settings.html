@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres Généraux - {{ settings.app_name if settings else 'BTP Premium' }}{% endblock %}
+
+{% block breadcrumbs %}
+<span class="mx-2 text-slate-300">/</span>
+<span class="font-medium text-slate-700">Paramètres</span>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto" x-data='{
+    activeTab: "branding",
+    metaTitle: {{ settings.meta_title_default | default("", true) | tojson }},
+    metaDesc: {{ settings.meta_description_default | default("", true) | tojson }},
+    appName: {{ settings.app_name | default("", true) | tojson }}
+}'>
+
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Paramètres Généraux</h1>
+            <p class="text-slate-500 mt-1">Gérez l'identité, le SEO et la configuration de la plateforme.</p>
+        </div>
+        <button type="submit" form="settingsForm" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm">
+            <i data-lucide="save" class="w-4 h-4 mr-2"></i>
+            Enregistrer les modifications
+        </button>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="flex space-x-1 bg-slate-100 p-1 rounded-xl mb-6 w-fit">
+        <button @click="activeTab = 'branding'"
+                :class="{'bg-white text-blue-600 shadow-sm': activeTab === 'branding', 'text-slate-500 hover:text-slate-700': activeTab !== 'branding'}"
+                class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center">
+            <i data-lucide="palette" class="w-4 h-4 mr-2"></i>
+            Branding & Identité
+        </button>
+        <button @click="activeTab = 'seo'"
+                :class="{'bg-white text-blue-600 shadow-sm': activeTab === 'seo', 'text-slate-500 hover:text-slate-700': activeTab !== 'seo'}"
+                class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center">
+            <i data-lucide="search" class="w-4 h-4 mr-2"></i>
+            SEO & Moteurs
+        </button>
+        <button @click="activeTab = 'system'"
+                :class="{'bg-white text-blue-600 shadow-sm': activeTab === 'system', 'text-slate-500 hover:text-slate-700': activeTab !== 'system'}"
+                class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center">
+            <i data-lucide="settings-2" class="w-4 h-4 mr-2"></i>
+            Système
+        </button>
+    </div>
+
+    <form id="settingsForm" method="POST" enctype="multipart/form-data" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- Section 1: Branding -->
+        <div x-show="activeTab === 'branding'" class="p-6 space-y-6" x-cloak>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Nom de l'Application</label>
+                    <input type="text" name="app_name" x-model="appName" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="Ex: BTP Premium">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Email de Contact</label>
+                    <input type="email" name="contact_email" value="{{ settings.contact_email or '' }}" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="contact@example.com">
+                </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-6">
+                <h3 class="text-sm font-medium text-slate-900 mb-4">Assets Visuels</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Logo Upload -->
+                    <div class="flex items-start space-x-4">
+                        <div class="h-16 w-16 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden">
+                            {% if settings.logo_url %}
+                            <img src="{{ url_for('static', filename=settings.logo_url) }}" alt="Logo" class="h-full w-full object-contain">
+                            {% else %}
+                            <i data-lucide="image" class="w-8 h-8 text-slate-400"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700">Logo du site</label>
+                            <p class="text-xs text-slate-500 mb-2">Recommandé: PNG transparent</p>
+                            <input type="file" name="logo" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        </div>
+                    </div>
+
+                    <!-- Favicon Upload -->
+                    <div class="flex items-start space-x-4">
+                        <div class="h-16 w-16 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden">
+                            {% if settings.favicon_url %}
+                            <img src="{{ url_for('static', filename=settings.favicon_url) }}" alt="Favicon" class="h-8 w-8 object-contain">
+                            {% else %}
+                            <i data-lucide="image" class="w-8 h-8 text-slate-400"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700">Favicon</label>
+                            <p class="text-xs text-slate-500 mb-2">Format .ico ou .png (32x32)</p>
+                            <input type="file" name="favicon" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-6">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Couleur Principale</label>
+                <div class="flex items-center space-x-3">
+                    <input type="color" name="primary_color" value="{{ settings.primary_color or '#0f172a' }}" class="h-10 w-20 rounded p-1 border border-slate-300 cursor-pointer">
+                    <span class="text-sm text-slate-500">Utilisée pour la sidebar et les boutons principaux.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: SEO -->
+        <div x-show="activeTab === 'seo'" class="p-6" x-cloak>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Inputs -->
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Méta Titre (Default)</label>
+                            <span class="text-xs" :class="metaTitle.length > 60 ? 'text-red-500' : 'text-slate-400'" x-text="metaTitle.length + '/60'"></span>
+                        </div>
+                        <input type="text" name="meta_title_default" x-model="metaTitle" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="Titre de la page">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Méta Description</label>
+                            <span class="text-xs" :class="metaDesc.length > 160 ? 'text-red-500' : 'text-slate-400'" x-text="metaDesc.length + '/160'"></span>
+                        </div>
+                        <textarea name="meta_description_default" x-model="metaDesc" rows="3" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="Description courte du site..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Mots-clés (Keywords)</label>
+                        <input type="text" name="meta_keywords" value="{{ settings.meta_keywords or '' }}" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="btp, erp, gestion, travaux">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Image Open Graph (Partage Social)</label>
+                        <input type="file" name="og_image" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        {% if settings.og_image_url %}
+                        <p class="mt-2 text-xs text-green-600 flex items-center">
+                            <i data-lucide="check" class="w-3 h-3 mr-1"></i> Image actuelle définie
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Google Preview -->
+                <div>
+                    <h3 class="text-sm font-medium text-slate-900 mb-4">Aperçu Google (Simulation)</h3>
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm max-w-lg">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <div class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center overflow-hidden">
+                                {% if settings.favicon_url %}
+                                <img src="{{ url_for('static', filename=settings.favicon_url) }}" class="w-4 h-4">
+                                {% else %}
+                                <div class="w-4 h-4 bg-slate-300 rounded-full"></div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="text-sm text-slate-800" x-text="appName || 'Nom du Site'"></div>
+                                <div class="text-xs text-slate-500">{{ request.host_url }}</div>
+                            </div>
+                        </div>
+                        <h4 class="text-xl text-[#1a0dab] hover:underline cursor-pointer truncate" x-text="metaTitle || 'Titre de la page'"></h4>
+                        <p class="text-sm text-[#4d5156] mt-1 line-clamp-2" x-text="metaDesc || 'Ceci est un exemple de description qui apparaitra dans les résultats de recherche Google...'"></p>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2 text-center">Cet aperçu est une approximation visuelle.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: System -->
+        <div x-show="activeTab === 'system'" class="p-6 space-y-6" x-cloak>
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i data-lucide="alert-triangle" class="h-5 w-5 text-yellow-400"></i>
+                    </div>
+                    <div class="ml-3 w-full">
+                        <h3 class="text-sm font-medium text-yellow-800">Mode Maintenance</h3>
+                        <div class="mt-2 max-w-xl text-sm text-yellow-700">
+                            <p>Si activé, seuls les administrateurs pourront accéder à l'application. Les autres utilisateurs verront une page de maintenance.</p>
+                        </div>
+                        <div class="mt-4">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="maintenance_mode" class="sr-only peer" {% if settings.maintenance_mode %}checked{% endif %}>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-900">Activer le mode maintenance</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+{% endblock %}
