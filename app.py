@@ -45,26 +45,21 @@ def index():
 
 @app.route('/commandes')
 def commandes():
-    # Placeholder: Reusing dashboard layout or specific view if requested.
-    # For now, listing orders.
-    return render_template('dashboard.html',
-                           stats=MOCK_STATS,
-                           orders=MOCK_ORDERS,
-                           projects=MOCK_PROJECTS) # Or a dedicated list page
+    return render_template('placeholder.html',
+                           title="Bons de Commande",
+                           icon="file-text")
 
 @app.route('/chantiers')
 def chantiers():
-    return render_template('dashboard.html',
-                           stats=MOCK_STATS,
-                           orders=MOCK_ORDERS,
-                           projects=MOCK_PROJECTS)
+    return render_template('placeholder.html',
+                           title="Chantiers",
+                           icon="hard-hat")
 
 @app.route('/articles')
 def articles():
-    return render_template('dashboard.html',
-                           stats=MOCK_STATS,
-                           orders=MOCK_ORDERS,
-                           projects=MOCK_PROJECTS)
+    return render_template('placeholder.html',
+                           title="Articles",
+                           icon="package")
 
 @app.route('/dictionnaire', methods=['GET', 'POST'])
 def dictionnaire():
