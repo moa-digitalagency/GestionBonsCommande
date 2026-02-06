@@ -1,19 +1,25 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user, login_required
 from models import db
 from models.company import Company
 from services.i18n_service import i18n
 from models.user import User
+from models.role import Role
+from models.permission import Permission
 from models.order import Order
 from models.lexique import LexiqueSuggestion
-from security.decorators import super_admin_required
+from security.decorators import super_admin_required, permission_required
 
 admin_bp = Blueprint('admin', __name__)
 
 @admin_bp.route('/')
 @login_required
-@super_admin_required
 def index():
+    # Basic check: user must have some admin privs
+    if not (current_user.has_permission('manage_users') or current_user.has_permission('manage_roles') or current_user.has_permission('manage_dictionary')):
+         flash(i18n.translate('Accès non autorisé.'), 'danger')
+         return redirect(url_for('main.dashboard'))
+
     companies = Company.query.all()
     users_count = User.query.count()
     orders_count = Order.query.count()
@@ -99,47 +105,141 @@ def edit_company(company_id):
     
     return render_template('admin/company_form.html', company=company)
 
-@admin_bp.route('/users')
-@login_required
-@super_admin_required
-def users():
-    users = User.query.order_by(User.email).all()
-    companies = Company.query.all()
-    return render_template('admin/users.html', users=users, companies=companies)
+# --- USERS MANAGEMENT ---
 
-@admin_bp.route('/users/<int:user_id>/assign', methods=['POST'])
+@admin_bp.route('/users', methods=['GET', 'POST'])
 @login_required
-@super_admin_required
-def assign_user(user_id):
+@permission_required('manage_users')
+def users():
+    if request.method == 'POST':
+        # Create User
+        email = request.form.get('email', '').strip()
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        password = request.form.get('password', '').strip()
+        role_id = request.form.get('role_id')
+        company_id = request.form.get('company_id')
+
+        if not email or not first_name or not last_name or not password:
+            flash(i18n.translate('Tous les champs obligatoires doivent être remplis.'), 'danger')
+        elif User.query.filter_by(email=email).first():
+            flash(i18n.translate('Cet email est déjà utilisé.'), 'danger')
+        else:
+            user = User(
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                role_id=role_id if role_id else None,
+                company_id=company_id if company_id else None,
+                is_active=True
+            )
+            user.set_password(password)
+
+            # Sync legacy role field for backward compatibility
+            if role_id:
+                role = Role.query.get(role_id)
+                if role and role.name == 'Super Admin':
+                    user.role = 'super_admin'
+                else:
+                    user.role = 'demandeur' # Default fallback
+
+            db.session.add(user)
+            db.session.commit()
+            flash(i18n.translate('Utilisateur créé avec succès.'), 'success')
+            return redirect(url_for('admin.users'))
+
+    users = User.query.order_by(User.email).all()
+    roles = Role.query.all()
+    companies = Company.query.all()
+    return render_template('admin/users.html', users=users, roles=roles, companies=companies)
+
+@admin_bp.route('/users/<int:user_id>/update', methods=['POST'])
+@login_required
+@permission_required('manage_users')
+def update_user(user_id):
     user = User.query.get_or_404(user_id)
-    company_id = request.form.get('company_id')
     
+    # Update Role
+    role_id = request.form.get('role_id')
+    if role_id:
+        user.role_id = int(role_id)
+        # Sync legacy
+        role = Role.query.get(role_id)
+        if role and role.name == 'Super Admin':
+            user.role = 'super_admin'
+        else:
+            user.role = 'demandeur'
+
+    # Update Company
+    company_id = request.form.get('company_id')
     if company_id:
         user.company_id = int(company_id)
     else:
         user.company_id = None
-    
+
     db.session.commit()
-    flash(i18n.translate('Utilisateur assigné.'), 'success')
+    flash(i18n.translate('Utilisateur mis à jour.'), 'success')
     return redirect(url_for('admin.users'))
 
-@admin_bp.route('/users/<int:user_id>/role', methods=['POST'])
+@admin_bp.route('/users/<int:user_id>/delete', methods=['POST'])
 @login_required
-@super_admin_required
-def change_role(user_id):
+@permission_required('manage_users')
+def delete_user(user_id):
     user = User.query.get_or_404(user_id)
-    role = request.form.get('role', 'demandeur')
-    
-    if role in ['super_admin', 'admin', 'valideur', 'demandeur']:
-        user.role = role
-        db.session.commit()
-        flash(i18n.translate('Rôle modifié.'), 'success')
-    
+    if user.id == current_user.id:
+        flash(i18n.translate('Vous ne pouvez pas vous désactiver vous-même.'), 'warning')
+        return redirect(url_for('admin.users'))
+
+    user.is_active = False
+    db.session.commit()
+    flash(i18n.translate('Utilisateur désactivé.'), 'success')
     return redirect(url_for('admin.users'))
+
+# --- ROLES MANAGEMENT ---
+
+@admin_bp.route('/roles', methods=['GET', 'POST'])
+@login_required
+@permission_required('manage_roles')
+def roles():
+    if request.method == 'POST':
+        # Create or Update Role
+        role_id = request.form.get('role_id')
+        name = request.form.get('name', '').strip()
+        color = request.form.get('color', 'blue')
+        permission_ids = request.form.getlist('permissions')
+
+        if not name:
+             flash(i18n.translate('Le nom du rôle est obligatoire.'), 'danger')
+             return redirect(url_for('admin.roles'))
+
+        if role_id:
+            role = Role.query.get_or_404(role_id)
+            role.name = name
+            role.color = color
+            flash(i18n.translate('Rôle mis à jour.'), 'success')
+        else:
+            role = Role(name=name, color=color)
+            db.session.add(role)
+            flash(i18n.translate('Rôle créé.'), 'success')
+
+        # Update Permissions
+        role.permissions = []
+        for perm_id in permission_ids:
+            perm = Permission.query.get(perm_id)
+            if perm:
+                role.permissions.append(perm)
+
+        db.session.commit()
+        return redirect(url_for('admin.roles'))
+
+    roles = Role.query.all()
+    permissions = Permission.query.all()
+    # Group permissions by category (optional, for now just list)
+    return render_template('admin/roles.html', roles=roles, permissions=permissions)
 
 @admin_bp.route('/stats')
 @login_required
-@super_admin_required
+@permission_required('view_dashboard') # Changed from super_admin_required
 def stats():
     from sqlalchemy import func
     

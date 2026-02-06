@@ -40,6 +40,23 @@ def tenant_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def permission_required(permission_code):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_authenticated:
+                flash(i18n.translate('Veuillez vous connecter pour accéder à cette page.'), 'warning')
+                return redirect(url_for('auth.login', next=request.url))
+
+            # Check for permission using the User model method
+            if not current_user.has_permission(permission_code):
+                flash(i18n.translate('Vous n\'avez pas la permission requise.'), 'danger')
+                abort(403)
+
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
 def super_admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):

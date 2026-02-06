@@ -153,13 +153,24 @@
             </nav>
 
             <div class="border-t border-slate-100 p-3 bg-slate-50/50">
-                {% if current_user.role == 'super_admin' %}
+                {% if current_user.has_permission('manage_users') or current_user.has_permission('manage_roles') or current_user.role == 'super_admin' %}
                 <div class="mb-2">
                      <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Administration</p>
-                     <a href="{{ url_for('admin.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                        <i data-lucide="shield" class="w-5 h-5 mr-3 text-slate-400 group-hover:text-slate-500"></i>
-                        Admin
+
+                     {% if current_user.has_permission('manage_users') or current_user.role == 'super_admin' %}
+                     <a href="{{ url_for('admin.users') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                        <i data-lucide="users" class="w-5 h-5 mr-3 text-slate-400 group-hover:text-slate-500"></i>
+                        Utilisateurs
                     </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('manage_roles') or current_user.role == 'super_admin' %}
+                     <a href="{{ url_for('admin.roles') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                        <i data-lucide="shield" class="w-5 h-5 mr-3 text-slate-400 group-hover:text-slate-500"></i>
+                        Rôles & Permissions
+                    </a>
+                    {% endif %}
+
                      <a href="{{ url_for('settings.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900">
                         <i data-lucide="settings" class="w-5 h-5 mr-3 text-slate-400 group-hover:text-slate-500"></i>
                         Paramètres Site
