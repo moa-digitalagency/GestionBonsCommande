@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - BTP Manager</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        blue: {
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-slate-50">
+
+    <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
+        <!-- Logo Icon -->
+        <div class="mx-auto h-12 w-12 bg-[#1e4e8c] rounded-lg flex items-center justify-center text-white mb-4 shadow-lg">
+             <i data-lucide="building-2" class="w-8 h-8"></i>
+        </div>
+
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-slate-900">
+            Welcome Back
+        </h2>
+        <p class="mt-2 text-center text-sm text-slate-600">
+            Sign in to access your construction permit dashboard
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-slate-100">
+            <form class="space-y-6" action="/login" method="POST">
+
+                <!-- Language Selector -->
+                 <div>
+                    <label for="language" class="block text-sm font-medium text-slate-700 mb-1">
+                        Language / اللغة
+                    </label>
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                             <img src="https://flagcdn.com/w20/gb.png" alt="English" class="h-4 w-6">
+                        </div>
+                        <select id="language" name="language" class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-slate-300 rounded-md py-2 border">
+                            <option>English</option>
+                            <option>Français</option>
+                            <option>العربية</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i data-lucide="chevron-down" class="h-4 w-4 text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-700">
+                        Email Address
+                    </label>
+                    <div class="mt-1">
+                        <input id="email" name="email" type="email" autocomplete="email" required placeholder="your.email@example.com" class="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-700">
+                        Password
+                    </label>
+                    <div class="mt-1">
+                        <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password" class="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-slate-900">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-blue-900 hover:text-blue-800">
+                            Forgot password?
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0e4e88] hover:bg-[#0c4273] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Sign In
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-slate-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-slate-500">
+                            Don't have an account? <a href="#" class="font-medium text-blue-900 hover:text-blue-800">Contact Administrator</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 text-center text-xs text-slate-500">
+        &copy; 2024 Construction Permit System. All rights reserved.
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
