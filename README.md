@@ -15,10 +15,10 @@ La documentation détaillée se trouve dans le dossier `docs/` :
 
 | Document | Description | Cible |
 | :--- | :--- | :--- |
-| [**Fonctionnalités (Bible)**](docs/features_full_list.md) | Liste exhaustive de toutes les features et règles métier. | Tout le monde |
-| [**Architecture Technique**](docs/technical_architecture.md) | Structure du code, Schéma BDD, Stack, Sécurité. | Développeurs |
-| [**Guide de Déploiement**](docs/deployment_guide.md) | Installation locale, VPS, Docker, Variables d'env. | DevOps / SysAdmin |
-| [**Manuel Utilisateur**](docs/user_guide.md) | Guide pas-à-pas pour créer des commandes et valider. | Utilisateurs finaux |
+| [**Fonctionnalités (Bible)**](docs/BTP_Commande_features_full_list.md) | Liste exhaustive de toutes les features et règles métier. | Tout le monde |
+| [**Architecture Technique**](docs/BTP_Commande_technical_architecture.md) | Structure du code, Schéma BDD, Stack, Sécurité. | Développeurs |
+| [**Guide de Déploiement**](docs/BTP_Commande_deployment_guide.md) | Installation locale, VPS, Docker, Variables d'env. | DevOps / SysAdmin |
+| [**Manuel Utilisateur**](docs/BTP_Commande_user_guide.md) | Guide pas-à-pas pour créer des commandes et valider. | Utilisateurs finaux |
 
 ---
 
