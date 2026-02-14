@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="min-h-[80vh] flex flex-col items-center justify-center p-4">
+        {% block error_content %}{% endblock %}
+    </div>
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+{% endblock %}
+
+{% block guest_content %}
+    <div class="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50">
+        {% block error_content_guest %}
+            {{ self.error_content() }}
+        {% endblock %}
+    </div>
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+{% endblock %}

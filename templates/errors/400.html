@@ -1,0 +1,31 @@
+{% extends "errors/base_error.html" %}
+
+{% block title %}Mauvaise Requête - 400{% endblock %}
+
+{% block error_content %}
+<div class="max-w-2xl w-full text-center space-y-8 animate-fade-in">
+    <!-- Visual -->
+    <div class="relative w-56 h-56 mx-auto flex items-center justify-center">
+        <!-- Suggestion: Place '400-confused-robot.json' in statics/lottie/ -->
+        <dotlottie-player src="{{ url_for('static', filename='lottie/400-confused-robot.json') }}" background="transparent" speed="1" style="width: 250px; height: 250px;" loop autoplay>
+             <div class="text-6xl font-bold text-slate-200">400</div>
+        </dotlottie-player>
+    </div>
+
+    <!-- Title & Copy -->
+    <div class="space-y-4">
+        <h1 class="text-3xl font-bold text-slate-800">C'est pas moi, c'est vous.</h1>
+        <p class="text-lg text-slate-600 max-w-lg mx-auto">
+            J'ai essayé de comprendre ce que vous vouliez, vraiment. Mais votre requête a un petit souci de syntaxe.
+            <span class="text-slate-400 text-sm block mt-2">(Promis, je ne juge pas.)</span>
+        </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-center space-x-4 pt-4">
+         <a href="{{ url_for('main.dashboard') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-slate-800 hover:bg-slate-900 shadow-sm transition-all">
+            Réessayer proprement
+         </a>
+    </div>
+</div>
+{% endblock %}

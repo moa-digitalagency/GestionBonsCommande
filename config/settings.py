@@ -45,3 +45,7 @@ class Config:
     SUPER_ADMIN_PASSWORD = os.environ.get('SUPER_ADMIN_PASSWORD', 'admin123')
     SUPER_ADMIN_FIRST_NAME = os.environ.get('SUPER_ADMIN_FIRST_NAME', 'Super')
     SUPER_ADMIN_LAST_NAME = os.environ.get('SUPER_ADMIN_LAST_NAME', 'Admin')
+
+    # Error Page Configuration
+    WHATSAPP_NUMBER = os.environ.get('WHATSAPP_NUMBER', '243860493345')
+    TIDYCAL_URL = os.environ.get('TIDYCAL_URL', 'https://tidycal.com/moamyoneart/consultation-gratuite-15-min')

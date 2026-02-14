@@ -1,0 +1,37 @@
+{% extends "errors/base_error.html" %}
+
+{% block title %}Accès Interdit - 403{% endblock %}
+
+{% block error_content %}
+<div class="max-w-xl w-full text-center space-y-8 animate-fade-in">
+    <!-- Visual -->
+    <div class="relative w-48 h-48 mx-auto flex items-center justify-center">
+        <!-- Suggestion: Place '403-lock.json' in statics/lottie/ -->
+        <dotlottie-player src="{{ url_for('static', filename='lottie/403-lock.json') }}" background="transparent" speed="1" style="width: 200px; height: 200px;" loop autoplay>
+            <div class="text-6xl font-bold text-slate-200">403</div>
+        </dotlottie-player>
+    </div>
+
+    <!-- Title & Copy -->
+    <div class="space-y-4">
+        <h1 class="text-3xl font-bold text-slate-900 tracking-tight flex items-center justify-center">
+            <i data-lucide="shield-alert" class="w-8 h-8 mr-3 text-red-600"></i>
+            Zone Restreinte
+        </h1>
+        <p class="text-lg text-slate-600">
+            Halte là ! Vous n'avez pas les accréditations nécessaires pour franchir cette porte.
+            <span class="block mt-2 text-sm text-slate-500">Si c'est une erreur, contactez votre administrateur.</span>
+        </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+         <a href="{{ url_for('main.dashboard') }}" class="inline-flex items-center justify-center px-6 py-3 border border-slate-300 text-base font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 shadow-sm transition-all">
+            Retourner en lieu sûr
+         </a>
+         <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all">
+            Demander un accès
+         </a>
+    </div>
+</div>
+{% endblock %}

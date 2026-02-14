@@ -1,0 +1,34 @@
+{% extends "errors/base_error.html" %}
+
+{% block title %}Censure - Accès Restreint{% endblock %}
+
+{% block error_content %}
+<div class="max-w-xl w-full text-center space-y-8 animate-fade-in bg-slate-900 text-slate-100 p-10 rounded-2xl shadow-2xl border border-slate-700 relative overflow-hidden">
+    <!-- Overlay for texture -->
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMWUxZTFlIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMzMzMiLz4KPC9zdmc+')] opacity-20 pointer-events-none"></div>
+
+    <!-- Visual -->
+    <div class="relative w-48 h-48 mx-auto flex items-center justify-center z-10">
+        <!-- Suggestion: Place '451-burning-book.json' in statics/lottie/ -->
+        <dotlottie-player src="{{ url_for('static', filename='lottie/451-burning-book.json') }}" background="transparent" speed="1" style="width: 200px; height: 200px;" loop autoplay>
+            <div class="text-6xl font-mono text-red-500">451</div>
+        </dotlottie-player>
+    </div>
+
+    <!-- Title & Copy -->
+    <div class="space-y-4 z-10 relative">
+        <h1 class="text-3xl font-mono text-red-500 tracking-wider uppercase">Censuré / Restricted</h1>
+        <p class="text-lg text-slate-400 font-mono">
+            Cette page a été brûlée... ou simplement restreinte pour des raisons légales.
+            Comme dans <span class="text-white italic">Fahrenheit 451</span>, certaines connaissances sont jugées dangereuses.
+        </p>
+    </div>
+
+    <div class="pt-6 border-t border-slate-700 z-10 relative">
+         <a href="{{ url_for('main.dashboard') }}" class="inline-flex items-center text-slate-400 hover:text-white transition-colors font-mono text-sm group">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"></i>
+            Retour en zone sûre
+         </a>
+    </div>
+</div>
+{% endblock %}
