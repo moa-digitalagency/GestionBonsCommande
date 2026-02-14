@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTP Commande - La Solution de Gestion Premium pour le BTP</title>
+    <meta name="description" content="Gérez vos commandes, chantiers et fournisseurs avec une élégance et une efficacité inégalées. La plateforme tout-en-un pour les professionnels du BTP.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i data-lucide="hexagon" class="logo-icon"></i>
+                BTP Commande
+            </div>
+
+            <nav class="nav-links">
+                <a href="#fonctionnalites">Fonctionnalités</a>
+                <a href="#comment-ca-marche">Comment ça marche</a>
+                <a href="#tarifs">Tarifs</a>
+            </nav>
+
+            <div class="header-actions">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-text">Connexion</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Essai Gratuit</a>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu">
+        <button class="close-menu-btn" aria-label="Fermer">
+            <i data-lucide="x"></i>
+        </button>
+        <nav class="mobile-nav-links">
+            <a href="#fonctionnalites">Fonctionnalités</a>
+            <a href="#comment-ca-marche">Comment ça marche</a>
+            <a href="#tarifs">Tarifs</a>
+            <a href="{{ url_for('auth.login') }}" class="text-primary">Connexion</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Essai Gratuit</a>
+        </nav>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text fade-in-up">
+                    <h1>Gérez vos chantiers avec <br><span>Excellence & Précision</span></h1>
+                    <p>La première plateforme de gestion BTP conçue pour les entreprises exigeantes. Centralisez commandes, stocks et équipes en un seul endroit sécurisé.</p>
+                    <div class="hero-actions">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+                            Commencer maintenant
+                            <i data-lucide="arrow-right" class="btn-icon-right"></i>
+                        </a>
+                        <a href="#demo" class="btn btn-secondary">
+                            <i data-lucide="play-circle" class="btn-icon-left"></i>
+                            Voir la démo
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual fade-in-up" style="transition-delay: 0.2s;">
+                    <!-- Construction Dashboard Abstract Image -->
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop" alt="Tableau de bord BTP Analytics" class="hero-img">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section (Bento Grid) -->
+    <section id="fonctionnalites" class="features">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>Une Suite Complète</h2>
+                <p>Tous les outils dont vous avez besoin pour piloter votre activité, repensés pour une expérience utilisateur fluide.</p>
+            </div>
+
+            <div class="bento-grid">
+                <!-- Large Feature -->
+                <div class="feature-card large fade-in-up">
+                    <div class="feature-icon">
+                        <i data-lucide="layout-dashboard"></i>
+                    </div>
+                    <h3>Tableau de Bord Intuitif</h3>
+                    <p>Visualisez l'état de tous vos chantiers en temps réel. Des graphiques clairs et des indicateurs de performance pour prendre les bonnes décisions instantanément.</p>
+                </div>
+
+                <div class="feature-card fade-in-up" style="transition-delay: 0.1s;">
+                    <div class="feature-icon">
+                        <i data-lucide="file-text"></i>
+                    </div>
+                    <h3>Bons de Commande</h3>
+                    <p>Créez, validez et envoyez des bons de commande professionnels en quelques clics.</p>
+                </div>
+
+                <div class="feature-card fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="feature-icon">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <h3>Gestion d'Équipe</h3>
+                    <p>Gérez les rôles et permissions de vos collaborateurs avec précision.</p>
+                </div>
+
+                <div class="feature-card fade-in-up" style="transition-delay: 0.3s;">
+                    <div class="feature-icon">
+                        <i data-lucide="book"></i>
+                    </div>
+                    <h3>Dictionnaire BTP</h3>
+                    <p>Accédez à un lexique multilingue (Français, Arabe, Darija) intégré.</p>
+                </div>
+
+                <div class="feature-card fade-in-up" style="transition-delay: 0.4s;">
+                    <div class="feature-icon">
+                        <i data-lucide="package"></i>
+                    </div>
+                    <h3>Catalogue Articles</h3>
+                    <p>Gérez votre base de données produits et fournisseurs centralisée.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="social-proof">
+        <div class="container">
+            <p class="social-title">IL NOUS FONT CONFIANCE</p>
+            <div class="logo-grid fade-in-up">
+                <div class="logo-item"><i data-lucide="building-2"></i> BATIMAT</div>
+                <div class="logo-item"><i data-lucide="hammer"></i> CONSTRUCT</div>
+                <div class="logo-item"><i data-lucide="hard-hat"></i> ARCHI-TECH</div>
+                <div class="logo-item"><i data-lucide="truck"></i> LOGISTIX</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>BTP Commande</h3>
+                    <p>La référence pour la digitalisation des processus d'achat dans le secteur du BTP.</p>
+                    <div class="footer-socials">
+                        <i data-lucide="linkedin" class="social-icon"></i>
+                        <i data-lucide="twitter" class="social-icon"></i>
+                        <i data-lucide="facebook" class="social-icon"></i>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Produit</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Fonctionnalités</a></li>
+                        <li><a href="#">Intégrations</a></li>
+                        <li><a href="#">Mises à jour</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Entreprise</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Carrières</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Légal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#">Confidentialité</a></li>
+                        <li><a href="#">CGU</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 BTP Commande. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
