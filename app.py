@@ -18,6 +18,7 @@ from routes.products import products_bp
 from routes.company import company_bp
 from routes.lexique import lexique_bp
 from routes.settings import settings_bp
+from routes.errors import errors_bp
 from models.settings import SiteSettings
 
 def create_app(config_class=Config):
@@ -64,6 +65,7 @@ def create_app(config_class=Config):
     app.register_blueprint(company_bp, url_prefix='/company')
     app.register_blueprint(lexique_bp, url_prefix='/lexique')
     app.register_blueprint(settings_bp, url_prefix='/parametres')
+    app.register_blueprint(errors_bp)
 
     return app
 
