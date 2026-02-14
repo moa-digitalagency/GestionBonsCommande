@@ -22,13 +22,9 @@
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-    <div style="position: fixed; top: 80px; right: 20px; z-index: 1000; width: 320px;">
+    <div class="flash-messages-container">
         {% for category, message in messages %}
-        <div style="padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
-            {% if category == 'success' %} background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0;
-            {% elif category == 'danger' %} background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca;
-            {% elif category == 'warning' %} background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047;
-            {% else %} background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; {% endif %}">
+        <div class="flash-message {{ category }} {% if category not in ['success', 'danger', 'warning'] %}info{% endif %}">
             {{ message }}
         </div>
         {% endfor %}
@@ -153,32 +149,117 @@
         </div>
     </section>
 
-    <!-- How it works Section (Placeholder) -->
-    <section id="comment-ca-marche" class="features" style="background-color: var(--color-bg-alt);">
+    <!-- How it works Section -->
+    <section id="comment-ca-marche" class="how-it-works" style="background-color: var(--color-bg-alt);">
         <div class="container">
             <div class="section-header fade-in-up">
                 <h2>Comment ça marche</h2>
-                <p>Une mise en place simple et rapide pour vos équipes.</p>
+                <p>Une mise en place simple et rapide pour vos équipes, en seulement 3 étapes.</p>
             </div>
-            <!-- Placeholder content -->
-            <div style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
-                <i data-lucide="settings-2" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
-                <p>Contenu détaillé à venir...</p>
+
+            <div class="steps-grid">
+                <!-- Step 1 -->
+                <div class="step-card fade-in-up">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i data-lucide="user-plus"></i>
+                    </div>
+                    <h3>Créez votre compte</h3>
+                    <p>Inscrivez-vous gratuitement et configurez votre profil entreprise en quelques minutes.</p>
+                </div>
+
+                <!-- Arrow -->
+                <div class="step-arrow fade-in-up" style="transition-delay: 0.1s;">
+                    <i data-lucide="arrow-right"></i>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i data-lucide="hard-hat"></i>
+                    </div>
+                    <h3>Ajoutez vos chantiers</h3>
+                    <p>Déclarez vos projets en cours, assignez vos équipes et définissez vos budgets.</p>
+                </div>
+
+                <!-- Arrow -->
+                <div class="step-arrow fade-in-up" style="transition-delay: 0.3s;">
+                    <i data-lucide="arrow-right"></i>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card fade-in-up" style="transition-delay: 0.4s;">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i data-lucide="file-check-2"></i>
+                    </div>
+                    <h3>Gérez vos commandes</h3>
+                    <p>Générez des bons de commande, validez-les et suivez vos livraisons en temps réel.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Pricing Section (Placeholder) -->
-    <section id="tarifs" class="features">
+    <!-- Pricing Section -->
+    <section id="tarifs" class="pricing">
         <div class="container">
             <div class="section-header fade-in-up">
-                <h2>Tarifs</h2>
-                <p>Des offres adaptées à la taille de votre entreprise.</p>
+                <h2>Tarifs Transparents</h2>
+                <p>Des offres adaptées à la taille de votre entreprise, sans coûts cachés.</p>
             </div>
-            <!-- Placeholder content -->
-            <div style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
-                <i data-lucide="credit-card" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
-                <p>Contenu détaillé à venir...</p>
+
+            <div class="pricing-grid">
+                <!-- Starter Plan -->
+                <div class="pricing-card fade-in-up">
+                    <div class="pricing-header">
+                        <h3>Starter</h3>
+                        <p class="price">0€<span>/mois</span></p>
+                        <p class="description">Idéal pour les artisans et auto-entrepreneurs.</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check"></i> 1 Utilisateur</li>
+                        <li><i data-lucide="check"></i> 3 Chantiers actifs</li>
+                        <li><i data-lucide="check"></i> 10 Bons de commande / mois</li>
+                        <li><i data-lucide="check"></i> Support par email</li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary full-width">Commencer</a>
+                </div>
+
+                <!-- Pro Plan (Popular) -->
+                <div class="pricing-card popular fade-in-up" style="transition-delay: 0.1s;">
+                    <div class="popular-tag">Populaire</div>
+                    <div class="pricing-header">
+                        <h3>Pro</h3>
+                        <p class="price">49€<span>/mois</span></p>
+                        <p class="description">Pour les PME en pleine croissance.</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check"></i> 5 Utilisateurs</li>
+                        <li><i data-lucide="check"></i> Chantiers illimités</li>
+                        <li><i data-lucide="check"></i> Commandes illimitées</li>
+                        <li><i data-lucide="check"></i> Catalogue articles complet</li>
+                        <li><i data-lucide="check"></i> Export PDF personnalisé</li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary full-width">Essayer Gratuitement</a>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="pricing-header">
+                        <h3>Entreprise</h3>
+                        <p class="price">Sur devis</p>
+                        <p class="description">Pour les grandes structures et groupes BTP.</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check"></i> Utilisateurs illimités</li>
+                        <li><i data-lucide="check"></i> Multi-sociétés</li>
+                        <li><i data-lucide="check"></i> API & Intégrations</li>
+                        <li><i data-lucide="check"></i> Support dédié 24/7</li>
+                        <li><i data-lucide="check"></i> Formation sur site</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline-primary full-width">Contactez-nous</a>
+                </div>
             </div>
         </div>
     </section>
