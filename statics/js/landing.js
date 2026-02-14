@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
-                const headerOffset = 80; // Match CSS variable --header-height
+                const header = document.querySelector('header');
+                const headerOffset = header ? header.offsetHeight : 80;
                 const elementPosition = targetElement.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 

@@ -212,8 +212,8 @@ header .container {
 
 /* Hero Section */
 .hero {
-    padding-top: calc(var(--header-height) + 4rem);
-    padding-bottom: 6rem;
+    padding-top: 180px; /* Ensure ample space below fixed header */
+    padding-bottom: 8rem;
     background: var(--gradient-hero);
     position: relative;
     overflow: hidden;
@@ -366,7 +366,7 @@ header .container {
 /* Social Proof */
 .social-proof {
     padding: 4rem 0;
-    background: var(--color-bg-light);
+    background: var(--color-white);
     border-top: 1px solid rgba(15, 23, 42, 0.05);
     border-bottom: 1px solid rgba(15, 23, 42, 0.05);
 }
@@ -381,18 +381,30 @@ header .container {
 .logo-grid {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 4rem;
     flex-wrap: wrap;
-    opacity: 0.6;
+    opacity: 0.8;
 }
 
 .logo-item {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-text-light);
+    height: 40px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    filter: grayscale(100%);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.logo-item:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.logo-item svg {
+    height: 100%;
+    width: auto;
 }
 
 /* Footer */
