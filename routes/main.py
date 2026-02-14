@@ -25,7 +25,7 @@ def set_language(lang_code):
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
-    return redirect(url_for('auth.login'))
+    return render_template('landing.html')
 
 @main_bp.route('/dashboard')
 @login_required
@@ -44,14 +44,23 @@ def dashboard():
                              companies=companies,
                              pending_suggestions=pending_suggestions)
     
-    orders = TenantService.get_tenant_orders().order_by(Order.created_at.desc()).limit(10).all()
+    orders_query = TenantService.get_tenant_orders()
+    orders = orders_query.order_by(Order.created_at.desc()).limit(10).all()
     projects = TenantService.get_tenant_projects().all()
-    products = TenantService.get_tenant_products().count()
     
-    pending_orders = TenantService.get_tenant_orders().filter_by(status='SOUMIS').count()
+    pending_orders = orders_query.filter_by(status='SOUMIS').count()
+
+    stats = {
+        'orders_count': orders_query.count(),
+        'pending_count': pending_orders,
+        'projects_count': len(projects)
+    }
+
+    # Restoring products_count for backward compatibility/unused variable safety
+    products_count = TenantService.get_tenant_products().count()
     
     return render_template('dashboard.html',
                          orders=orders,
                          projects=projects,
-                         products_count=products,
-                         pending_orders=pending_orders)
+                         products_count=products_count,
+                         stats=stats)

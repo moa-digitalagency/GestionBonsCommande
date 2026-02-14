@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTP Commande - La Solution de Gestion Premium pour le BTP</title>
+    <meta name="description" content="Gérez vos commandes, chantiers et fournisseurs avec une élégance et une efficacité inégalées. La plateforme tout-en-un pour les professionnels du BTP.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages-container">
+        {% for category, message in messages %}
+        <div class="flash-message {{ category }} {% if category not in ['success', 'danger', 'warning'] %}info{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i data-lucide="hexagon" class="logo-icon"></i>
+                BTP Commande
+            </div>
+
+            <nav class="nav-links">
+                <a href="#fonctionnalites">Fonctionnalités</a>
+                <a href="#comment-ca-marche">Comment ça marche</a>
+                <a href="#tarifs">Tarifs</a>
+            </nav>
+
+            <div class="header-actions">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-text">Connexion</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Essai Gratuit</a>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu">
+        <button class="close-menu-btn" aria-label="Fermer">
+            <i data-lucide="x"></i>
+        </button>
+        <nav class="mobile-nav-links">
+            <a href="#fonctionnalites">Fonctionnalités</a>
+            <a href="#comment-ca-marche">Comment ça marche</a>
+            <a href="#tarifs">Tarifs</a>
+            <a href="{{ url_for('auth.login') }}" class="text-primary">Connexion</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Essai Gratuit</a>
+        </nav>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text fade-in-up">
+                    <h1>Gérez vos chantiers avec <br><span>Excellence & Précision</span></h1>
+                    <p>La première plateforme de gestion BTP conçue pour les entreprises exigeantes. Centralisez commandes, stocks et équipes en un seul endroit sécurisé.</p>
+                    <div class="hero-actions">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+                            Commencer maintenant
+                            <i data-lucide="arrow-right" class="btn-icon-right"></i>
+                        </a>
+                        <a href="#demo" class="btn btn-secondary">
+                            <i data-lucide="play-circle" class="btn-icon-left"></i>
+                            Voir la démo
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual fade-in-up" style="transition-delay: 0.2s;">
+                    <!-- Construction Dashboard Abstract Image -->
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop" alt="Tableau de bord BTP Analytics" class="hero-img">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section (Bento Grid) -->
+    <section id="fonctionnalites" class="features">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>Une Suite Complète</h2>
+                <p>Tous les outils dont vous avez besoin pour piloter votre activité, repensés pour une expérience utilisateur fluide.</p>
+            </div>
+
+            <div class="bento-grid">
+                <!-- Large Feature -->
+                <div class="feature-card large fade-in-up">
+                    <div class="feature-icon">
+                        <i data-lucide="layout-dashboard"></i>
+                    </div>
+                    <h3>Tableau de Bord Intuitif</h3>
+                    <p>Visualisez l'état de tous vos chantiers en temps réel. Des graphiques clairs et des indicateurs de performance pour prendre les bonnes décisions instantanément.</p>
+                </div>
+
+                <div class="feature-card fade-in-up" style="transition-delay: 0.1s;">
+                    <div class="feature-icon">
+                        <i data-lucide="file-text"></i>
+                    </div>
+                    <h3>Bons de Commande</h3>
+                    <p>Créez, validez et envoyez des bons de commande professionnels en quelques clics.</p>
+                </div>
+
+                <div class="feature-card fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="feature-icon">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <h3>Gestion d'Équipe</h3>
+                    <p>Gérez les rôles et permissions de vos collaborateurs avec précision.</p>
+                </div>
+
+                <div class="feature-card fade-in-up" style="transition-delay: 0.3s;">
+                    <div class="feature-icon">
+                        <i data-lucide="book"></i>
+                    </div>
+                    <h3>Dictionnaire BTP</h3>
+                    <p>Accédez à un lexique multilingue (Français, Arabe, Darija) intégré.</p>
+                </div>
+
+                <div class="feature-card fade-in-up" style="transition-delay: 0.4s;">
+                    <div class="feature-icon">
+                        <i data-lucide="package"></i>
+                    </div>
+                    <h3>Catalogue Articles</h3>
+                    <p>Gérez votre base de données produits et fournisseurs centralisée.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works Section -->
+    <section id="comment-ca-marche" class="how-it-works" style="background-color: var(--color-bg-alt);">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>Comment ça marche</h2>
+                <p>Une mise en place simple et rapide pour vos équipes, en seulement 3 étapes.</p>
+            </div>
+
+            <div class="steps-grid">
+                <!-- Step 1 -->
+                <div class="step-card fade-in-up">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i data-lucide="user-plus"></i>
+                    </div>
+                    <h3>Créez votre compte</h3>
+                    <p>Inscrivez-vous gratuitement et configurez votre profil entreprise en quelques minutes.</p>
+                </div>
+
+                <!-- Arrow -->
+                <div class="step-arrow fade-in-up" style="transition-delay: 0.1s;">
+                    <i data-lucide="arrow-right"></i>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i data-lucide="hard-hat"></i>
+                    </div>
+                    <h3>Ajoutez vos chantiers</h3>
+                    <p>Déclarez vos projets en cours, assignez vos équipes et définissez vos budgets.</p>
+                </div>
+
+                <!-- Arrow -->
+                <div class="step-arrow fade-in-up" style="transition-delay: 0.3s;">
+                    <i data-lucide="arrow-right"></i>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card fade-in-up" style="transition-delay: 0.4s;">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i data-lucide="file-check-2"></i>
+                    </div>
+                    <h3>Gérez vos commandes</h3>
+                    <p>Générez des bons de commande, validez-les et suivez vos livraisons en temps réel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="tarifs" class="pricing">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>Tarifs Transparents</h2>
+                <p>Des offres adaptées à la taille de votre entreprise, sans coûts cachés.</p>
+            </div>
+
+            <div class="pricing-grid">
+                <!-- Starter Plan -->
+                <div class="pricing-card fade-in-up">
+                    <div class="pricing-header">
+                        <h3>Starter</h3>
+                        <p class="price">0€<span>/mois</span></p>
+                        <p class="description">Idéal pour les artisans et auto-entrepreneurs.</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check"></i> 1 Utilisateur</li>
+                        <li><i data-lucide="check"></i> 3 Chantiers actifs</li>
+                        <li><i data-lucide="check"></i> 10 Bons de commande / mois</li>
+                        <li><i data-lucide="check"></i> Support par email</li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary full-width">Commencer</a>
+                </div>
+
+                <!-- Pro Plan (Popular) -->
+                <div class="pricing-card popular fade-in-up" style="transition-delay: 0.1s;">
+                    <div class="popular-tag">Populaire</div>
+                    <div class="pricing-header">
+                        <h3>Pro</h3>
+                        <p class="price">49€<span>/mois</span></p>
+                        <p class="description">Pour les PME en pleine croissance.</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check"></i> 5 Utilisateurs</li>
+                        <li><i data-lucide="check"></i> Chantiers illimités</li>
+                        <li><i data-lucide="check"></i> Commandes illimitées</li>
+                        <li><i data-lucide="check"></i> Catalogue articles complet</li>
+                        <li><i data-lucide="check"></i> Export PDF personnalisé</li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary full-width">Essayer Gratuitement</a>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="pricing-header">
+                        <h3>Entreprise</h3>
+                        <p class="price">Sur devis</p>
+                        <p class="description">Pour les grandes structures et groupes BTP.</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check"></i> Utilisateurs illimités</li>
+                        <li><i data-lucide="check"></i> Multi-sociétés</li>
+                        <li><i data-lucide="check"></i> API & Intégrations</li>
+                        <li><i data-lucide="check"></i> Support dédié 24/7</li>
+                        <li><i data-lucide="check"></i> Formation sur site</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline-primary full-width">Contactez-nous</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="social-proof">
+        <div class="container">
+            <p class="social-title">ILS NOUS FONT CONFIANCE</p>
+            <div class="logo-grid fade-in-up">
+                <!-- Batimat -->
+                <div class="logo-item" title="Batimat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 mr-2">
+                        <path d="M3 21h18"/>
+                        <path d="M5 21V7l8-4 8 4v14"/>
+                        <path d="M17 21v-8.5a1.5 1.5 0 0 0-1.5-1.5h-5a1.5 1.5 0 0 0-1.5 1.5V21"/>
+                    </svg>
+                    <span style="font-weight: 700; font-size: 1.25rem;">BATIMAT</span>
+                </div>
+
+                <!-- Construct -->
+                <div class="logo-item" title="Construct">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 mr-2">
+                        <path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/>
+                        <path d="M17.64 15 22 10.64"/>
+                        <path d="m20.9 7.9-1.9-1.9c-.3-.3-.3-.8 0-1.1l2.5-2.5a2 2 0 0 0-2.8-2.8l-2.5 2.5c-.3.3-.8.3-1.1 0L13.1 4"/>
+                        <path d="m17.5 17.5 2.5 2.5"/>
+                    </svg>
+                    <span style="font-weight: 700; font-size: 1.25rem;">CONSTRUCT</span>
+                </div>
+
+                <!-- Archi-Tech -->
+                <div class="logo-item" title="Archi-Tech">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 mr-2">
+                        <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                        <path d="M2 2l7.586 7.586"/>
+                        <circle cx="11" cy="11" r="2"/>
+                    </svg>
+                    <span style="font-weight: 700; font-size: 1.25rem;">ARCHI-TECH</span>
+                </div>
+
+                <!-- Logistix -->
+                <div class="logo-item" title="Logistix">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 mr-2">
+                        <rect width="20" height="12" x="2" y="6" rx="2"/>
+                        <path d="M12 12h.01"/>
+                        <path d="M17 12h.01"/>
+                        <path d="M7 12h.01"/>
+                    </svg>
+                    <span style="font-weight: 700; font-size: 1.25rem;">LOGISTIX</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>BTP Commande</h3>
+                    <p>La référence pour la digitalisation des processus d'achat dans le secteur du BTP.</p>
+                    <div class="footer-socials">
+                        <i data-lucide="linkedin" class="social-icon"></i>
+                        <i data-lucide="twitter" class="social-icon"></i>
+                        <i data-lucide="facebook" class="social-icon"></i>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Produit</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Fonctionnalités</a></li>
+                        <li><a href="#">Intégrations</a></li>
+                        <li><a href="#">Mises à jour</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Entreprise</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Carrières</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Légal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#">Confidentialité</a></li>
+                        <li><a href="#">CGU</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 BTP Commande. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
