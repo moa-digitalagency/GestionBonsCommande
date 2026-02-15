@@ -22,7 +22,7 @@ from routes.errors import errors_bp
 from models.settings import SiteSettings
 
 def create_app(config_class=Config):
-    app = Flask(__name__, static_folder='statics', static_url_path='/static')
+    app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config_class)
 
     # Initialize extensions
