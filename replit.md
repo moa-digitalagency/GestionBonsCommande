@@ -33,7 +33,7 @@ Application SaaS multi-tenant pour la gestion des bons de commande de matériaux
 │   ├── order_service    # Workflow BC
 │   ├── lexique_service  # Dictionnaire
 │   └── pdf_service      # Génération PDF
-├── statics/             # Fichiers statiques
+├── static/              # Fichiers statiques
 │   ├── css/
 │   ├── js/
 │   ├── img/

@@ -6,7 +6,7 @@
 </head>
 <body>
     <div class="header">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div class="header-flex">
             <div>
                 {% if company.logo_path %}
                 <img src="{{ url_for('static', filename=company.logo_path) }}" alt="Logo" class="logo">
@@ -51,12 +51,12 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 5%;">#</th>
-                <th style="width: 45%;">Désignation</th>
-                <th style="width: 15%; text-align: right;">Quantité</th>
-                <th style="width: 10%;">Unité</th>
-                <th style="width: 12%; text-align: right;">Prix U.</th>
-                <th style="width: 13%; text-align: right;">Total</th>
+                <th class="col-id">#</th>
+                <th class="col-desc">Désignation</th>
+                <th class="col-qty">Quantité</th>
+                <th class="col-unit">Unité</th>
+                <th class="col-price">Prix U.</th>
+                <th class="col-total">Total</th>
             </tr>
         </thead>
         <tbody>
@@ -67,15 +67,15 @@
                 <td>
                     {{ line.description }}
                     {% if line.note %}
-                    <br><em style="font-size: 9pt; color: #666;">{{ line.note }}</em>
+                    <br><em class="note-text">{{ line.note }}</em>
                     {% endif %}
                 </td>
-                <td style="text-align: right;">{{ line.quantity }}</td>
+                <td class="text-right">{{ line.quantity }}</td>
                 <td>{{ line.unit }}</td>
-                <td style="text-align: right;">
+                <td class="text-right">
                     {% if line.unit_price %}{{ '%.2f' % line.unit_price }}{% else %}-{% endif %}
                 </td>
-                <td style="text-align: right;">
+                <td class="text-right">
                     {% if line.unit_price %}
                         {% set subtotal = line.quantity|float * line.unit_price|float %}
                         {% set total.value = total.value + subtotal %}
@@ -88,8 +88,8 @@
         {% if total.value > 0 %}
         <tfoot>
             <tr class="total-row">
-                <td colspan="5" style="text-align: right;"><strong>TOTAL HT:</strong></td>
-                <td style="text-align: right;"><strong>{{ '%.2f' % total.value }} MAD</strong></td>
+                <td colspan="5" class="text-right"><strong>TOTAL HT:</strong></td>
+                <td class="text-right"><strong>{{ '%.2f' % total.value }} MAD</strong></td>
             </tr>
         </tfoot>
         {% endif %}
@@ -104,12 +104,12 @@
     <div class="signature-section">
         <div class="signature-box">
             <p>Demandé par</p>
-            <p style="font-size: 10pt; color: #666;">{{ order.creator.full_name }}</p>
+            <p class="signature-text">{{ order.creator.full_name }}</p>
         </div>
         <div class="signature-box">
             <p>Validé par</p>
             {% if order.validator %}
-            <p style="font-size: 10pt; color: #666;">{{ order.validator.full_name }}</p>
+            <p class="signature-text">{{ order.validator.full_name }}</p>
             {% endif %}
         </div>
     </div>
@@ -124,7 +124,7 @@
         {% if company.bc_footer %}
         <div>{{ company.bc_footer }}</div>
         {% endif %}
-        <div style="margin-top: 10px; text-align: center; font-size: 8pt;">
+        <div class="footer-date">
             Document généré le {{ generated_at.strftime('%d/%m/%Y à %H:%M') }} - BTP Commande
         </div>
     </div>

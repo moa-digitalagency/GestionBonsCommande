@@ -194,10 +194,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    // Ensure Lucide icons are re-scanned if needed
-    document.addEventListener('alpine:initialized', () => {
-         lucide.createIcons();
-    });
-</script>
+<script src="{{ url_for('static', filename='js/lexique.js') }}"></script>
 {% endblock %}

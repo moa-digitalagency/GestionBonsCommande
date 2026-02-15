@@ -1,0 +1,22 @@
+/* Global Styles from base.html and layout.html */
+[x-cloak] {
+    display: none !important;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.font-arabic {
+    font-family: 'Cairo', sans-serif;
+}
+
+/* Error Page Styles */
+.lottie-player-container {
+    width: 300px;
+    height: 300px;
+}
+
+.lottie-200 { width: 200px; height: 200px; }
+.lottie-250 { width: 250px; height: 250px; }
+.lottie-300 { width: 300px; height: 300px; }

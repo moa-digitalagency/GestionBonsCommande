@@ -13,43 +13,27 @@
     <link rel="icon" href="{{ url_for('static', filename=settings.favicon_url) }}">
     {% endif %}
 
-    <!-- Tailwind CSS -->
+    <!-- Theme Settings Meta -->
+    {% set theme_settings = {
+        'primaryColor': settings.primary_color if settings and settings.primary_color else "#2563eb"
+    } %}
+    <meta name="theme-settings" content='{{ theme_settings | tojson | safe }}'>
+
+    <!-- Tailwind Config -->
+    <script src="{{ url_for('static', filename='js/tailwind-config.js') }}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: '{{ settings.primary_color if settings and settings.primary_color else "#2563eb" }}',
-                        slate: {
-                            850: '#151e32',
-                            900: '#0f172a', // Sidebar bg
-                        },
-                        blue: {
-                            600: '#2563eb', // Accent
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        [x-cloak] { display: none !important; }
-        body { font-family: 'Inter', sans-serif; }
-    </style>
 </head>
 <body class="h-full" x-data="{ sidebarOpen: false }">
 
@@ -182,8 +166,7 @@
          x-transition.opacity
          x-cloak></div>
 
-    <script>
-        lucide.createIcons();
-    </script>
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

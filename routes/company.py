@@ -64,7 +64,7 @@ def settings():
             file = request.files['logo']
             if file and file.filename and allowed_file(file.filename):
                 filename = secure_filename(f"logo_{company.id}_{file.filename}")
-                upload_path = os.path.join(current_app.root_path, 'statics', 'uploads', 'logos')
+                upload_path = os.path.join(current_app.root_path, 'static', 'uploads', 'logos')
                 os.makedirs(upload_path, exist_ok=True)
                 filepath = os.path.join(upload_path, filename)
                 file.save(filepath)

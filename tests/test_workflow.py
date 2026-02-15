@@ -66,7 +66,7 @@ class TestWorkflow(BaseTestCase):
         # 6. Generate PDF (Mocked)
         with patch('services.pdf_service.PDFService.generate_order_pdf') as mock_pdf:
             # We must make sure the file exists because the route calls send_file on the result
-            dummy_rel_path = 'statics/uploads/pdfs/dummy.pdf'
+            dummy_rel_path = 'static/uploads/pdfs/dummy.pdf'
             dummy_abs_path = os.path.join(self.app.root_path, dummy_rel_path)
 
             os.makedirs(os.path.dirname(dummy_abs_path), exist_ok=True)

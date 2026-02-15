@@ -75,121 +75,10 @@ class PDFService:
             generated_at=datetime.utcnow()
         )
         
-        css = CSS(string='''
-            @page {
-                size: A4;
-                margin: 1.5cm;
-            }
-            body {
-                font-family: Arial, sans-serif;
-                font-size: 11pt;
-                line-height: 1.4;
-            }
-            .header {
-                display: flex;
-                justify-content: space-between;
-                border-bottom: 2px solid #333;
-                padding-bottom: 15px;
-                margin-bottom: 20px;
-            }
-            .logo {
-                max-height: 80px;
-                max-width: 200px;
-            }
-            .company-info {
-                text-align: right;
-                font-size: 10pt;
-            }
-            .company-name {
-                font-size: 14pt;
-                font-weight: bold;
-                color: #2563eb;
-            }
-            .bc-title {
-                text-align: center;
-                font-size: 18pt;
-                font-weight: bold;
-                margin: 20px 0;
-                color: #1e40af;
-            }
-            .bc-number {
-                text-align: center;
-                font-size: 14pt;
-                margin-bottom: 20px;
-            }
-            .info-section {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 20px;
-            }
-            .info-box {
-                width: 48%;
-                border: 1px solid #ddd;
-                padding: 10px;
-                border-radius: 5px;
-            }
-            .info-box h3 {
-                margin: 0 0 10px 0;
-                font-size: 12pt;
-                color: #374151;
-                border-bottom: 1px solid #ddd;
-                padding-bottom: 5px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 20px 0;
-            }
-            th {
-                background-color: #2563eb;
-                color: white;
-                padding: 10px;
-                text-align: left;
-                font-size: 10pt;
-            }
-            td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                font-size: 10pt;
-            }
-            tr:nth-child(even) {
-                background-color: #f9fafb;
-            }
-            .total-row {
-                font-weight: bold;
-                background-color: #e5e7eb !important;
-            }
-            .footer {
-                margin-top: 30px;
-                border-top: 1px solid #ddd;
-                padding-top: 15px;
-                font-size: 9pt;
-                color: #6b7280;
-            }
-            .legal-info {
-                margin-bottom: 10px;
-            }
-            .signature-section {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 40px;
-            }
-            .signature-box {
-                width: 45%;
-                border-top: 1px solid #333;
-                padding-top: 10px;
-                text-align: center;
-            }
-            .notes {
-                background-color: #fffbeb;
-                border: 1px solid #fbbf24;
-                padding: 10px;
-                border-radius: 5px;
-                margin: 15px 0;
-            }
-        ''')
+        css_path = os.path.join(current_app.static_folder, 'css', 'pdf.css')
+        css = CSS(filename=css_path)
         
-        uploads_dir = os.path.join(current_app.root_path, 'statics', 'uploads', 'pdfs')
+        uploads_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'pdfs')
         os.makedirs(uploads_dir, exist_ok=True)
         
         filename = f"BC_{order.bc_number.replace('-', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
@@ -199,7 +88,7 @@ class PDFService:
         html = HTML(string=html_content, base_url=current_app.root_path, url_fetcher=PDFService.safe_url_fetcher)
         html.write_pdf(filepath, stylesheets=[css])
         
-        relative_path = os.path.join('statics', 'uploads', 'pdfs', filename)
+        relative_path = os.path.join('static', 'uploads', 'pdfs', filename)
         
         return relative_path
     
