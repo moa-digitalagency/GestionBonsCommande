@@ -1,29 +1,29 @@
-[ 🇫🇷 **Français** ](BTP_Commande_deployment_guide.md) | [ 🇬🇧 English ](BTP_Commande_deployment_guide_en.md)
+[ 🇫🇷 Français ](BTP_Commande_deployment_guide.md) | [ 🇬🇧 **English** ](BTP_Commande_deployment_guide_en.md)
 
-# BTP Commande - Guide de Déploiement
+# BTP Commande - Deployment Guide
 
-Ce guide détaille les procédures pour installer **BTP Commande** en environnement de développement local et sur un serveur de production (VPS Linux).
-
----
-
-## 1. Prérequis Système
-
-*   **OS:** Ubuntu 20.04/22.04 LTS (Recommandé) ou macOS/Windows (WSL2).
-*   **Python:** 3.10 ou supérieur.
-*   **Base de Données:** SQLite (Dev), PostgreSQL (Prod).
-*   **Dépendances Système:** `libcairo2`, `libpango-1.0-0` (Pour WeasyPrint).
+This guide details the procedures for installing **BTP Commande** in a local development environment and on a production server (Linux VPS).
 
 ---
 
-## 2. Installation Locale (Dev)
+## 1. System Requirements
 
-### 2.1 Cloner le Projet
+*   **OS:** Ubuntu 20.04/22.04 LTS (Recommended) or macOS/Windows (WSL2).
+*   **Python:** 3.10 or higher.
+*   **Database:** SQLite (Dev), PostgreSQL (Prod).
+*   **System Dependencies:** `libcairo2`, `libpango-1.0-0` (For WeasyPrint).
+
+---
+
+## 2. Local Installation (Dev)
+
+### 2.1 Clone Repository
 ```bash
-git clone <url-du-repo-prive>
+git clone <private-repo-url>
 cd btp-commande
 ```
 
-### 2.2 Environnement Virtuel
+### 2.2 Virtual Environment
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -31,7 +31,7 @@ pip install -r requirements.txt
 ```
 
 ### 2.3 Configuration
-Créez un fichier `.env` à la racine :
+Create a `.env` file at the root:
 ```ini
 FLASK_APP=app.py
 FLASK_ENV=development
@@ -39,37 +39,37 @@ SECRET_KEY=dev-key-change-me
 DATABASE_URL=sqlite:///btp_commande.db
 ```
 
-### 2.4 Initialisation BDD
+### 2.4 Initialize DB
 ```bash
 python init_db.py
 ```
-*Crée les tables et un compte admin par défaut (admin@btpcommande.ma / admin123).*
+*Creates tables and a default admin account (admin@btpcommande.ma / admin123).*
 
-### 2.5 Lancer le Serveur
+### 2.5 Run Server
 ```bash
 flask run
 ```
-Accès : `http://127.0.0.1:5000`
+Access: `http://127.0.0.1:5000`
 
 ---
 
-## 3. Déploiement Production (VPS)
+## 3. Production Deployment (VPS)
 
-### 3.1 Script d'Installation Automatisé
-Le script `setup_vps.sh` installe les paquets système nécessaires.
+### 3.1 Automated Install Script
+The `setup_vps.sh` script installs necessary system packages.
 ```bash
 chmod +x setup_vps.sh
 sudo ./setup_vps.sh
 ```
 
-### 3.2 Serveur d'Application (Gunicorn)
-Ne jamais utiliser `flask run` en production. Utiliser Gunicorn.
+### 3.2 Application Server (Gunicorn)
+Never use `flask run` in production. Use Gunicorn.
 ```bash
 gunicorn -w 4 -b 127.0.0.1:8000 "app:create_app()"
 ```
 
-### 3.3 Service Systemd
-Créez `/etc/systemd/system/btp-commande.service` :
+### 3.3 Systemd Service
+Create `/etc/systemd/system/btp-commande.service`:
 ```ini
 [Unit]
 Description=Gunicorn instance for BTP Commande
@@ -87,11 +87,11 @@ WantedBy=multi-user.target
 ```
 
 ### 3.4 Reverse Proxy (Nginx)
-Configurez Nginx pour gérer le SSL et les fichiers statiques.
+Configure Nginx to handle SSL and static files.
 ```nginx
 server {
     listen 80;
-    server_name votre-domaine.com;
+    server_name your-domain.com;
 
     location / {
         include proxy_params;
@@ -108,7 +108,7 @@ server {
 
 ## 4. Maintenance
 
-### Mises à jour
+### Updates
 ```bash
 git fetch origin main
 git merge origin/main

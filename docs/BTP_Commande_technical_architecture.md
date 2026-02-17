@@ -1,3 +1,5 @@
+[ 🇫🇷 **Français** ](BTP_Commande_technical_architecture.md) | [ 🇬🇧 English ](BTP_Commande_technical_architecture_en.md)
+
 # BTP Commande - Architecture Technique
 
 Ce document détaille l'architecture logicielle, la structure de la base de données et les choix techniques structurants du projet **BTP Commande**.
@@ -17,7 +19,7 @@ Le projet suit le pattern "Application Factory" recommandé par Flask pour une m
 ├── routes/                 # Contrôleurs (Blueprints)
 ├── services/               # Logique Métier (Service Layer)
 ├── static/                 # Assets (CSS, JS, Uploads)
-├── templates/              # Vues Jinja2
+├── templates/              # Vues Jinja2 (SSR)
 └── tests/                  # Tests unitaires et d'intégration
 ```
 
@@ -57,7 +59,7 @@ L'application utilise SQLAlchemy comme ORM. La base de données par défaut est 
 
 #### `LexiqueEntry` (Dictionnaire)
 *   `category` : Catégorie métier (ex: 'Maçonnerie').
-*   `translations` (JSON ?) ou Colonnes dédiées (`fr`, `ar`, `dr`).
+*   `translations` : Colonnes dédiées (`fr`, `ar`, `dr`).
 *   `usage_count` : Compteur pour le tri par popularité.
 
 ---

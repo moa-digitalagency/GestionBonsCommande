@@ -1,89 +1,79 @@
-# BTP Commande - Plateforme de Gestion des Achats BTP
+![Python Version](https://img.shields.io/badge/Python-3.12-blue?style=flat-square) ![Framework](https://img.shields.io/badge/Framework-Flask-green?style=flat-square) ![Database](https://img.shields.io/badge/Database-SQLAlchemy-orange?style=flat-square) ![Status](https://img.shields.io/badge/Status-Private%2FInternal-red?style=flat-square) ![License](https://img.shields.io/badge/License-Proprietary-black?style=flat-square) ![Owner](https://img.shields.io/badge/Owner-MOA_Digital_Agency-purple?style=flat-square)
 
-![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
-![Framework](https://img.shields.io/badge/flask-3.0-green.svg)
-![Status](https://img.shields.io/badge/status-active-success.svg)
-![License](https://img.shields.io/badge/license-proprietary-red.svg)
+[ 🇫🇷 **Français** ](README.md) | [ 🇬🇧 English ](README_en.md)
 
-**BTP Commande** est une solution SaaS complète conçue pour digitaliser et simplifier le processus d'achat dans le secteur du Bâtiment et Travaux Publics. Elle comble le fossé linguistique et technique entre les chantiers et les fournisseurs grâce à un moteur de traduction intelligent et une gestion rigoureuse des bons de commande.
+# BTP Commande - Plateforme de Gestion des Achats
 
----
+> **AVERTISSEMENT JURIDIQUE :** Ce logiciel est la propriété exclusive de **MOA Digital Agency**. Toute reproduction, distribution ou utilisation non autorisée est strictement interdite. Code source confidentiel.
 
-## 📚 Documentation Complète
+## 📌 Présentation
 
-La documentation détaillée se trouve dans le dossier `docs/` :
+**BTP Commande** est une solution SaaS propriétaire conçue pour optimiser et sécuriser le processus d'achat dans le secteur du Bâtiment et des Travaux Publics. Elle permet la gestion complète du cycle de vie des commandes, de la création du brouillon à la génération de bons de commande officiels en PDF, avec un fort accent sur la traduction technique (Français / Arabe / Darija) pour faciliter les échanges avec les fournisseurs.
 
-| Document | Description | Cible |
+## 🏗️ Architecture Technique
+
+```mermaid
+graph TD
+    User([Utilisateur]) -->|HTTPS| Nginx[Nginx Reverse Proxy]
+    Nginx -->|Proxy Pass| Gunicorn[Gunicorn App Server]
+    Gunicorn -->|WSGI| Flask[Application Flask]
+
+    subgraph "Coeur BTP Commande"
+        Flask --> Auth[Auth (Login/RBAC)]
+        Flask --> Orders[Commandes (CRUD)]
+        Flask --> Lexique[Dictionnaire (Traduction)]
+
+        Auth --> DB[(PostgreSQL/SQLite)]
+        Orders --> DB
+        Lexique --> DB
+
+        Orders --> PDF[Service PDF (WeasyPrint)]
+        PDF --> Storage[Stockage Local (Static)]
+    end
+
+    subgraph "Client / Assets"
+        Browser[Navigateur Client] -->|Charge| Tailwind[Tailwind CSS (CDN)]
+        Browser -->|Charge| Alpine[Alpine.js (CDN)]
+        Browser -->|Charge| Fonts[Google Fonts (Inter/Cairo)]
+    end
+```
+
+## 📚 Documentation
+
+Toute la documentation technique et fonctionnelle est disponible dans le dossier `docs/`.
+
+| Document | Description | Public |
 | :--- | :--- | :--- |
-| [**Fonctionnalités (Bible)**](docs/BTP_Commande_features_full_list.md) | Liste exhaustive de toutes les features et règles métier. | Tout le monde |
-| [**Architecture Technique**](docs/BTP_Commande_technical_architecture.md) | Structure du code, Schéma BDD, Stack, Sécurité. | Développeurs |
-| [**Guide de Déploiement**](docs/BTP_Commande_deployment_guide.md) | Installation locale, VPS, Docker, Variables d'env. | DevOps / SysAdmin |
-| [**Manuel Utilisateur**](docs/BTP_Commande_user_guide.md) | Guide pas-à-pas pour créer des commandes et valider. | Utilisateurs finaux |
-
----
+| [**La Bible des Fonctionnalités**](docs/BTP_Commande_features_full_list.md) | Liste exhaustive de toutes les règles métier et micro-fonctionnalités. | Product Owners / Devs |
+| [**Architecture Technique**](docs/BTP_Commande_technical_architecture.md) | Détails sur la stack, la base de données et les flux. | Développeurs / DevOps |
+| [**Guide de Déploiement**](docs/BTP_Commande_deployment_guide.md) | Procédures d'installation (Local & VPS). | DevOps / SysAdmin |
+| [**Manuel Utilisateur**](docs/BTP_Commande_user_guide.md) | Guide d'utilisation pour les chefs de chantier et acheteurs. | Utilisateurs Finaux |
 
 ## ✨ Fonctionnalités Clés
 
-*   **Workflow de Commande Strict :** Cycle de vie maîtrisé (Brouillon &rarr; Soumis &rarr; Validé &rarr; PDF).
-*   **Moteur de Traduction BTP :** Traduction automatique des articles (Français &leftrightarrow; Arabe/Darija) pour les fournisseurs.
-*   **Génération PDF Sécurisée :** Création de bons de commande officiels via `WeasyPrint` avec protection contre les failles LFI.
-*   **Multi-Tenant :** Isolation totale des données par entreprise (`company_id`).
-*   **Interface Moderne :** UI responsive (TailwindCSS + Alpine.js) avec support RTL (Right-to-Left) natif.
-*   **Partage Instantané :** Envoi des commandes par WhatsApp et Email en un clic.
+*   **Workflow de Validation Strict :** Brouillon -> Soumis -> Validé -> PDF généré.
+*   **Moteur PDF WeasyPrint :** Génération de documents haute fidélité avec protection LFI.
+*   **Dictionnaire Intelligent :** Traduction automatique des termes techniques BTP.
+*   **Multi-Tenant :** Isolation totale des données par entreprise.
+*   **Interface Réactive :** Utilisation d'Alpine.js pour une expérience fluide sans lourdeur SPA.
 
----
+## 🚀 Installation Rapide (Dev)
 
-## 🚀 Démarrage Rapide (Local)
+Voir le [Guide de Déploiement](docs/BTP_Commande_deployment_guide.md) pour les détails complets.
 
-### 1. Cloner et Installer
 ```bash
-git clone https://github.com/votre-org/btp-commande.git
-cd btp-commande
-python3 -m venv venv
-source venv/bin/activate  # Sur Windows: venv\Scripts\activate
+# 1. Cloner le dépôt (Accès restreint)
+git clone <url-interne>
+
+# 2. Installer les dépendances
 pip install -r requirements.txt
-```
 
-### 2. Initialiser la Base de Données
-Le script crée les tables et un administrateur par défaut.
-```bash
+# 3. Initialiser la BDD
 python init_db.py
-```
-*Compte Admin par défaut : `admin@btpcommande.ma` / `admin123`*
 
-### 3. Lancer l'Application
-```bash
+# 4. Lancer le serveur
 flask run
 ```
-Accédez à `http://127.0.0.1:5000`.
 
 ---
-
-## 🛠️ Stack Technique
-
-*   **Backend :** Python 3.12, Flask 3.0, SQLAlchemy 2.0.
-*   **Frontend :** Jinja2 (SSR), TailwindCSS (CDN), Alpine.js.
-*   **PDF Engine :** WeasyPrint 68.0 (Requiert `libpango`, `libcairo`).
-*   **Base de Données :** SQLite (Dev), PostgreSQL (Prod).
-*   **Sécurité :** Flask-Login, Flask-WTF (CSRF), Secure Headers.
-
----
-
-## 🧪 Tests
-
-Pour lancer la suite de tests unitaires et d'intégration :
-```bash
-pytest
-```
-
----
-
-## 👥 Crédits
-
-*   **Produit de :** MOA Digital Agency (www.myoneart.com)
-*   **Développement :** Aisance KALONJI (www.aisancekalonji.com)
-*   **Audit Sécurité :** La CyberConfiance (www.cyberconfiance.com)
-*   **Documentation & Refonte :** Jules (Lead Dev)
-
----
-&copy; 2024 BTP Commande. Tous droits réservés.
+&copy; 2024 MOA Digital Agency. Tous droits réservés. Auteur : Aisance KALONJI.
