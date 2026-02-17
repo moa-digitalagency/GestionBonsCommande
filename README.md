@@ -16,25 +16,25 @@
 graph TD
     User([Utilisateur]) -->|HTTPS| Nginx[Nginx Reverse Proxy]
     Nginx -->|Proxy Pass| Gunicorn[Gunicorn App Server]
-    Gunicorn -->|WSGI| Flask[Application Flask]
+    Gunicorn -->|WSGI| FlaskApp[Application Flask]
 
     subgraph "Coeur BTP Commande"
-        Flask --> Auth[Auth (Login/RBAC)]
-        Flask --> Orders[Commandes (CRUD)]
-        Flask --> Lexique[Dictionnaire (Traduction)]
+        FlaskApp --> Auth["Auth (Login/RBAC)"]
+        FlaskApp --> Orders["Commandes (CRUD)"]
+        FlaskApp --> Lexique["Dictionnaire (Traduction)"]
 
-        Auth --> DB[(PostgreSQL/SQLite)]
+        Auth --> DB[("PostgreSQL/SQLite")]
         Orders --> DB
         Lexique --> DB
 
-        Orders --> PDF[Service PDF (WeasyPrint)]
-        PDF --> Storage[Stockage Local (Static)]
+        Orders --> PDF["Service PDF (WeasyPrint)"]
+        PDF --> Storage["Stockage Local (Static)"]
     end
 
     subgraph "Client / Assets"
         Browser[Navigateur Client] -->|Charge| Tailwind[Tailwind CSS (CDN)]
         Browser -->|Charge| Alpine[Alpine.js (CDN)]
-        Browser -->|Charge| Fonts[Google Fonts (Inter/Cairo)]
+        Browser -->|Charge| Fonts["Google Fonts (Inter/Cairo)"]
     end
 ```
 
