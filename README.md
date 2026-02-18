@@ -32,8 +32,8 @@ graph TD
     end
 
     subgraph "Client / Assets"
-        Browser[Navigateur Client] -->|Charge| Tailwind[Tailwind CSS (CDN)]
-        Browser -->|Charge| Alpine[Alpine.js (CDN)]
+        Browser[Navigateur Client] -->|Charge| Tailwind["Tailwind CSS (CDN)"]
+        Browser -->|Charge| Alpine["Alpine.js (CDN)"]
         Browser -->|Charge| Fonts["Google Fonts (Inter/Cairo)"]
     end
 ```
