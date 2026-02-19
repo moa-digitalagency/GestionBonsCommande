@@ -19,22 +19,22 @@ graph TD
     Gunicorn -->|WSGI| Flask[Flask Application]
 
     subgraph "BTP Commande Core"
-        Flask --> Auth[Auth (Login/RBAC)]
-        Flask --> Orders[Orders (CRUD)]
-        Flask --> Lexique[Dictionary (Translation)]
+        Flask --> Auth["Auth (Login/RBAC)"]
+        Flask --> Orders["Orders (CRUD)"]
+        Flask --> Lexique["Dictionary (Translation)"]
 
-        Auth --> DB[(PostgreSQL/SQLite)]
+        Auth --> DB[("PostgreSQL/SQLite")]
         Orders --> DB
         Lexique --> DB
 
-        Orders --> PDF[PDF Service (WeasyPrint)]
-        PDF --> Storage[Local Storage (Static)]
+        Orders --> PDF["PDF Service (WeasyPrint)"]
+        PDF --> Storage["Local Storage (Static)"]
     end
 
     subgraph "Client / Assets"
-        Browser[Client Browser] -->|Load| Tailwind[Tailwind CSS (CDN)]
-        Browser -->|Load| Alpine[Alpine.js (CDN)]
-        Browser -->|Load| Fonts[Google Fonts (Inter/Cairo)]
+        Browser[Client Browser] -->|Load| Tailwind["Tailwind CSS (CDN)"]
+        Browser -->|Load| Alpine["Alpine.js (CDN)"]
+        Browser -->|Load| Fonts["Google Fonts (Inter/Cairo)"]
     end
 ```
 
