@@ -26,3 +26,9 @@ def unavailable_for_legal_reasons_error(error):
     return render_template('errors/451.html',
                            whatsapp_number=Config.WHATSAPP_NUMBER,
                            tidycal_url=Config.TIDYCAL_URL), 451
+
+@errors_bp.app_errorhandler(500)
+def internal_server_error(error):
+    return render_template('errors/500.html',
+                           whatsapp_number=Config.WHATSAPP_NUMBER,
+                           tidycal_url=Config.TIDYCAL_URL), 500
