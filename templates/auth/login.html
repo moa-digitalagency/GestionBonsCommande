@@ -27,15 +27,15 @@
             <!-- Language Selector (Inside Form) -->
             <div class="flex justify-center space-x-4 mb-6 border-b border-gray-100 pb-4">
                 {% set current_lang = get_locale() %}
-                <a href="{{ url_for('main.set_language', lang_code='fr') }}"
+                <a href="{{ url_for('main.set_language', lang='fr') }}"
                    class="text-sm font-medium {{ 'text-blue-600 border-b-2 border-blue-600' if current_lang == 'fr' else 'text-gray-500 hover:text-gray-700' }} pb-1 transition-colors">
                     Français
                 </a>
-                <a href="{{ url_for('main.set_language', lang_code='en') }}"
+                <a href="{{ url_for('main.set_language', lang='en') }}"
                    class="text-sm font-medium {{ 'text-blue-600 border-b-2 border-blue-600' if current_lang == 'en' else 'text-gray-500 hover:text-gray-700' }} pb-1 transition-colors">
                     English
                 </a>
-                <a href="{{ url_for('main.set_language', lang_code='ar') }}"
+                <a href="{{ url_for('main.set_language', lang='ar') }}"
                    class="text-sm font-medium {{ 'text-blue-600 border-b-2 border-blue-600' if current_lang == 'ar' else 'text-gray-500 hover:text-gray-700' }} pb-1 transition-colors">
                     Arabe(Darija)
                 </a>
