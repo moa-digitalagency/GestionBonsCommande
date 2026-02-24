@@ -5,8 +5,7 @@
 #  * Auditer par : La CyberConfiance, www.cyberconfiance.com
 #  */
 
-import io
-import csv
+import pandas as pd
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import current_user, login_required
 from models import db
@@ -191,26 +190,35 @@ def bulk_import():
         flash(i18n.translate('Aucun fichier sélectionné.'), 'danger')
         return redirect(url_for('lexique.admin'))
 
-    if not file.filename.endswith('.csv'):
-        flash(i18n.translate('Seuls les fichiers CSV sont acceptés.'), 'danger')
+    if not (file.filename.endswith('.csv') or file.filename.endswith('.xlsx')):
+        flash(i18n.translate('Seuls les fichiers CSV ou Excel (.xlsx) sont acceptés.'), 'danger')
         return redirect(url_for('lexique.admin'))
 
     try:
-        stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
-        csv_input = csv.DictReader(stream)
+        if file.filename.endswith('.csv'):
+             df = pd.read_csv(file, sep=None, engine='python')
+        else:
+             df = pd.read_excel(file)
+
+        # Normalize columns to lowercase
+        df.columns = df.columns.str.lower()
+        # Handle NaN values
+        df = df.fillna('')
 
         count = 0
-        for row in csv_input:
-            # Expected columns: fr, en, es, ar, category
+        for row in df.to_dict(orient='records'):
+            # Expected columns: fr, en, ar, dr, category (case insensitive now)
             translations = {}
             for lang in Config.SUPPORTED_LANGUAGES:
-                if lang in row and row[lang].strip():
-                    translations[lang] = row[lang].strip()
+                if lang in row and str(row[lang]).strip():
+                    translations[lang] = str(row[lang]).strip()
 
             if not translations.get('fr'):
                 continue
 
             category = row.get('category', 'general')
+            if not category or str(category).strip() == '':
+                 category = 'general'
 
             # Create suggestion to be validated
             suggestion = LexiqueService.suggest_term(
