@@ -18,10 +18,10 @@ def is_safe_url(target):
     return test_url.scheme in ('http', 'https') and \
            ref_url.netloc == test_url.netloc
 
-@main_bp.route('/set_language/<lang_code>')
-def set_language(lang_code):
-    if lang_code in Config.SUPPORTED_LANGUAGES:
-        session['lang'] = lang_code
+@main_bp.route('/set_language/<lang>')
+def set_language(lang):
+    if lang in Config.SUPPORTED_LANGUAGES:
+        session['lang'] = lang
 
     referrer = request.referrer
     if referrer and is_safe_url(referrer):
