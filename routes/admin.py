@@ -5,7 +5,9 @@
 #  * Auditer par : La CyberConfiance, www.cyberconfiance.com
 #  */
 
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+import os
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, current_app
+from werkzeug.utils import secure_filename
 from flask_login import current_user, login_required
 from models import db
 from models.company import Company
@@ -18,6 +20,10 @@ from models.lexique import LexiqueSuggestion
 from security.decorators import super_admin_required, permission_required
 
 admin_bp = Blueprint('admin', __name__)
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @admin_bp.route('/')
 @login_required
@@ -53,8 +59,6 @@ def add_company():
         name = request.form.get('name', '').strip()
         ice = request.form.get('ice', '').strip()
         rc = request.form.get('rc', '').strip()
-        patente = request.form.get('patente', '').strip()
-        if_number = request.form.get('if_number', '').strip()
         address = request.form.get('address', '').strip()
         city = request.form.get('city', '').strip()
         phone = request.form.get('phone', '').strip()
@@ -69,8 +73,6 @@ def add_company():
             name=name,
             ice=ice,
             rc=rc,
-            patente=patente,
-            if_number=if_number,
             address=address,
             city=city,
             phone=phone,
@@ -81,6 +83,17 @@ def add_company():
         
         db.session.add(company)
         db.session.commit()
+
+        if 'logo' in request.files:
+            file = request.files['logo']
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(f"company_{company.id}_{file.filename}")
+                upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'companies')
+                os.makedirs(upload_dir, exist_ok=True)
+                filepath = os.path.join(upload_dir, filename)
+                file.save(filepath)
+                company.logo_path = f"uploads/companies/{filename}"
+                db.session.commit()
         
         flash(i18n.translate('Société créée avec succès.'), 'success')
         return redirect(url_for('admin.companies'))
@@ -97,14 +110,22 @@ def edit_company(company_id):
         company.name = request.form.get('name', company.name).strip()
         company.ice = request.form.get('ice', '').strip()
         company.rc = request.form.get('rc', '').strip()
-        company.patente = request.form.get('patente', '').strip()
-        company.if_number = request.form.get('if_number', '').strip()
         company.address = request.form.get('address', '').strip()
         company.city = request.form.get('city', '').strip()
         company.phone = request.form.get('phone', '').strip()
         company.email = request.form.get('email', '').strip()
         company.bc_prefix = request.form.get('bc_prefix', 'BC').strip()
         company.is_active = request.form.get('is_active') == 'on'
+
+        if 'logo' in request.files:
+            file = request.files['logo']
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(f"company_{company.id}_{file.filename}")
+                upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'companies')
+                os.makedirs(upload_dir, exist_ok=True)
+                filepath = os.path.join(upload_dir, filename)
+                file.save(filepath)
+                company.logo_path = f"uploads/companies/{filename}"
         
         db.session.commit()
         flash(i18n.translate('Société mise à jour.'), 'success')

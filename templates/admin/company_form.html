@@ -3,99 +3,141 @@
 {% block title %}{{ 'Modifier' if company else 'Nouvelle' }} Société - Administration{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="flex items-center mb-6">
-        <a href="{{ url_for('admin.companies') }}" class="text-gray-500 hover:text-gray-700 mr-4">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-        <h1 class="text-2xl font-bold text-gray-900">{{ 'Modifier la société' if company else 'Nouvelle société' }}</h1>
+<div class="max-w-4xl mx-auto py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center">
+            <a href="{{ url_for('admin.companies') }}" class="mr-4 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">{{ 'Modifier la société' if company else 'Nouvelle société' }}</h1>
+                <p class="mt-1 text-sm text-gray-500">Gérez les informations légales et les paramètres de la société.</p>
+            </div>
+        </div>
     </div>
-    
-    <div class="bg-white rounded-lg shadow p-6">
-        <form method="POST" class="space-y-6">
+
+    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+        <form method="POST" enctype="multipart/form-data" class="p-8 space-y-8">
+            
+            <!-- Section: Identité -->
             <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Raison sociale *</label>
-                <input type="text" name="name" id="name" required
-                       value="{{ company.name if company else '' }}"
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="ice" class="block text-sm font-medium text-gray-700">ICE</label>
-                    <input type="text" name="ice" id="ice"
-                           value="{{ company.ice if company else '' }}"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label for="rc" class="block text-sm font-medium text-gray-700">RC</label>
-                    <input type="text" name="rc" id="rc"
-                           value="{{ company.rc if company else '' }}"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label for="patente" class="block text-sm font-medium text-gray-700">Patente</label>
-                    <input type="text" name="patente" id="patente"
-                           value="{{ company.patente if company else '' }}"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label for="if_number" class="block text-sm font-medium text-gray-700">IF</label>
-                    <input type="text" name="if_number" id="if_number"
-                           value="{{ company.if_number if company else '' }}"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <h2 class="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Identité de la société</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="col-span-1 md:col-span-2">
+                        <label for="name" class="block text-sm font-semibold text-gray-700">Raison sociale <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" id="name" required
+                               value="{{ company.name if company else '' }}"
+                               class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all sm:text-sm">
+                    </div>
+
+                    <div class="col-span-1 md:col-span-2">
+                        <label for="logo" class="block text-sm font-medium text-gray-700">Logo de la société</label>
+                        <div class="mt-2 flex items-center gap-x-4">
+                            {% if company and company.logo_path %}
+                                <img src="{{ url_for('static', filename=company.logo_path) }}" alt="Logo" class="h-16 w-16 rounded-full object-cover border border-gray-200">
+                            {% else %}
+                                <div class="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 border border-gray-200">
+                                    <i class="fas fa-building text-2xl"></i>
+                                </div>
+                            {% endif %}
+                            <input type="file" name="logo" id="logo" accept="image/*"
+                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Formats acceptés : PNG, JPG, WEBP.</p>
+                    </div>
                 </div>
             </div>
-            
+
+            <!-- Section: Informations Légales -->
             <div>
-                <label for="address" class="block text-sm font-medium text-gray-700">Adresse</label>
-                <textarea name="address" id="address" rows="2"
-                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ company.address if company else '' }}</textarea>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label for="city" class="block text-sm font-medium text-gray-700">Ville</label>
-                    <input type="text" name="city" id="city"
-                           value="{{ company.city if company else '' }}"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone</label>
-                    <input type="tel" name="phone" id="phone"
-                           value="{{ company.phone if company else '' }}"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" name="email" id="email"
-                           value="{{ company.email if company else '' }}"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <h2 class="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Informations Légales</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="ice" class="block text-sm font-semibold text-gray-700">ICE <span class="text-red-500">*</span></label>
+                        <input type="text" name="ice" id="ice" required
+                               value="{{ company.ice if company else '' }}"
+                               class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="rc" class="block text-sm font-semibold text-gray-700">RC <span class="text-red-500">*</span></label>
+                        <input type="text" name="rc" id="rc" required
+                               value="{{ company.rc if company else '' }}"
+                               class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all sm:text-sm">
+                    </div>
                 </div>
             </div>
-            
+
+            <!-- Section: Coordonnées -->
             <div>
-                <label for="bc_prefix" class="block text-sm font-medium text-gray-700">Préfixe BC</label>
-                <input type="text" name="bc_prefix" id="bc_prefix"
-                       value="{{ company.bc_prefix if company else 'BC' }}"
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <h2 class="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Coordonnées</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700">Adresse</label>
+                        <textarea name="address" id="address" rows="3"
+                                  class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all sm:text-sm">{{ company.address if company else '' }}</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="city" class="block text-sm font-medium text-gray-700">Ville</label>
+                            <input type="text" name="city" id="city"
+                                   value="{{ company.city if company else '' }}"
+                                   class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone</label>
+                            <input type="tel" name="phone" id="phone"
+                                   value="{{ company.phone if company else '' }}"
+                                   class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" name="email" id="email"
+                                   value="{{ company.email if company else '' }}"
+                                   class="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Configuration -->
+            <div>
+                <h2 class="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Configuration</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div>
+                        <label for="bc_prefix" class="block text-sm font-medium text-gray-700">Préfixe Bons de Commande</label>
+                        <div class="mt-2 relative rounded-md shadow-sm">
+                            <input type="text" name="bc_prefix" id="bc_prefix"
+                                   value="{{ company.bc_prefix if company else 'BC' }}"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all sm:text-sm">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Préfixe utilisé pour la génération des numéros (ex: BC-2024-001)</p>
+                    </div>
+
+                    {% if company %}
+                    <div class="flex items-center pt-8">
+                        <div class="relative flex items-start">
+                            <div class="flex h-6 items-center">
+                                <input type="checkbox" name="is_active" id="is_active"
+                                       {% if company.is_active %}checked{% endif %}
+                                       class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-600">
+                            </div>
+                            <div class="ml-3 text-sm leading-6">
+                                <label for="is_active" class="font-medium text-gray-900">Société active</label>
+                                <p class="text-gray-500">Désactiver pour empêcher l'accès aux utilisateurs de cette société.</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
             
-            {% if company %}
-            <div class="flex items-center">
-                <input type="checkbox" name="is_active" id="is_active" 
-                       {% if company.is_active %}checked{% endif %}
-                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <label for="is_active" class="ml-2 block text-sm text-gray-700">Société active</label>
-            </div>
-            {% endif %}
-            
-            <div class="flex justify-end space-x-4 pt-4">
-                <a href="{{ url_for('admin.companies') }}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+            <div class="flex justify-end space-x-4 pt-6 border-t mt-8">
+                <a href="{{ url_for('admin.companies') }}" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">
                     Annuler
                 </a>
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-save mr-2"></i> {{ 'Enregistrer' if company else 'Créer' }}
+                <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg font-medium transition-all transform hover:-translate-y-0.5">
+                    <i class="fas fa-save mr-2"></i> {{ 'Enregistrer les modifications' if company else 'Créer la société' }}
                 </button>
             </div>
         </form>
