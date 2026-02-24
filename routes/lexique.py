@@ -1,3 +1,10 @@
+# /* * Nom de l'application : BTP Commande
+#  * Description : Gestion du dictionnaire BTP
+#  * Produit de : MOA Digital Agency, www.myoneart.com
+#  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+#  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+#  */
+
 import io
 import csv
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app

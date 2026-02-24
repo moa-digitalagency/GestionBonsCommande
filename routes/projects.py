@@ -1,3 +1,10 @@
+# /* * Nom de l'application : BTP Commande
+#  * Description : Gestion des chantiers
+#  * Produit de : MOA Digital Agency, www.myoneart.com
+#  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+#  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+#  */
+
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_required
 from models import db
