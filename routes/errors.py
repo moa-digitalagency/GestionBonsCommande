@@ -1,3 +1,10 @@
+# /* * Nom de l'application : BTP Commande
+#  * Description : Gestion des erreurs et pages d'erreur
+#  * Produit de : MOA Digital Agency, www.myoneart.com
+#  * Fait par : Aisance KALONJI, www.aisancekalonji.com
+#  * Auditer par : La CyberConfiance, www.cyberconfiance.com
+#  */
+
 from flask import Blueprint, render_template, abort
 from config.settings import Config
 
