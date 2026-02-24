@@ -19,6 +19,8 @@
     {% endif %}
     {% if settings and settings.favicon_url %}
     <link rel="icon" href="{{ url_for('static', filename=settings.favicon_url) }}">
+    {% else %}
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
     {% endif %}
 
     <!-- Theme Settings Meta -->
